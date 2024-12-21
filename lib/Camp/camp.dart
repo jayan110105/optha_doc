@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Camp/camp_dashboard.dart';
 import 'package:opthadoc/Camp/camp_registration.dart';
+import 'package:opthadoc/Camp/camp_eye_checkup.dart';
 
 
 class Camp extends StatefulWidget {
@@ -16,6 +17,7 @@ class _CampState extends State<Camp> {
   final pages = [
     const CampDashboard(),
     const CampRegistration(),
+    const CampEyeCheckup(),
   ];
 
   void _onItemTapped(int index) {

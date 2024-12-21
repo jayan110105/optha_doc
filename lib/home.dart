@@ -130,7 +130,7 @@ class _ActionButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF163352),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40),
+              borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.all(15),
           ),

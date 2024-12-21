@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/CustomTextArea.dart';
+import 'package:opthadoc/Components/StretchedIconButton.dart';
 
 class CampRegistration extends StatefulWidget {
   const CampRegistration({super.key});
@@ -78,14 +79,14 @@ class _CampRegistrationState extends State<CampRegistration> {
           children: [
             CircleAvatar(
               radius: 80,
-              backgroundColor: Color(0xFF163351).withOpacity(0.1),
+              backgroundColor: Color(0xFF163351).withValues(alpha: 0.1),
               backgroundImage: formData["photo"] != null
                   ? FileImage(formData["photo"] as File)
                   : null,
               child: formData["photo"] == null
                   ? Icon(
                 Icons.camera_alt,
-                color: Color(0xFF163351).withOpacity(0.4),
+                color: Color(0xFF163351).withValues(alpha: 0.4),
                 size: 50,
               )
                   : null,
@@ -116,28 +117,13 @@ class _CampRegistrationState extends State<CampRegistration> {
             onChanged: (value) => updateForm("age", value),
           ),
           SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity, // Makes the button stretch across the container
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF163351),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onPressed: scanAadhar,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center, // Centers the content
-                children: [
-                  Icon(Icons.qr_code_scanner, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text("Scan Aadhar"),
-                ],
-              ),
-            ),
-          )
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            textColor: Colors.white,
+            icon: Icons.qr_code_scanner,
+            label: "Scan Aadhar",
+            onPressed: scanAadhar, // Replace with your onPressed function
+          ),
         ],
       ),
       // Step 3: Gender
@@ -293,10 +279,10 @@ class _CampRegistrationState extends State<CampRegistration> {
                                 CircleAvatar(
                                   radius: 20,
                                   backgroundColor:
-                                  step >= index ? Color(0xFF163351) : Colors.grey[300],
+                                  step >= index ? Color(0xFF163351) : Color(0xFF163351).withValues(alpha: 0.1),
                                   child: Icon(
                                     step > index ? Icons.check_circle : s["icon"],
-                                    color: step >= index ? Colors.white : Colors.grey[600],
+                                    color: step >= index ? Colors.white : Color(0xFF163351).withValues(alpha: 0.4),
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -321,7 +307,7 @@ class _CampRegistrationState extends State<CampRegistration> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: .1),
                                 blurRadius: 10,
                                 spreadRadius: 2,
                                 offset: const Offset(0, 4),
