@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/StretchedIconButton.dart';
+import 'package:opthadoc/Components/VisionMeasurement.dart';
 
 class CampEyeCheckup extends StatefulWidget {
   const CampEyeCheckup({super.key});
@@ -50,190 +51,6 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
 
   void nextStep() => setState(() => step = (step + 1).clamp(0, steps.length - 1));
   void prevStep() => setState(() => step = (step - 1).clamp(0, steps.length - 1));
-
-  Widget visionMeasurements(String prefix) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ...["left", "right"].map((eye) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10), // Add spacing between rows
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Eye Indicator
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Color(0xFF163351),
-                    child: Text(
-                      eye == "left" ? "L" : "R",
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    eye == "left" ? "Left Eye" : "Right Eye",
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Distance Vision",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF163351).withValues(alpha: 0.6),
-                    fontSize: 16
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Sphere and Cylinder in one row
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildDropdown("${prefix}.${eye}.sphere", "Sphere", [-10, 10]),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildDropdown("${prefix}.${eye}.cylinder", "Cylinder", [-10, 10]),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Axis and Visual Acuity in one row
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildNumberField("${prefix}.${eye}.axis", "Axis", 0, 180),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _buildDropdown("${prefix}.${eye}.va", "Visual Acuity", ["6/6", "6/9", "6/12", "6/18"]),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-        SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Checkbox(
-              visualDensity: VisualDensity.compact,
-              value: isChecked,
-              onChanged: (bool? value) {
-                setState(() {
-                  isChecked = value!;
-                });
-              },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4), // Rounded corners
-              ),
-              activeColor: Color(0xFF163351), // Background color when checked
-              checkColor: Colors.white, // Color of the checkmark
-              side: BorderSide(
-                color: Color(0xFF163351), // Border color
-                width: 2, // Border width
-              ),
-            ),
-            const SizedBox(width: 4),
-            Label(text: "Near Vision Required")
-          ],
-        ),
-        SizedBox(height: 16),
-        Label(text: "IPD Value"),
-        SizedBox(height: 8,),
-        InputField(hintText: "Enter IPD value")
-     ]
-    );
-  }
-
-  Widget _buildDropdown(String key, String label, dynamic items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Label(text: label),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8), // Matches "rounded-md"
-            border: Border.all(
-              color: const Color(0xFFE0E0E0), // Matches "border-input"
-            ),
-          ),
-          child: DropdownButton<String>(
-            value: formData[key],
-            isExpanded: true,
-            icon: const Icon(Icons.keyboard_arrow_down, size: 24, color: Colors.grey),
-            hint: Text(
-              "Select",
-              style: const TextStyle(color: Colors.grey, fontSize: 14), // Matches placeholder text style
-            ),
-            style: const TextStyle(color: Colors.black, fontSize: 14),
-            underline: Container(),
-            items: (items as List)
-                .map((item) => DropdownMenuItem(
-              value: item.toString(),
-              child: Text(item.toString()),
-            ))
-                .toList(),
-            onChanged: (value) => updateForm(key, value),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAxisWheel(int value, Function(int) onSelectedItemChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 50,
-          child: ListWheelScrollView.useDelegate(
-            magnification: 1.05,
-            diameterRatio: 1.2,
-            overAndUnderCenterOpacity: 0.4,
-            useMagnifier: true,
-            itemExtent: 20,
-            onSelectedItemChanged: onSelectedItemChanged,
-            childDelegate: ListWheelChildBuilderDelegate(
-              builder: (context, index) {
-                return Container(
-                  width: double.infinity,
-                  color: Color(0xFF163351).withOpacity(0.1),
-                  child: Center(
-                    child: Text(
-                      '${(index * 5).toString()} °',
-                      style: TextStyle(
-                        color: Color(0xFF163351).withOpacity(0.8),
-                      ),
-                    ),
-                  ),
-                );
-              },
-              childCount: 37,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNumberField(String key, String label, int min, int max) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Label(text: label),
-        _buildAxisWheel(formData[key]??0, (value) => updateForm(key, value)),
-      ],
-    );
-  }
 
   Widget buildProgressSteps() {
     return Row(
@@ -284,9 +101,33 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
         ],
       ),
       // Step 1: Without Glasses
-      visionMeasurements("withoutGlasses"),
+      VisionMeasurements(
+        prefix: "withoutGlasses",
+        isChecked: false,
+        onCheckboxChanged: (value) {
+          print("Checkbox changed: $value");
+        },
+        formData: formData,
+        updateForm: (key, value) {
+          setState(() {
+            formData[key] = value;
+          });
+        },
+      ),
       // Step 2: With Glasses
-      visionMeasurements("withGlasses"),
+      VisionMeasurements(
+        prefix: "withGlasses",
+        isChecked: false,
+        onCheckboxChanged: (value) {
+          print("Checkbox changed: $value");
+        },
+        formData: formData,
+        updateForm: (key, value) {
+          setState(() {
+            formData[key] = value;
+          });
+        },
+      ),
       // Step 3: Additional Info
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
