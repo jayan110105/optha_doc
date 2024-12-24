@@ -6,6 +6,7 @@ class InputField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final TextInputType keyboardType;
   final bool isEnabled;
+  final Icon? prefixIcon; // Optional prefix icon
 
   const InputField({
     super.key,
@@ -14,6 +15,7 @@ class InputField extends StatelessWidget {
     this.onChanged,
     this.keyboardType = TextInputType.text,
     this.isEnabled = true,
+    this.prefixIcon, // Optional prefix icon
   });
 
   @override
@@ -28,6 +30,11 @@ class InputField extends StatelessWidget {
         hintStyle: TextStyle(
           fontSize: 14, // Matches "text-sm"
           color: Colors.grey[400], // Matches "text-muted-foreground"
+        ),
+        prefixIcon: prefixIcon, // Adds the optional prefix icon
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 36, // Matches design spacing
+          minHeight: 36,
         ),
         filled: true,
         fillColor: const Color(0xFFF9F9F9), // Matches background color

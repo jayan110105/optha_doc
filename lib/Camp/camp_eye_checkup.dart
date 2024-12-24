@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:opthadoc/Components/CustomDropdown.dart';
+import 'package:opthadoc/Components/CustomTextArea.dart';
 import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/StretchedIconButton.dart';
@@ -132,25 +134,56 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextField(
-            onChanged: (value) => updateForm("complaint", value),
-            decoration: InputDecoration(labelText: "Brief Complaint"),
-          ),
-          SizedBox(height: 10),
-          TextField(
-            onChanged: (value) => updateForm("ipd", value),
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: "IPD Value"),
-          ),
           Row(
             children: [
-              Checkbox(
-                value: formData["nearVision"],
-                onChanged: (value) => updateForm("nearVision", value),
-              ),
-              Text("Near Vision Required"),
+              const Icon(Icons.search, size: 20, color: Color(0xFF163351)),
+              const SizedBox(width: 8),
+              Label(text: "Bifocal")
             ],
           ),
+          SizedBox(height: 8),
+          CustomDropdown(
+              keyName: "Bifocal",
+              items: [],
+              onChanged: (value) => updateForm("bifocal", value)
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              const Icon(Icons.color_lens, size: 20, color: Color(0xFF163351)),
+              const SizedBox(width: 8),
+              Label(text: "Color")
+            ],
+          ),
+          SizedBox(height: 8),
+          CustomDropdown(
+              keyName: "Bifocal",
+              items: [],
+              onChanged: (value) => updateForm("bifocal", value)
+          ),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              const Icon(Icons.chat_bubble, size: 20, color: Color(0xFF163351)),
+              const SizedBox(width: 8),
+              Label(text: "Remarks")
+            ],
+          ),
+          SizedBox(height: 8),
+          CustomDropdown(
+              keyName: "Bifocal",
+              items: [],
+              onChanged: (value) => updateForm("bifocal", value)
+          ),
+          SizedBox(height: 16),
+          Label(text: "Brief Complaint"),
+          SizedBox(height: 8),
+          CustomTextArea(
+              hintText: "Enter patient's complaint",
+              isEnabled: true,
+              minLines: 3,
+              maxLines: null,
+          )
         ],
       ),
     ];

@@ -5,10 +5,10 @@ class Label extends StatelessWidget {
   final TextStyle? style;
 
   const Label({
-    Key? key,
+    super.key,
     required this.text,
     this.style,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
