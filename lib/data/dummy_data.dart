@@ -29,6 +29,9 @@ final List<Map<String, dynamic>> records = [
     "sphere": {"left": "null6.0", "right": "nullnull"},
     "complaint": "bad",
     "createdAt": DateTime.parse("2024-10-09T11:29:00"),
+    "bifocal": "Yes",
+    "color": "Brown",
+    "remarks": "Patient is doing well.",
   },
   {
     "id": "2",
@@ -58,6 +61,9 @@ final List<Map<String, dynamic>> records = [
     "sphere": {"left": "-2.5", "right": "-2.0"},
     "complaint": "blurred vision",
     "createdAt": DateTime.parse("2024-10-04T21:53:00"),
+    "bifocal": "No",
+    "color": "Blue",
+    "remarks": "Needs follow-up.",
   },
 ];
 
