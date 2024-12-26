@@ -5,12 +5,14 @@ class ProgressSteps extends StatefulWidget {
   final List<Map<String, dynamic>> steps;
   final int currentStep;
   final ValueChanged<int> onStepTapped;
+  final bool allowStepTap;
 
   const ProgressSteps({
     super.key,
     required this.steps,
     required this.currentStep,
     required this.onStepTapped,
+    this.allowStepTap = true,
   });
 
   @override
@@ -27,7 +29,9 @@ class _ProgressStepsState extends State<ProgressSteps> {
       children: widget.steps.map((step) {
         int index = widget.steps.indexOf(step);
         return GestureDetector(
-          onTap: () => widget.onStepTapped(index),
+          onTap: widget.allowStepTap
+              ? () => widget.onStepTapped(index) // Allow tapping if enabled
+              : null,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

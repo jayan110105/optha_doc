@@ -7,6 +7,8 @@ import 'package:opthadoc/Components/StretchedIconButton.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:opthadoc/Components/ErrorSnackBar.dart';
+import 'package:opthadoc/utils/ocr_helper.dart';
 
 extension StringExtension on String {
   String capitalize() {
@@ -45,6 +47,19 @@ class _CampRegistrationState extends State<CampRegistration> {
     "complaint": TextEditingController(),
   };
 
+  void showCustomSnackBar(BuildContext context, String title, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        content: ErrorSnackBar(
+          title: title,
+          message: message,
+        ),
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -69,8 +84,10 @@ class _CampRegistrationState extends State<CampRegistration> {
   }
 
   void nextStep() {
-    if (!validateStepFields(step)) return; // Validate current step fields
-    if (step < steps.length - 1) {
+    // if (!validateStepFields(step)) return;
+    if(step == steps.length - 1)// Validate current step fields
+      print("Submit");
+    else if (step < steps.length - 1) {
       setState(() {
         step++;
       });
@@ -83,8 +100,10 @@ class _CampRegistrationState extends State<CampRegistration> {
     switch (currentStep) {
       case 0: // Step 1: Photo
         if (_image == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please upload a photo.")),
+          showCustomSnackBar(
+            context,
+            "Photo is required",
+            "Please upload a photo to proceed.",
           );
           return false;
         }
@@ -108,8 +127,10 @@ class _CampRegistrationState extends State<CampRegistration> {
 
     for (var field in requiredFields) {
       if (controllers[field]?.text.isEmpty ?? true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("${field.capitalize()} cannot be empty.")),
+        showCustomSnackBar(
+          context,
+          "${field.capitalize()} is required",
+          "Please enter the ${field.replaceAll('_', ' ')} to proceed.",
         );
         return false;
       }
@@ -126,16 +147,18 @@ class _CampRegistrationState extends State<CampRegistration> {
     }
   }
 
-  void scanAadhar() {
-    Future.delayed(Duration(seconds: 2), () {
+  Future<void> scanAadhar() async {
+    File? imageFile = await getImage();
+    if (imageFile != null) {
+      String text = await performOCR(imageFile);
+      Map<String, String> extractedData = preprocessAadhaarText(text);
       setState(() {
-        controllers["name"]?.text = "John Doe";
-        controllers["age"]?.text = "30";
-        controllers["gender"]?.text = "Male";
-        controllers["aadhar"]?.text = "1234 5678 9012";
-        controllers["address"]?.text = "123 Main St, City, State, PIN: 123456";
+        controllers["name"]?.text = extractedData['name'] ?? '';
+        controllers["age"]?.text = extractedData['age'] ?? '';
+        controllers["gender"]?.text = extractedData['gender'] ?? '';
+        controllers["aadhar"]?.text = extractedData['aadhar'] ?? '';
       });
-    });
+    }
   }
 
   @override
@@ -351,6 +374,7 @@ class _CampRegistrationState extends State<CampRegistration> {
                         ProgressSteps(
                           steps: steps,
                           currentStep: step,
+                          allowStepTap: false,
                           onStepTapped: (index) {
                             setState(() {
                               step = index;
@@ -395,8 +419,7 @@ class _CampRegistrationState extends State<CampRegistration> {
                                   borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
                                 ),
                               ),
-                              onPressed:
-                              step == steps.length - 1 ? () => print("") : nextStep,
+                              onPressed: nextStep,
                               child: Row(
                                 children: [
                                   Text(step == steps.length - 1 ? "Submit" : "Continue"),
