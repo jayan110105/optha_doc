@@ -26,11 +26,12 @@ class _CampRecordsState extends State<CampRecords> {
   String searchQuery = "";
   Map<String, dynamic>? selectedRecord;
   int step = 0;
+  bool isEditing = false;
 
   List<Widget> getStepWidgets() {
     return [
-      PatientDetailsCard(selectedRecord: selectedRecord),
-      WithoutAidCard(selectedRecord: selectedRecord),
+      PatientDetailsCard(selectedRecord: selectedRecord, isEditing: isEditing,),
+      WithoutAidCard(selectedRecord: selectedRecord,  isEditing: isEditing,),
       WithAidCard(selectedRecord: selectedRecord),
       WithCorrectionCard(selectedRecord: selectedRecord),
       AdditionalInfoCard(selectedRecord: selectedRecord),
@@ -158,7 +159,7 @@ class _CampRecordsState extends State<CampRecords> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          // Define your onTap functionality here
+                          setState(() => isEditing = !isEditing);
                         },
                         child: Container(
                           height: 40.0,

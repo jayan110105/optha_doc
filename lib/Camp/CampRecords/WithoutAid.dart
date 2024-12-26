@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:opthadoc/Components/CustomDropdown.dart';
 
-class WithoutAidCard extends StatelessWidget {
+class WithoutAidCard extends StatefulWidget {
   final Map<String, dynamic>? selectedRecord;
+  final bool isEditing;
 
-  const WithoutAidCard({super.key, this.selectedRecord});
+  const WithoutAidCard({super.key, this.selectedRecord, required this.isEditing});
 
-  Widget _buildEyeSection(String eye, String distanceVision) {
+  @override
+  State<WithoutAidCard> createState() => _WithoutAidCardState();
+}
+
+class _WithoutAidCardState extends State<WithoutAidCard> {
+  void updateRecord(String key, Map<String, String> value) {
+    setState(() {
+      widget.selectedRecord?[key] = value;
+    });
+  }
+
+  Widget _buildEyeSection(String eye) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -14,13 +27,13 @@ class WithoutAidCard extends StatelessWidget {
           children: [
             Icon(
               Icons.visibility,
-              color: Color(0xFF163351),
+              color: const Color(0xFF163351),
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               "$eye Eye",
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF163351),
@@ -30,36 +43,56 @@ class WithoutAidCard extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         // Vision Details Container
-        SizedBox(
+        Container(
           width: double.infinity,
-          child: Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Color(0xFF163351).withValues(alpha: .05),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Distance Vision",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF163351).withValues(alpha: .6),
-                    fontWeight: FontWeight.w500,
-                  ),
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: const Color(0xFF163351).withValues(alpha: .05),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Distance Vision",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF163351),
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  distanceVision,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF163351),
-                  ),
+              ),
+              const SizedBox(height: 4),
+              widget.isEditing
+                  ? CustomDropdown(
+                textStyle: TextStyle(
+                  color: Color(0xFF163351),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold
                 ),
-              ],
-            ),
+                keyName: '$eye Eye',
+                items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60"],
+                selectedValue: widget.selectedRecord?['withoutAid']?[eye.toLowerCase()],
+                onChanged: (value) {
+                  if (value != null) {
+                    updateRecord(
+                      'withoutAid',
+                      {
+                        ...?widget.selectedRecord?['withoutAid'],
+                        eye.toLowerCase(): value
+                      },
+                    );
+                  }
+                },
+              )
+                  : Text(
+                widget.selectedRecord?['withoutAid']?[eye.toLowerCase()] ?? '-',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF163351),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -92,24 +125,10 @@ class WithoutAidCard extends StatelessWidget {
               ),
             ],
           ),
-          // Card Content
           const SizedBox(height: 24),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Left Eye Details
-              _buildEyeSection(
-                "Left",
-                selectedRecord?['withoutAid']['left'] ?? "-",
-              ),
-              const SizedBox(height: 24.0), // Space between Left and Right Eye
-              // Right Eye Details
-              _buildEyeSection(
-                "Right",
-                selectedRecord?['withoutAid']['right'] ?? "-",
-              ),
-            ],
-          ),
+          _buildEyeSection("Left"),
+          const SizedBox(height: 24),
+          _buildEyeSection("Right"),
         ],
       ),
     );
