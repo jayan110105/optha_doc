@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CustomDropdown.dart';
 
-class WithoutAidCard extends StatefulWidget {
+class EditWithoutAidCard extends StatefulWidget {
   final Map<String, dynamic>? selectedRecord;
 
-  const WithoutAidCard({super.key, this.selectedRecord});
+  const EditWithoutAidCard({super.key, this.selectedRecord});
 
   @override
-  State<WithoutAidCard> createState() => _WithoutAidCardState();
+  State<EditWithoutAidCard> createState() => _WithoutAidCardState();
 }
 
-class _WithoutAidCardState extends State<WithoutAidCard> {
+class _WithoutAidCardState extends State<EditWithoutAidCard> {
   void updateRecord(String key, Map<String, String> value) {
     setState(() {
       widget.selectedRecord?[key] = value;
@@ -61,13 +61,26 @@ class _WithoutAidCardState extends State<WithoutAidCard> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                widget.selectedRecord?['withoutAid']?[eye.toLowerCase()] ?? '-',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              CustomDropdown(
+                textStyle: TextStyle(
                   color: Color(0xFF163351),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold
                 ),
+                keyName: '$eye Eye',
+                items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60"],
+                selectedValue: widget.selectedRecord?['withoutAid']?[eye.toLowerCase()],
+                onChanged: (value) {
+                  if (value != null) {
+                    updateRecord(
+                      'withoutAid',
+                      {
+                        ...?widget.selectedRecord?['withoutAid'],
+                        eye.toLowerCase(): value
+                      },
+                    );
+                  }
+                },
               ),
             ],
           ),

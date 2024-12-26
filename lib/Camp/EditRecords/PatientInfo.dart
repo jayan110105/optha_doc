@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class PatientDetailsCard extends StatefulWidget {
+class EditPatientDetailsCard extends StatefulWidget {
   final Map<String, dynamic>? selectedRecord;
 
-  const PatientDetailsCard({
+  const EditPatientDetailsCard({
     super.key,
     this.selectedRecord,
   });
 
   @override
-  State<PatientDetailsCard> createState() => _PatientDetailsCardState();
+  State<EditPatientDetailsCard> createState() => _PatientDetailsCardState();
 }
 
-class _PatientDetailsCardState extends State<PatientDetailsCard> {
+class _PatientDetailsCardState extends State<EditPatientDetailsCard> {
   late TextEditingController nameController;
   late TextEditingController ageController;
 
@@ -103,14 +103,15 @@ class _PatientDetailsCardState extends State<PatientDetailsCard> {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            widget.selectedRecord?['name'] ?? '',
-            style: const TextStyle(
+          buildInputField(
+            controller: nameController,
+            hint: 'Enter name',
+            inputType: TextInputType.text,
+            textStyle: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Color(0xFF163351),
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           Column(
@@ -130,9 +131,12 @@ class _PatientDetailsCardState extends State<PatientDetailsCard> {
                             color: Color(0xFF163351).withValues(alpha: .6),
                           ),
                         ),
-                        Text(
-                          '${widget.selectedRecord?['age']}',
-                          style: TextStyle(
+                        buildInputField(
+                          controller: ageController,
+                          hint: 'Enter age',
+                          inputType: TextInputType.number,
+                          width: 60,
+                          textStyle: TextStyle(
                             fontSize: 14,
                             color: Color(0xFF163351).withValues(alpha: .6),
                           ),

@@ -10,6 +10,11 @@ import 'package:opthadoc/Camp/CampRecords/WithoutAid.dart';
 import 'package:opthadoc/Camp/CampRecords/WithAid.dart';
 import 'package:opthadoc/Camp/CampRecords/WithCorrection.dart';
 import 'package:opthadoc/Camp/CampRecords/AdditionalInfo.dart';
+import 'package:opthadoc/Camp/EditRecords/PatientInfo.dart';
+import 'package:opthadoc/Camp/EditRecords/WithoutAid.dart';
+import 'package:opthadoc/Camp/EditRecords/WithAid.dart';
+import 'package:opthadoc/Camp/EditRecords/WithCorrection.dart';
+import 'package:opthadoc/Camp/EditRecords/AdditionalInfo.dart';
 
 class CampRecords extends StatefulWidget {
   const CampRecords({super.key});
@@ -28,13 +33,23 @@ class _CampRecordsState extends State<CampRecords> {
   int step = 0;
   bool isEditing = false;
 
-  List<Widget> getStepWidgets() {
+  List<Widget> getViewStepWidgets() {
     return [
-      PatientDetailsCard(selectedRecord: selectedRecord, isEditing: isEditing,),
-      WithoutAidCard(selectedRecord: selectedRecord,  isEditing: isEditing,),
+      PatientDetailsCard(selectedRecord: selectedRecord,),
+      WithoutAidCard(selectedRecord: selectedRecord,),
       WithAidCard(selectedRecord: selectedRecord),
       WithCorrectionCard(selectedRecord: selectedRecord),
       AdditionalInfoCard(selectedRecord: selectedRecord),
+    ];
+  }
+
+  List<Widget> getEditStepWidgets() {
+    return [
+      EditPatientDetailsCard(selectedRecord: selectedRecord),
+      EditWithoutAidCard(selectedRecord: selectedRecord),
+      EditWithAidCard(selectedRecord: selectedRecord),
+      EditWithCorrectionCard(selectedRecord: selectedRecord),
+      EditAdditionalInfoCard(selectedRecord: selectedRecord),
     ];
   }
 
@@ -49,76 +64,76 @@ class _CampRecordsState extends State<CampRecords> {
       backgroundColor: Color(0xFFE9E6DB),
       body: selectedRecord == null
           ? Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Text(
-                  "Camp Registration",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF163351),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Register a new patient for the eye camp",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF163351).withValues(alpha: 0.6),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                CardComponent(
-                    child: InputField(
-                        hintText: "Search by name or ID...",
-                        onChanged: (value) {
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "Camp Registration",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF163351),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Register a new patient for the eye camp",
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF163351).withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 20),
+            CardComponent(
+                child: InputField(
+                    hintText: "Search by name or ID...",
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[400])
+                )
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredRecords.length,
+                itemBuilder: (context, index) {
+                  final record = filteredRecords[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: CardComponent(
+                      boxShadow: [],
+                      padding: EdgeInsets.zero,
+                      child: ListTile(
+                        onTap: () {
                           setState(() {
-                            searchQuery = value;
+                            selectedRecord = record;
                           });
                         },
-                        prefixIcon: Icon(Icons.search, color: Colors.grey[400])
-                    )
-                ),
-                SizedBox(height: 20),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredRecords.length,
-                    itemBuilder: (context, index) {
-                      final record = filteredRecords[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: CardComponent(
-                          boxShadow: [],
-                          padding: EdgeInsets.zero,
-                          child: ListTile(
-                            onTap: () {
-                              setState(() {
-                                selectedRecord = record;
-                              });
-                            },
-                            leading: CircleAvatar(
-                              backgroundColor: Color(0xFF163351),
-                              foregroundColor: Colors.white,
-                              child: Text(record["name"][0]),
-                            ),
-                            title: Text(record["name"],
-                                style: TextStyle(color: Color(0xFF163351), fontWeight: FontWeight.bold)),
-                            subtitle: Text(
-                              "ID: ${record["patientId"]} • ${DateFormat('MMM d, yyyy').format(record["createdAt"])}",
-                              style: TextStyle(color: Color(0xFF163351).withValues(alpha: 0.6)),
-                            ),
-                            trailing: Icon(Icons.chevron_right,
-                                color: Color(0xFF163351).withValues(alpha: 0.6)),
-                          ),
+                        leading: CircleAvatar(
+                          backgroundColor: Color(0xFF163351),
+                          foregroundColor: Colors.white,
+                          child: Text(record["name"][0]),
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+                        title: Text(record["name"],
+                            style: TextStyle(color: Color(0xFF163351), fontWeight: FontWeight.bold)),
+                        subtitle: Text(
+                          "ID: ${record["patientId"]} • ${DateFormat('MMM d, yyyy').format(record["createdAt"])}",
+                          style: TextStyle(color: Color(0xFF163351).withValues(alpha: 0.6)),
+                        ),
+                        trailing: Icon(Icons.chevron_right,
+                            color: Color(0xFF163351).withValues(alpha: 0.6)),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          )
+          ],
+        ),
+      )
           : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -210,29 +225,29 @@ class _CampRecordsState extends State<CampRecords> {
               ),
               SizedBox(height: 20),
               ProgressSteps(
-                  steps: steps,
-                  currentStep: step,
-                  onStepTapped: (index) {
-                    setState(() {
-                      step = index;
-                    });
-                  },
+                steps: steps,
+                currentStep: step,
+                onStepTapped: (index) {
+                  setState(() {
+                    step = index;
+                  });
+                },
               ),
               SizedBox(height: 20),
               CardComponent(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color(0xFF163351).withValues(alpha: 0.1),
-                            width: 1.5,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFF163351).withValues(alpha: 0.1),
+                          width: 1.5,
                         ),
-                        child: getStepWidgets()[step])
-                    ,
-                  ),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: isEditing? getEditStepWidgets()[step]: getViewStepWidgets()[step])
+                  ,
+                ),
               ),
               SizedBox(height: 24),
               Row(
