@@ -4,6 +4,17 @@ import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/CustomTextArea.dart';
 import 'package:opthadoc/Components/StretchedIconButton.dart';
+import 'package:opthadoc/Components/ProgressStep.dart';
+import 'package:opthadoc/Components/CardComponent.dart';
+import 'package:image_picker/image_picker.dart';
+
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return '${this[0].toUpperCase()}${substring(1)}';
+  }
+}
+
 
 class CampRegistration extends StatefulWidget {
   const CampRegistration({super.key});
@@ -14,6 +25,7 @@ class CampRegistration extends StatefulWidget {
 
 class _CampRegistrationState extends State<CampRegistration> {
   int step = 0;
+  File? _image;
 
   final List<Map<String, dynamic>> steps = [
     {"id": "photo", "title": "Photo", "icon": Icons.camera_alt},
@@ -22,30 +34,88 @@ class _CampRegistrationState extends State<CampRegistration> {
     {"id": "details", "title": "Details", "icon": Icons.description},
   ];
 
-  final formData = {
-    "photo": null,
-    "name": "",
-    "age": "",
-    "gender": "",
-    "aadhar": "",
-    "parent": "",
-    "phone": "",
-    "address": "",
-    "complaint": "",
+  final Map<String, TextEditingController> controllers = {
+    "name": TextEditingController(),
+    "age": TextEditingController(),
+    "gender": TextEditingController(),
+    "aadhar": TextEditingController(),
+    "parent": TextEditingController(),
+    "phone": TextEditingController(),
+    "address": TextEditingController(),
+    "complaint": TextEditingController(),
   };
 
-  void updateForm(String key, dynamic value) {
-    setState(() {
-      formData[key] = value;
-    });
+
+  @override
+  void dispose() {
+    // Dispose all controllers to free memory
+    for (var controller in controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  // Check if all required fields are filled
+
+
+  Future<File?> getImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera); // or ImageSource.gallery
+
+    if (pickedFile != null) {
+      return File(pickedFile.path);
+    }
+    return null;
   }
 
   void nextStep() {
+    if (!validateStepFields(step)) return; // Validate current step fields
     if (step < steps.length - 1) {
       setState(() {
         step++;
       });
     }
+  }
+
+  bool validateStepFields(int currentStep) {
+    List<String> requiredFields;
+
+    switch (currentStep) {
+      case 0: // Step 1: Photo
+        if (_image == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Please upload a photo.")),
+          );
+          return false;
+        }
+        return true;
+
+      case 1: // Step 2: Basic Info
+        requiredFields = ["name", "age"];
+        break;
+
+      case 2: // Step 3: Gender
+        requiredFields = ["gender"];
+        break;
+
+      case 3: // Step 4: Details
+        requiredFields = ["aadhar", "parent", "phone", "address", "complaint"];
+        break;
+
+      default:
+        return true; // No validation needed for undefined steps
+    }
+
+    for (var field in requiredFields) {
+      if (controllers[field]?.text.isEmpty ?? true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("${field.capitalize()} cannot be empty.")),
+        );
+        return false;
+      }
+    }
+
+    return true; // All fields for the current step are valid
   }
 
   void prevStep() {
@@ -59,12 +129,11 @@ class _CampRegistrationState extends State<CampRegistration> {
   void scanAadhar() {
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
-        formData["name"] = "John Doe";
-        formData["age"] = "30";
-        formData["gender"] = "Male";
-        formData["aadhar"] = "1234 5678 9012";
-        formData["address"] = "123 Main St, City, State, PIN: 123456";
-        step = 2;
+        controllers["name"]?.text = "John Doe";
+        controllers["age"]?.text = "30";
+        controllers["gender"]?.text = "Male";
+        controllers["aadhar"]?.text = "1234 5678 9012";
+        controllers["address"]?.text = "123 Main St, City, State, PIN: 123456";
       });
     });
   }
@@ -77,19 +146,27 @@ class _CampRegistrationState extends State<CampRegistration> {
       Center(
         child: Column(
           children: [
-            CircleAvatar(
-              radius: 80,
-              backgroundColor: Color(0xFF163351).withValues(alpha: 0.1),
-              backgroundImage: formData["photo"] != null
-                  ? FileImage(formData["photo"] as File)
-                  : null,
-              child: formData["photo"] == null
-                  ? Icon(
-                Icons.camera_alt,
-                color: Color(0xFF163351).withValues(alpha: 0.4),
-                size: 50,
-              )
-                  : null,
+            GestureDetector(
+              onTap: () async {
+                File? imageFile = await getImage();
+                if (imageFile != null) {
+                  setState(() {
+                    _image = imageFile;
+                  });
+                }
+              },
+              child: CircleAvatar(
+                radius: 80,
+                backgroundColor: Color(0xFF163351).withValues(alpha: 0.1),
+                backgroundImage: _image != null ? FileImage(_image!) : null,
+                child: _image == null
+                    ? Icon(
+                  Icons.camera_alt,
+                  color: Color(0xFF163351).withValues(alpha: 0.4),
+                  size: 50,
+                )
+                    : null,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
@@ -106,15 +183,15 @@ class _CampRegistrationState extends State<CampRegistration> {
           Label(text: "Patient Name"),
           const SizedBox(height: 8),
           InputField(
+            controller: controllers["name"],
             hintText: "Enter patient name",
-            onChanged: (value) => updateForm("name", value),
           ),
           const SizedBox(height: 16),
           Label(text: "Age"),
           const SizedBox(height: 8),
           InputField(
+            controller: controllers["age"],
             hintText: "Enter age",
-            onChanged: (value) => updateForm("age", value),
           ),
           SizedBox(height: 24),
           StretchedIconButton(
@@ -145,12 +222,14 @@ class _CampRegistrationState extends State<CampRegistration> {
           }
 
           return GestureDetector(
-            onTap: () => updateForm("gender", gender),
+            onTap: () => setState(() {
+              controllers["gender"]!.text = gender;
+            }),
             child: Container(
               width: 90, // Fixed width for each item
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: formData["gender"] == gender
+                color: controllers["gender"]!.text == gender
                     ? const Color(0xFF163351)
                     : Colors.grey[200],
                 borderRadius: BorderRadius.circular(8),
@@ -161,18 +240,18 @@ class _CampRegistrationState extends State<CampRegistration> {
                 children: [
                   Icon(
                     genderIcon,
-                    color: formData["gender"] == gender
+                    color: controllers["gender"]!.text == gender
                         ? Colors.grey[200]
-                        : Color(0xFF163351),
+                        : const Color(0xFF163351),
                     size: 30,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     gender,
                     style: TextStyle(
-                      color: formData["gender"] == gender
+                      color: controllers["gender"]!.text == gender
                           ? Colors.grey[200]
-                          : Color(0xFF163351),
+                          : const Color(0xFF163351),
                     ),
                   ),
                 ],
@@ -188,29 +267,29 @@ class _CampRegistrationState extends State<CampRegistration> {
           Label(text: "Aadhar Card Number"),
           SizedBox(height: 8),
           InputField(
-            hintText: "Enter Aadhar number",
-            onChanged: (value) => updateForm("aadhar", value),
+            controller: controllers["aadhar"],
+            hintText: "Enter Aadhaar number",
           ),
           SizedBox(height: 16),
           Label(text: "Parent/Spouse Name"),
           SizedBox(height: 8),
           InputField(
+            controller: controllers["parent"],
             hintText: "Enter parent/spouse name",
-            onChanged: (value) => updateForm("parent", value),
           ),
           SizedBox(height: 16),
           Label(text: "Phone Number"),
           SizedBox(height: 8),
           InputField(
+            controller: controllers["phone"],
             hintText: "Enter phone number",
-            onChanged: (value) => updateForm("phone", value),
           ),
           SizedBox(height: 16),
           Label(text: "Address"),
           SizedBox(height: 8),
           CustomTextArea(
+            controller: controllers["address"],
             hintText: "Enter address",
-            onChanged: (value) => updateForm("address", value),
             isEnabled: true,
             minLines: 5,
             maxLines: null, // Allows unlimited lines
@@ -219,8 +298,8 @@ class _CampRegistrationState extends State<CampRegistration> {
           Label(text: "Chief Complaint"),
           SizedBox(height: 8),
           CustomTextArea(
+            controller: controllers["complaint"],
             hintText: "Enter chief complaint",
-            onChanged: (value) => updateForm("complaint", value),
             isEnabled: true,
             minLines: 5,
             maxLines: null, // Allows unlimited lines
@@ -269,55 +348,21 @@ class _CampRegistrationState extends State<CampRegistration> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        // Use the current step widget
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: steps.map((s) {
-                            int index = steps.indexOf(s);
-                            return Column(
-                              children: [
-                                CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor:
-                                  step >= index ? Color(0xFF163351) : Color(0xFF163351).withValues(alpha: 0.1),
-                                  child: Icon(
-                                    step > index ? Icons.check_circle : s["icon"],
-                                    color: step >= index ? Colors.white : Color(0xFF163351).withValues(alpha: 0.4),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  s["title"],
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: step >= index
-                                        ? Color(0xFF163351)
-                                        : Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
+                        ProgressSteps(
+                          steps: steps,
+                          currentStep: step,
+                          onStepTapped: (index) {
+                            setState(() {
+                              step = index;
+                            });
+                          },
                         ),
                         const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: .1),
-                                blurRadius: 10,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: stepWidgets[step],
-                          ), // Display the current step widget
+                        CardComponent(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: stepWidgets[step],
+                            ),
                         ),
                         SizedBox(height: 24),
                         Row(
@@ -351,7 +396,7 @@ class _CampRegistrationState extends State<CampRegistration> {
                                 ),
                               ),
                               onPressed:
-                              step == steps.length - 1 ? () => print(formData) : nextStep,
+                              step == steps.length - 1 ? () => print("") : nextStep,
                               child: Row(
                                 children: [
                                   Text(step == steps.length - 1 ? "Submit" : "Continue"),

@@ -21,6 +21,10 @@ class InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      style: TextStyle(
+        fontWeight: FontWeight.w500,
+      ),
+      cursorColor: Color(0xFF163351),
       controller: controller,
       onChanged: onChanged,
       keyboardType: keyboardType,
@@ -28,6 +32,7 @@ class InputField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
+          fontWeight: FontWeight.normal,
           fontSize: 14, // Matches "text-sm"
           color: Colors.grey[400], // Matches "text-muted-foreground"
         ),
