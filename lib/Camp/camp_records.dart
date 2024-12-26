@@ -181,18 +181,24 @@ class _CampRecordsState extends State<CampRecords> {
                           width: 40.0,
                           decoration: BoxDecoration(
                             color: Colors.white, // Background color
-                            border: Border.all(color: Color(0xFFd1d5db)), // Matches 'border-input'
+                            border: Border.all(color: const Color(0xFFd1d5db)), // Matches 'border-input'
                             borderRadius: BorderRadius.circular(8.0), // Rounded corners
                           ),
                           child: Center(
-                            child: SvgPicture.asset(
-                              'assets/icons/edit_square.svg', // Path to your SVG file
-                              colorFilter: ColorFilter.mode(
+                            child: isEditing
+                                ? Icon(
+                              Icons.save_outlined, // Material UI save icon
+                              color: Colors.black,
+                              size: 20.0,
+                            )
+                                : SvgPicture.asset(
+                              'assets/icons/edit_square.svg', // Path to your 'edit_square' SVG file
+                              colorFilter: const ColorFilter.mode(
                                 Colors.black, // Apply the color filter
                                 BlendMode.srcIn,
-                              ), // Optional: Apply a color filter
-                              height: 18.0, // Matches size-4
-                              width: 18.0, // Matches size-4
+                              ),
+                              height: 18.0,
+                              width: 18.0,
                             ),
                           ),
                         ),

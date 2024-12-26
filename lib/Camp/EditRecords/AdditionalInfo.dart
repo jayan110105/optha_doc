@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:opthadoc/Components/CustomDropdown.dart';
 
-class EditAdditionalInfoCard extends StatelessWidget {
+class EditAdditionalInfoCard extends StatefulWidget {
   final Map<String, dynamic>? selectedRecord;
 
   const EditAdditionalInfoCard({super.key, this.selectedRecord});
 
-  Widget _buildSection({
+  @override
+  State<EditAdditionalInfoCard> createState() => _EditAdditionalInfoCardState();
+}
+
+class _EditAdditionalInfoCardState extends State<EditAdditionalInfoCard> {
+
+  Widget _buildDropdownSection({
     required IconData icon,
     required String title,
     required String content,
+    required String keyName,
+    required List<String> dropdownItems,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,28 +32,27 @@ class EditAdditionalInfoCard extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF163351),
+                color: Color(0xFF163351),
               ),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12.0),
-          decoration: BoxDecoration(
-            color: const Color(0xFF163351).withValues(alpha: .05),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: Text(
-            content,
-            style: TextStyle(
-              fontSize: 14,
-              color: const Color(0xFF163351),
-            ),
+        CustomDropdown(
+          keyName: keyName,
+          items: dropdownItems,
+          selectedValue: content,
+          onChanged: (value) {
+            setState(() {
+              widget.selectedRecord?[keyName] = value;
+            });
+          },
+          textStyle: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF163351),
           ),
         ),
       ],
@@ -60,20 +68,25 @@ class EditAdditionalInfoCard extends StatelessWidget {
         children: [
           // Card Header
           Row(
-            children: const [
-              Icon(
-                Icons.text_snippet,
-                color: Color(0xFF163351),
-                size: 24,
-              ),
-              SizedBox(width: 8),
-              Text(
-                "Additional Information",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF163351),
-                ),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: const [
+                  Icon(
+                    Icons.text_snippet,
+                    color: Color(0xFF163351),
+                    size: 24,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    "Additional Information",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF163351),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -82,41 +95,50 @@ class EditAdditionalInfoCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Brief Complaint
-              _buildSection(
+              // Brief Complaint Dropdown
+              _buildDropdownSection(
                 icon: Icons.message,
                 title: "Brief Complaint",
-                content: selectedRecord?['complaint'] ?? "N/A",
+                content: widget.selectedRecord?['complaint'] ?? "None",
+                keyName: 'complaint',
+                dropdownItems: ["None", "Blurred Vision", "Headache", "Eye Pain"], // Example complaints
               ),
               const SizedBox(height: 16),
 
-              // Bifocal and Color Grid
               Row(
                 children: [
+                  // Bifocal Dropdown
                   Expanded(
-                    child: _buildSection(
+                    child: _buildDropdownSection(
                       icon: Icons.remove_red_eye,
                       title: "Bifocal",
-                      content: selectedRecord?['bifocal'] ?? "N/A",
+                      content: widget.selectedRecord?['bifocal'] ?? "N/A",
+                      keyName: 'bifocal',
+                      dropdownItems: ["Yes", "No"],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 16), // Space between the dropdowns
+                  // Color Dropdown
                   Expanded(
-                    child: _buildSection(
+                    child: _buildDropdownSection(
                       icon: Icons.palette,
                       title: "Color",
-                      content: selectedRecord?['color'] ?? "N/A",
+                      content: widget.selectedRecord?['color'] ?? "N/A",
+                      keyName: 'color',
+                      dropdownItems: ["Red", "Blue", "Green", "Yellow"], // Example colors
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
 
-              // Remarks
-              _buildSection(
+              // Remarks Dropdown
+              _buildDropdownSection(
                 icon: Icons.text_snippet,
                 title: "Remarks",
-                content: selectedRecord?['remarks'] ?? "No remarks",
+                content: widget.selectedRecord?['remarks'] ?? "No remarks",
+                keyName: 'remarks',
+                dropdownItems: ["None", "Follow-up Required", "Refer to Specialist"], // Example remarks
               ),
             ],
           ),
