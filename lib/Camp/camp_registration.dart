@@ -17,7 +17,6 @@ extension StringExtension on String {
   }
 }
 
-
 class CampRegistration extends StatefulWidget {
   const CampRegistration({super.key});
 
@@ -69,9 +68,6 @@ class _CampRegistrationState extends State<CampRegistration> {
     }
     super.dispose();
   }
-
-  // Check if all required fields are filled
-
 
   Future<File?> getImage() async {
     final picker = ImagePicker();

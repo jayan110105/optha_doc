@@ -22,13 +22,24 @@ Future<String> performOCR(File imageFile) async {
   return extractedText;
 }
 
+String cleanName(String name) {
+  // Match and retain only words containing alphabetic characters exclusively
+  String cleanedName = name
+      .split(' ') // Split the name into words
+      .where((word) => RegExp(r'^[a-zA-Z]+$').hasMatch(word)) // Keep only alphabetic words
+      .join(' '); // Join the cleaned words back into a single string
+
+  return cleanedName.trim(); // Trim any leading or trailing spaces
+}
+
 /// Preprocesses the scanned text to extract Aadhaar details.
 Map<String, String> preprocessAadhaarText(String scannedText) {
   String normalizedText = scannedText.toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
   String namePattern = r'government of india\s*(.*?)\s*(?:dob|date of birth|date of bith|gender|male|female)';
   RegExp nameRegex = RegExp(namePattern, caseSensitive: false);
-  String name = capitalize(nameRegex.firstMatch(normalizedText)?.group(1)?.trim()) ?? 'Name not found';
+  String rawName = capitalize(nameRegex.firstMatch(normalizedText)?.group(1)?.trim()) ?? 'Name not found';
+  String name = cleanName(rawName);
 
   String dobPattern = r'(dob:|date of birth[: ]*)\s*(\d{1,2}/\d{1,2}/\d{4})';
   RegExp dobRegex = RegExp(dobPattern, caseSensitive: false);

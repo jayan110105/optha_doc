@@ -5,6 +5,8 @@ import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/StretchedIconButton.dart';
 import 'package:opthadoc/Components/VisionMeasurement.dart';
+import 'package:opthadoc/Components/ProgressStep.dart';
+import 'package:opthadoc/Components/CardComponent.dart';
 
 class CampEyeCheckup extends StatefulWidget {
   const CampEyeCheckup({super.key});
@@ -53,30 +55,6 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
 
   void nextStep() => setState(() => step = (step + 1).clamp(0, steps.length - 1));
   void prevStep() => setState(() => step = (step - 1).clamp(0, steps.length - 1));
-
-  Widget buildProgressSteps() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: steps.map((s) {
-        int index = steps.indexOf(s);
-        return Column(
-          children: [
-            CircleAvatar(
-              backgroundColor: step >= index ? Color(0xFF163351) : Color(0xFF163351).withValues(alpha: 0.1),
-              child: Icon(
-                step > index ? Icons.check_circle : s["icon"],
-                color: step >= index ? Colors.white : Color(0xFF163351).withValues(alpha: 0.4),
-              ),
-            ),
-            SizedBox(height: 4),
-            Text(s["title"], style: TextStyle(fontSize: 12, color: step >= index
-                ? Color(0xFF163351)
-                : Colors.grey[600],)),
-          ],
-        );
-      }).toList(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -227,26 +205,22 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        buildProgressSteps(),
+                        ProgressSteps(
+                          steps: steps,
+                          currentStep: step,
+                          // allowStepTap: false,
+                          onStepTapped: (index) {
+                            setState(() {
+                              step = index;
+                            });
+                          },
+                        ),
                         const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: .1),
-                                blurRadius: 10,
-                                spreadRadius: 2,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
+                        CardComponent(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: stepWidgets[step],
-                          ), // Display the current step widget
+                          ),
                         ),
                         SizedBox(height: 24),
                         Row(
