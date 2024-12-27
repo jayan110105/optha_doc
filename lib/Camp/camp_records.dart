@@ -33,6 +33,14 @@ class _CampRecordsState extends State<CampRecords> {
   int step = 0;
   bool isEditing = false;
 
+  final List<Map<String, dynamic>> steps = [
+    {"title": "Patient Info", "icon": Icons.person},
+    {"title": "Without Glasses", "icon": Icons.visibility_off},
+    {"title": "With Glasses", "icon": Icons.visibility},
+    {"title": "With Correction", "icon": "assets/icons/eyeglasses.svg"},
+    {"title": "Additional Info", "icon": Icons.text_snippet},
+  ];
+
   List<Widget> getViewStepWidgets() {
     return [
       PatientDetailsCard(selectedRecord: selectedRecord,),
@@ -138,7 +146,7 @@ class _CampRecordsState extends State<CampRecords> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

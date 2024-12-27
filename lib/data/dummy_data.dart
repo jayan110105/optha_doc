@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 final List<Map<String, dynamic>> records = [
   {
     "id": "1",
@@ -66,12 +64,4 @@ final List<Map<String, dynamic>> records = [
     "remarks": "Foll"
         "ow-up Required",
   },
-];
-
-final List<Map<String, dynamic>> steps = [
-  {"title": "Patient Info", "icon": Icons.person},
-  {"title": "Without Aid", "icon": Icons.visibility_off},
-  {"title": "With Aid", "icon": Icons.visibility},
-  {"title": "With Correction", "icon": "assets/icons/eyeglasses.svg"},
-  {"title": "Additional Info", "icon": Icons.text_snippet},
 ];

@@ -23,7 +23,7 @@ class _ProgressStepsState extends State<ProgressSteps> {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: 16.0, // Space between each step
+      // spacing: 16.0, // Space between each step
       alignment: WrapAlignment.spaceBetween,
       runSpacing: 8.0, // Space between rows when wrapping occurs
       children: widget.steps.map((step) {

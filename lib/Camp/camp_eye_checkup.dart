@@ -21,10 +21,11 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
   bool isChecked = false;
 
   final List<Map<String, dynamic>> steps = [
-    {"id": "patient", "title": "Patient ID", "icon": Icons.search},
-    {"id": "without-glasses", "title": "Without Glasses", "icon": Icons.visibility_off},
-    {"id": "with-glasses", "title": "With Glasses", "icon": Icons.visibility},
-    {"id": "additional", "title": "Additional Info", "icon": Icons.check_circle},
+    {"title": "Patient ID", "icon": Icons.search},
+    {"title": "Without Glasses", "icon": Icons.visibility_off},
+    {"title": "With Glasses", "icon": Icons.visibility},
+    {"title": "With Correction", "icon": "assets/icons/eyeglasses.svg"},
+    {"title": "Additional Info", "icon": Icons.text_snippet},
   ];
 
   final Map<String, dynamic> formData = {
@@ -169,111 +170,108 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
     return Scaffold(
       backgroundColor: Color(0xFFE9E7DB),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Eye Checkup",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF163351),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Perform an eye checkup for the patient",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF163351).withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        ProgressSteps(
-                          steps: steps,
-                          currentStep: step,
-                          // allowStepTap: false,
-                          onStepTapped: (index) {
-                            setState(() {
-                              step = index;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        CardComponent(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: stepWidgets[step],
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white, // Matches the bg-background color
-                                foregroundColor: const Color(0xFF163351),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
-                                ),
-                              ),
-                              onPressed: step > 0 ? prevStep : null,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.arrow_back_ios,
-                                    color: step > 0 ? Color(0xFF163351): Colors.grey[500],
-                                  ),
-                                  SizedBox(width: 8,),
-                                  Text("Back")],
+                            Text(
+                              "Eye Checkup",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF163351),
                               ),
                             ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF163351), // Button background color
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
-                                ),
-                              ),
-                              onPressed:
-                              step == steps.length - 1 ? () => print(formData) : nextStep,
-                              child: Row(
-                                children: [
-                                  Text(step == steps.length - 1 ? "Save Checkup" : "Continue"),
-                                  if (step < steps.length - 1) ...[
-                                    SizedBox(width: 8), // Adds spacing if not the last step
-                                    Icon(Icons.arrow_forward_ios, color: Colors.white),
-                                  ],
-                                ],
+                            const SizedBox(height: 8),
+                            Text(
+                              "Perform an eye checkup for the patient",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF163351).withValues(alpha: 0.6),
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 20),
+                      ProgressSteps(
+                        steps: steps,
+                        currentStep: step,
+                        // allowStepTap: false,
+                        onStepTapped: (index) {
+                          setState(() {
+                            step = index;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      CardComponent(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: stepWidgets[step],
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white, // Matches the bg-background color
+                              foregroundColor: const Color(0xFF163351),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
+                              ),
+                            ),
+                            onPressed: step > 0 ? prevStep : null,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.arrow_back_ios,
+                                  color: step > 0 ? Color(0xFF163351): Colors.grey[500],
+                                ),
+                                SizedBox(width: 8,),
+                                Text("Back")],
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF163351), // Button background color
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
+                              ),
+                            ),
+                            onPressed:
+                            step == steps.length - 1 ? () => print(formData) : nextStep,
+                            child: Row(
+                              children: [
+                                Text(step == steps.length - 1 ? "Save Checkup" : "Continue"),
+                                if (step < steps.length - 1) ...[
+                                  SizedBox(width: 8), // Adds spacing if not the last step
+                                  Icon(Icons.arrow_forward_ios, color: Colors.white),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
