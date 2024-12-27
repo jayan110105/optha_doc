@@ -6,17 +6,11 @@ import 'package:opthadoc/Components/AxisScrollWheel.dart';
 
 class VisionMeasurements extends StatefulWidget {
   final String prefix;
-  final bool isChecked;
-  final Function(bool) onCheckboxChanged;
-  final Map<String, dynamic> formData;
-  final Function(String, dynamic) updateForm;
+  final Map<String, TextEditingController> controllers;
 
   const VisionMeasurements({
     required this.prefix,
-    required this.isChecked,
-    required this.onCheckboxChanged,
-    required this.formData,
-    required this.updateForm,
+    required this.controllers,
     super.key,
   });
 
@@ -28,17 +22,22 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
   late bool isChecked;
 
   @override
-  void initState() {
-    super.initState();
-    isChecked = widget.isChecked;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView( // Add scrolling capability
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              'With Glasses',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF163351),
+              ),
+            ),
+          ),
           ...["left", "right"].map((eye) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -59,7 +58,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                       const SizedBox(width: 10),
                       Text(
                         eye == "left" ? "Left Eye" : "Right Eye",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                       ),
                     ],
                   ),
@@ -67,7 +66,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                   Text(
                     "Distance Vision",
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: const Color(0xFF163351).withValues(alpha: 0.6),
                       fontSize: 16,
                     ),
@@ -83,22 +82,55 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                             const Label(text: "Sphere"),
                             CustomDropdown(
                               keyName: "${widget.prefix}.$eye.sphere",
-                              items: ["-10", "10"],
-                              onChanged: (value) => widget.updateForm("${widget.prefix}.$eye.sphere", value),
+                              items: List.generate(33, (index) => (index * 0.25).toStringAsFixed(2)),
+                              selectedValue: widget.controllers["${widget.prefix}.$eye.sphere"]?.text,
+                              onChanged: (value) {
+                                setState(() {
+                                  widget.controllers["${widget.prefix}.$eye.sphere"]?.text = value!;
+                                });
+                              }
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Label(text: "Cylinder"),
-                            CustomDropdown(
-                              keyName: "${widget.prefix}.$eye.cylinder",
-                              items: ["-10", "10"],
-                              onChanged: (value) => widget.updateForm("${widget.prefix}.$eye.cylinder", value),
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: CustomDropdown(
+                                    hintText: "+/-",
+                                    keyName: "${widget.prefix}.$eye.sign",
+                                    items: ["+", "-"],
+                                    selectedValue: widget.controllers["${widget.prefix}.$eye.sign"]?.text,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        widget.controllers["${widget.prefix}.$eye.sign"]?.text = value!;
+                                      });
+                                    }
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  flex: 1,
+                                  child: CustomDropdown(
+                                    hintText: "0.0",
+                                    keyName: "${widget.prefix}.$eye.cylinder",
+                                    items: List.generate(25, (index) => (index * 0.25).toStringAsFixed(2)),
+                                    selectedValue: widget.controllers["${widget.prefix}.$eye.cylinder"]?.text,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        widget.controllers["${widget.prefix}.$eye.cylinder"]?.text = value!;
+                                      });
+                                    }
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -115,13 +147,16 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                           label: "Axis",
                           min: 0,
                           max: 180,
-                          selectedValue: widget.formData["${widget.prefix}.$eye.axis"] ?? 0,
+                          selectedValue: int.tryParse(widget.controllers["${widget.prefix}.$eye.axis"]!.text) ?? 0, // Parse the String to int
                           onChanged: (value) {
-                            widget.updateForm("${widget.prefix}.$eye.axis", value);
+                            setState(() {
+                              widget.controllers["${widget.prefix}.$eye.axis"]?.text = value.toString();
+                              print(widget.controllers["${widget.prefix}.$eye.axis"]?.text);
+                            });
                           },
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,8 +164,13 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                             const Label(text: "Visual Acuity"),
                             CustomDropdown(
                               keyName: "${widget.prefix}.$eye.va",
-                              items: ["6/6", "6/9", "6/12", "6/18"],
-                              onChanged: (value) => widget.updateForm("${widget.prefix}.$eye.va", value),
+                              items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
+                              selectedValue: widget.controllers["${widget.prefix}.$eye.va"]?.text,
+                              onChanged: (value) {
+                                setState(() {
+                                  widget.controllers["${widget.prefix}.$eye.va"]?.text = value!;
+                                });
+                              },
                             ),
                           ],
                         ),
@@ -148,11 +188,11 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
             children: [
               Checkbox(
                 visualDensity: VisualDensity.compact,
-                value: isChecked,
+                value: true,
                 onChanged: (bool? value) {
                   setState(() {
-                    isChecked = value!;
-                    widget.onCheckboxChanged(value);
+                    // isChecked = value?;
+                    // widget.onCheckboxChanged(value);
                   });
                 },
                 shape: RoundedRectangleBorder(
@@ -172,7 +212,10 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
           const SizedBox(height: 16),
           const Label(text: "IPD Value"),
           const SizedBox(height: 8),
-          const InputField(hintText: "Enter IPD value"),
+          InputField(
+              hintText: "Enter IPD value",
+              controller: widget.controllers['${widget.prefix}.IPD'],
+          ),
         ],
       ),
     );

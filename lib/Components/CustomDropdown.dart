@@ -6,6 +6,7 @@ class CustomDropdown extends StatelessWidget {
   final String? selectedValue;
   final ValueChanged<String?> onChanged;
   final TextStyle? textStyle;
+  final String? hintText;
 
   const CustomDropdown({
     required this.keyName,
@@ -13,6 +14,7 @@ class CustomDropdown extends StatelessWidget {
     this.selectedValue,
     required this.onChanged,
     this.textStyle,
+    this.hintText,
     super.key,
   });
 
@@ -29,12 +31,12 @@ class CustomDropdown extends StatelessWidget {
       ),
       child: DropdownButton<String>(
         borderRadius: BorderRadius.circular(8),
-        value: selectedValue,
+        value: items.contains(selectedValue) ? selectedValue : null,
         isExpanded: true,
         icon: const Icon(Icons.keyboard_arrow_down, size: 24, color: Colors.grey),
-        hint: const Text(
-          "Select",
-          style: TextStyle(color: Colors.grey, fontSize: 14), // Placeholder text style
+        hint: Text(
+          hintText ?? "Select",
+          style: const TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.normal), // Placeholder text style
         ),
         style: textStyle ??
             const TextStyle(

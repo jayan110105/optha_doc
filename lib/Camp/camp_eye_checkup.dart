@@ -28,30 +28,42 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
     {"title": "Additional Info", "icon": Icons.text_snippet},
   ];
 
-  final Map<String, dynamic> formData = {
-    "patientId": "",
-    "withoutGlasses": {
-      "left": {"sphere": "", "cylinder": "", "axis": "", "va": ""},
-      "right": {"sphere": "", "cylinder": "", "axis": "", "va": ""},
-    },
-    "withGlasses": {
-      "left": {"sphere": "", "cylinder": "", "axis": "", "va": ""},
-      "right": {"sphere": "", "cylinder": "", "axis": "", "va": ""},
-    },
-    "complaint": "",
-    "ipd": "",
-    "nearVision": false,
-  };
+  final Map<String, TextEditingController> controllers = {};
 
-  void updateForm(String key, dynamic value) {
-    setState(() {
-      final keys = key.split('.');
-      Map<String, dynamic> currentMap = formData;
-      for (int i = 0; i < keys.length - 1; i++) {
-        currentMap = currentMap[keys[i]] as Map<String, dynamic>;
+  @override
+  void initState() {
+
+    super.initState();
+    for (var eye in ['left', 'right']) {
+      controllers['withoutGlasses.$eye.distanceVision'] = TextEditingController();
+    }
+
+    for (var prefix in ['withGlasses', 'withCorrection']) {
+      for (var eye in ['left', 'right']) {
+        controllers['$prefix.$eye.sphere'] = TextEditingController();
+        controllers['$prefix.$eye.cylinder'] = TextEditingController();
+        controllers['$prefix.$eye.sign'] = TextEditingController();
+        controllers['$prefix.$eye.axis'] = TextEditingController();
+        controllers['$prefix.$eye.va'] = TextEditingController();
       }
-      currentMap[keys.last] = value;
-    });
+      controllers['$prefix.IPD'] = TextEditingController();
+    }
+
+    controllers['patientId'] = TextEditingController();
+
+    controllers['bifocal'] = TextEditingController();
+    controllers['color'] = TextEditingController();
+    controllers['remarks'] = TextEditingController();
+    controllers['complaint'] = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // Dispose controllers
+    for (var controller in controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   void nextStep() => setState(() => step = (step + 1).clamp(0, steps.length - 1));
@@ -69,7 +81,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           SizedBox(height: 8,),
           InputField(
               hintText: "Enter patient ID",
-              onChanged: (value) => updateForm("patientId", value),
+              controller: controllers['patientId'],
           ),
           SizedBox(height: 16),
           StretchedIconButton(
@@ -81,33 +93,84 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           ),
         ],
       ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              'Without Glasses',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF163351),
+              ),
+            ),
+          ),
+          SizedBox(height: 8,),
+          ...['right', 'left'].map((eye) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: const Color(0xFF163351),
+                        child: Text(
+                          eye == "left" ? "L" : "R",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        eye == "left" ? "Left Eye" : "Right Eye",
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Distance Vision',
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  CustomDropdown(
+                    hintText: "Select VA",
+                    textStyle: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF163351),
+                        fontWeight: FontWeight.bold
+                    ),
+                    keyName: 'withoutGlasses-$eye-distanceVision',
+                    items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
+                    selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                    onChanged: (value) {
+                      setState(() {
+                        controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
       // Step 1: Without Glasses
       VisionMeasurements(
-        prefix: "withoutGlasses",
-        isChecked: false,
-        onCheckboxChanged: (value) {
-          print("Checkbox changed: $value");
-        },
-        formData: formData,
-        updateForm: (key, value) {
-          setState(() {
-            formData[key] = value;
-          });
-        },
+        prefix: "withGlasses",
+        controllers: controllers,
       ),
       // Step 2: With Glasses
       VisionMeasurements(
-        prefix: "withGlasses",
-        isChecked: false,
-        onCheckboxChanged: (value) {
-          print("Checkbox changed: $value");
-        },
-        formData: formData,
-        updateForm: (key, value) {
-          setState(() {
-            formData[key] = value;
-          });
-        },
+        prefix: "withCorrection",
+        controllers: controllers,
       ),
       // Step 3: Additional Info
       Column(
@@ -123,8 +186,13 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           SizedBox(height: 8),
           CustomDropdown(
               keyName: "Bifocal",
-              items: [],
-              onChanged: (value) => updateForm("bifocal", value)
+              items: ["Blue","Green","Red"],
+              selectedValue: controllers['bifocal']!.text, // Use controller value
+              onChanged: (value) {
+                setState(() {
+                  controllers['bifocal']!.text = value!; // Update controller
+                });
+              },
           ),
           SizedBox(height: 16),
           Row(
@@ -136,9 +204,14 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           ),
           SizedBox(height: 8),
           CustomDropdown(
-              keyName: "Bifocal",
-              items: [],
-              onChanged: (value) => updateForm("bifocal", value)
+              keyName: "Color",
+              items: ["Blue","Green","Red"],
+              selectedValue: controllers['color']!.text, // Use controller value
+              onChanged: (value) {
+                setState(() {
+                  controllers['color']!.text = value!; // Update controller
+                }); // Update controller
+              },
           ),
           SizedBox(height: 16),
           Row(
@@ -150,9 +223,14 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           ),
           SizedBox(height: 8),
           CustomDropdown(
-              keyName: "Bifocal",
-              items: [],
-              onChanged: (value) => updateForm("bifocal", value)
+              keyName: "Remarks",
+              items: ["Blue","Green","Red"],
+              selectedValue: controllers['remarks']!.text, // Use controller value
+              onChanged: (value) {
+                setState(() {
+                  controllers['remarks']!.text = value!;
+                });
+              },
           ),
           SizedBox(height: 16),
           Label(text: "Brief Complaint"),
@@ -162,6 +240,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
               isEnabled: true,
               minLines: 3,
               maxLines: null,
+              controller: controllers['complaint'],
           )
         ],
       ),
@@ -253,7 +332,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                               ),
                             ),
                             onPressed:
-                            step == steps.length - 1 ? () => print(formData) : nextStep,
+                            step == steps.length - 1 ? () => print("") : nextStep,
                             child: Row(
                               children: [
                                 Text(step == steps.length - 1 ? "Save Checkup" : "Continue"),
