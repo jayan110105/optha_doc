@@ -68,25 +68,26 @@ class _EditAdditionalInfoCardState extends State<EditAdditionalInfoCard> {
         children: [
           // Card Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: const [
-                  Icon(
-                    Icons.text_snippet,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Icon(
+                Icons.text_snippet,
+                color: Color(0xFF163351),
+                size: 24,
+              ),
+              SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  "Additional Information",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                     color: Color(0xFF163351),
-                    size: 24,
+                    height: 1,
                   ),
-                  SizedBox(width: 8),
-                  Text(
-                    "Additional Information",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF163351),
-                    ),
-                  ),
-                ],
+                  softWrap: true, // Enables wrapping if text exceeds the available width
+                  overflow: TextOverflow.visible, // Ensures text doesn't get clipped
+                ),
               ),
             ],
           ),

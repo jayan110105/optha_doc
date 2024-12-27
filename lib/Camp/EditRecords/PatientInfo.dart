@@ -113,7 +113,7 @@ class _PatientDetailsCardState extends State<EditPatientDetailsCard> {
               color: Color(0xFF163351),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -144,7 +144,12 @@ class _PatientDetailsCardState extends State<EditPatientDetailsCard> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   _buildDetailItem(
                     icon: Icons.text_snippet,
                     content: Text(

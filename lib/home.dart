@@ -5,6 +5,9 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: const Color(0xFFE9E6DB),
       body: Center(
@@ -12,7 +15,10 @@ class Home extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const _HeaderText('OpthaDoc'),
-            const _HomeImage(imagePath: 'assets/images/homepage.jpg'),
+            _HomeImage(
+                imagePath: 'assets/images/homepage.jpg',
+                maxHeight: screenHeight * 0.3
+            ),
             const _SubtitleText('Welcome to OpthaDoc!'),
             const _DescriptionText('Let\'s transform eye care together!'),
             const SizedBox(height: 50),
@@ -57,14 +63,15 @@ class _HeaderText extends StatelessWidget {
 // Reusable image widget
 class _HomeImage extends StatelessWidget {
   final String imagePath;
+  final double maxHeight;
 
-  const _HomeImage({required this.imagePath});
+  const _HomeImage({required this.imagePath, required this.maxHeight});
 
   @override
   Widget build(BuildContext context) {
     return Image.asset(
       imagePath,
-      height: 300, // Adjust the size as needed
+      height: maxHeight, // Adjust the size as needed
     );
   }
 }

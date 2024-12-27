@@ -223,61 +223,66 @@ class _CampRegistrationState extends State<CampRegistration> {
         ],
       ),
       // Step 3: Gender
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: ["Male", "Female", "Other"].map((gender) {
-          IconData genderIcon;
+      LayoutBuilder(
+        builder: (context, constraints) {
+          double itemWidth = constraints.maxWidth / 3 - 16; // Calculate dynamic width
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ["Male", "Female", "Other"].map((gender) {
+              IconData genderIcon;
 
-          // Assign custom icons for each gender
-          switch (gender) {
-            case "Male":
-              genderIcon = Icons.male;
-              break;
-            case "Female":
-              genderIcon = Icons.female;
-              break;
-            default:
-              genderIcon = Icons.transgender;
-          }
+              // Assign custom icons for each gender
+              switch (gender) {
+                case "Male":
+                  genderIcon = Icons.male;
+                  break;
+                case "Female":
+                  genderIcon = Icons.female;
+                  break;
+                default:
+                  genderIcon = Icons.transgender;
+              }
 
-          return GestureDetector(
-            onTap: () => setState(() {
-              controllers["gender"]!.text = gender;
-            }),
-            child: Container(
-              width: 90, // Fixed width for each item
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: controllers["gender"]!.text == gender
-                    ? const Color(0xFF163351)
-                    : Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    genderIcon,
+              return GestureDetector(
+                onTap: () => setState(() {
+                  controllers["gender"]!.text = gender;
+                }),
+                child: Container(
+                  width: itemWidth, // Dynamic width based on screen size
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
                     color: controllers["gender"]!.text == gender
-                        ? Colors.grey[200]
-                        : const Color(0xFF163351),
-                    size: 30,
+                        ? const Color(0xFF163351)
+                        : Colors.grey[200],
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    gender,
-                    style: TextStyle(
-                      color: controllers["gender"]!.text == gender
-                          ? Colors.grey[200]
-                          : const Color(0xFF163351),
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        genderIcon,
+                        color: controllers["gender"]!.text == gender
+                            ? Colors.grey[200]
+                            : const Color(0xFF163351),
+                        size: 30,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        gender,
+                        style: TextStyle(
+                          color: controllers["gender"]!.text == gender
+                              ? Colors.grey[200]
+                              : const Color(0xFF163351),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            }).toList(),
           );
-        }).toList(),
+        },
       ),
       // Step 4: Details
       Column(

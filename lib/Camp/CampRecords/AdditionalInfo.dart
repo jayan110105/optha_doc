@@ -60,6 +60,7 @@ class AdditionalInfoCard extends StatelessWidget {
         children: [
           // Card Header
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               Icon(
                 Icons.text_snippet,
@@ -67,12 +68,17 @@ class AdditionalInfoCard extends StatelessWidget {
                 size: 24,
               ),
               SizedBox(width: 8),
-              Text(
-                "Additional Information",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF163351),
+              Flexible(
+                child: Text(
+                  "Additional Information",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF163351),
+                    height: 1,
+                  ),
+                  softWrap: true, // Enables wrapping if text exceeds the available width
+                  overflow: TextOverflow.visible, // Ensures text doesn't get clipped
                 ),
               ),
             ],

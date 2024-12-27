@@ -69,9 +69,9 @@ class WithAidCard extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(), // Prevents scrolling inside the grid
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, // Number of columns
-              mainAxisSpacing: 12, // Spacing between rows
+              mainAxisSpacing: 4, // Spacing between rows
               crossAxisSpacing: 8, // Spacing between columns
-              childAspectRatio: 3, // Adjust to control the height/width ratio
+              childAspectRatio: 2, // Adjust to control the height/width ratio
             ),
             children: [
               _buildDetailRow("Distance Vision", record['withAid'][eye]['distanceVision']),
