@@ -19,7 +19,28 @@ class VisionMeasurements extends StatefulWidget {
 }
 
 class _VisionMeasurementsState extends State<VisionMeasurements> {
-  late bool isChecked;
+  late bool isNearVisionRequired = false;
+  late Map<String, bool> isDistanceVisionPRequired = {
+    "left": false,
+    "right": false,
+  };
+  late Map<String, bool> isNearVisionPRequired = {
+    "left": false,
+    "right": false,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    isNearVisionRequired =  widget.controllers['${widget.prefix}.nearVisionRequired']?.text == 'Yes';
+
+    isDistanceVisionPRequired['left'] =  widget.controllers['${widget.prefix}.left.distanceVisionP']?.text == 'Yes';
+    isDistanceVisionPRequired['right'] =  widget.controllers['${widget.prefix}.right.distanceVisionP']?.text == 'Yes';
+
+    isNearVisionPRequired['left'] =  widget.controllers['${widget.prefix}.left.nearVisionP']?.text == 'Yes';
+    isNearVisionPRequired['right'] =  widget.controllers['${widget.prefix}.right.nearVisionP']?.text == 'Yes';
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +101,37 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Label(text: "Sphere"),
-                            CustomDropdown(
-                              keyName: "${widget.prefix}.$eye.sphere",
-                              items: List.generate(33, (index) => (index * 0.25).toStringAsFixed(2)),
-                              selectedValue: widget.controllers["${widget.prefix}.$eye.sphere"]?.text,
-                              onChanged: (value) {
-                                setState(() {
-                                  widget.controllers["${widget.prefix}.$eye.sphere"]?.text = value!;
-                                });
-                              }
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: CustomDropdown(
+                                      hintText: "+/-",
+                                      keyName: "${widget.prefix}.$eye.distanceVisionSphereSign",
+                                      items: ["+", "-"],
+                                      selectedValue: widget.controllers["${widget.prefix}.$eye.distanceVisionSphereSign"]?.text,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          widget.controllers["${widget.prefix}.$eye.distanceVisionSphereSign"]?.text = value!;
+                                        });
+                                      }
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: CustomDropdown(
+                                    hintText: "0.0",
+                                    keyName: "${widget.prefix}.$eye.distanceVisionSphere",
+                                    items: List.generate(33, (index) => (index * 0.25).toStringAsFixed(2)),
+                                    selectedValue: widget.controllers["${widget.prefix}.$eye.distanceVisionSphere"]?.text,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        widget.controllers["${widget.prefix}.$eye.distanceVisionSphere"]?.text = value!;
+                                      });
+                                    }
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -105,12 +148,12 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                                   flex: 1,
                                   child: CustomDropdown(
                                     hintText: "+/-",
-                                    keyName: "${widget.prefix}.$eye.sign",
+                                    keyName: "${widget.prefix}.$eye.cylinderSign",
                                     items: ["+", "-"],
-                                    selectedValue: widget.controllers["${widget.prefix}.$eye.sign"]?.text,
+                                    selectedValue: widget.controllers["${widget.prefix}.$eye.cylinderSign"]?.text,
                                     onChanged: (value) {
                                       setState(() {
-                                        widget.controllers["${widget.prefix}.$eye.sign"]?.text = value!;
+                                        widget.controllers["${widget.prefix}.$eye.cylinderSign"]?.text = value!;
                                       });
                                     }
                                   ),
@@ -143,7 +186,6 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                     children: [
                       Expanded(
                         child: AxisScrollWheel(
-                          keyName: "${widget.prefix}.$eye.axis",
                           label: "Axis",
                           min: 0,
                           max: 180,
@@ -151,7 +193,6 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                           onChanged: (value) {
                             setState(() {
                               widget.controllers["${widget.prefix}.$eye.axis"]?.text = value.toString();
-                              print(widget.controllers["${widget.prefix}.$eye.axis"]?.text);
                             });
                           },
                         ),
@@ -162,21 +203,170 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Label(text: "Visual Acuity"),
-                            CustomDropdown(
-                              keyName: "${widget.prefix}.$eye.va",
-                              items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
-                              selectedValue: widget.controllers["${widget.prefix}.$eye.va"]?.text,
-                              onChanged: (value) {
-                                setState(() {
-                                  widget.controllers["${widget.prefix}.$eye.va"]?.text = value!;
-                                });
-                              },
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: CustomDropdown(
+                                    keyName: "${widget.prefix}.$eye.distanceVisionVA",
+                                    items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
+                                    selectedValue: widget.controllers["${widget.prefix}.$eye.distanceVisionVA"]?.text,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        widget.controllers["${widget.prefix}.$eye.distanceVisionVA"]?.text = value!;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    children: [
+                                      Checkbox(
+                                        visualDensity: VisualDensity.compact,
+                                        value: isDistanceVisionPRequired[eye] ?? false,
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            isDistanceVisionPRequired[eye] = value ?? false; // Update the state
+                                            widget.controllers['${widget.prefix}.$eye.distanceVisionP']?.text = isDistanceVisionPRequired[eye]??false ? 'Yes' : 'No'; // Update the controller if needed
+                                          });
+                                        },
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        activeColor: const Color(0xFF163351),
+                                        checkColor: Colors.white,
+                                        side: const BorderSide(
+                                          color: Color(0xFF163351),
+                                          width: 2,
+                                        ),
+                                      ),
+                                      Label(text: "p")
+                                    ],
+                                  )
+                                )
+                              ],
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
+                  SizedBox(height: 16,),
+                  isNearVisionRequired ?
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Near Vision",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF163351).withValues(alpha: 0.6),
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Label(text: "Sphere"),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: CustomDropdown(
+                                          hintText: "+/-",
+                                          keyName: "${widget.prefix}.$eye.nearVisionSphereSign",
+                                          items: ["+", "-"],
+                                          selectedValue: widget.controllers["${widget.prefix}.$eye.nearVisionSphereSign"]?.text,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              widget.controllers["${widget.prefix}.$eye.nearVisionSphereSign"]?.text = value!;
+                                            });
+                                          }
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: CustomDropdown(
+                                          hintText: "0.0",
+                                          keyName: "${widget.prefix}.$eye.nearVisionSphere",
+                                          items: List.generate(33, (index) => (index * 0.25).toStringAsFixed(2)),
+                                          selectedValue: widget.controllers["${widget.prefix}.$eye.nearVisionSphere"]?.text,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              widget.controllers["${widget.prefix}.$eye.nearVisionSphere"]?.text = value!;
+                                            });
+                                          }
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Label(text: "Visual Acuity"),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: CustomDropdown(
+                                        keyName: "${widget.prefix}.$eye.nearVisionVA",
+                                        items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
+                                        selectedValue: widget.controllers["${widget.prefix}.$eye.nearVisionVA"]?.text,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            widget.controllers["${widget.prefix}.$eye.nearVisionVA"]?.text = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                        flex: 1,
+                                        child: Row(
+                                          children: [
+                                            Checkbox(
+                                              visualDensity: VisualDensity.compact,
+                                              value: isNearVisionPRequired[eye] ?? false,
+                                              onChanged: (bool? value) {
+                                                setState(() {
+                                                  isNearVisionPRequired[eye] = value ?? false; // Update the state
+                                                  widget.controllers['${widget.prefix}.$eye.nearVisionP']?.text = isNearVisionPRequired[eye]??false ? 'Yes' : 'No'; // Update the controller if needed
+                                                });
+                                              },
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              activeColor: const Color(0xFF163351),
+                                              checkColor: Colors.white,
+                                              side: const BorderSide(
+                                                color: Color(0xFF163351),
+                                                width: 2,
+                                              ),
+                                            ),
+                                            Label(text: "p")
+                                          ],
+                                        )
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ) : const SizedBox(),
                 ],
               ),
             );
@@ -188,11 +378,11 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
             children: [
               Checkbox(
                 visualDensity: VisualDensity.compact,
-                value: true,
+                value: isNearVisionRequired, // Current state of the checkbox
                 onChanged: (bool? value) {
                   setState(() {
-                    // isChecked = value?;
-                    // widget.onCheckboxChanged(value);
+                    isNearVisionRequired = value ?? false; // Update the state
+                    widget.controllers['${widget.prefix}.nearVisionRequired']?.text = isNearVisionRequired ? 'Yes' : 'No'; // Update the controller if needed
                   });
                 },
                 shape: RoundedRectangleBorder(

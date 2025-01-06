@@ -40,13 +40,20 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
 
     for (var prefix in ['withGlasses', 'withCorrection']) {
       for (var eye in ['left', 'right']) {
-        controllers['$prefix.$eye.sphere'] = TextEditingController();
+        controllers['$prefix.$eye.distanceVisionSphereSign'] = TextEditingController();
+        controllers['$prefix.$eye.distanceVisionSphere'] = TextEditingController();
+        controllers['$prefix.$eye.cylinderSign'] = TextEditingController();
         controllers['$prefix.$eye.cylinder'] = TextEditingController();
-        controllers['$prefix.$eye.sign'] = TextEditingController();
         controllers['$prefix.$eye.axis'] = TextEditingController();
-        controllers['$prefix.$eye.va'] = TextEditingController();
+        controllers['$prefix.$eye.distanceVisionVA'] = TextEditingController();
+        controllers['$prefix.$eye.distanceVisionP'] = TextEditingController();
+        controllers['$prefix.$eye.nearVisionSphereSign'] = TextEditingController();
+        controllers['$prefix.$eye.nearVisionSphere'] = TextEditingController();
+        controllers['$prefix.$eye.nearVisionVA'] = TextEditingController();
+        controllers['$prefix.$eye.nearVisionP'] = TextEditingController();
       }
       controllers['$prefix.IPD'] = TextEditingController();
+      controllers['$prefix.nearVisionRequired'] = TextEditingController(text: 'No');
     }
 
     controllers['patientId'] = TextEditingController();
@@ -164,11 +171,13 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       ),
       // Step 1: Without Glasses
       VisionMeasurements(
+        key: ValueKey("withGlasses"),
         prefix: "withGlasses",
         controllers: controllers,
       ),
       // Step 2: With Glasses
       VisionMeasurements(
+        key: ValueKey("withCorrection"),
         prefix: "withCorrection",
         controllers: controllers,
       ),
@@ -186,7 +195,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           SizedBox(height: 8),
           CustomDropdown(
               keyName: "Bifocal",
-              items: ["Blue","Green","Red"],
+              items: ["Kryptok","Executive","D-Segment","Trifocal","Omnivision","Progressive"],
               selectedValue: controllers['bifocal']!.text, // Use controller value
               onChanged: (value) {
                 setState(() {
@@ -205,7 +214,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           SizedBox(height: 8),
           CustomDropdown(
               keyName: "Color",
-              items: ["Blue","Green","Red"],
+              items: ["White","SP2Alpha","Photogrey","Photosun","Photobrown"],
               selectedValue: controllers['color']!.text, // Use controller value
               onChanged: (value) {
                 setState(() {
@@ -224,7 +233,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           SizedBox(height: 8),
           CustomDropdown(
               keyName: "Remarks",
-              items: ["Blue","Green","Red"],
+              items: ["D.V. only","N.V. only","Constant use"],
               selectedValue: controllers['remarks']!.text, // Use controller value
               onChanged: (value) {
                 setState(() {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/Label.dart';
 
 class AxisScrollWheel extends StatelessWidget {
-  final String keyName;
   final String label;
   final int min;
   final int max;
@@ -10,7 +9,6 @@ class AxisScrollWheel extends StatelessWidget {
   final ValueChanged<int> onChanged;
 
   const AxisScrollWheel({
-    required this.keyName,
     required this.label,
     required this.min,
     required this.max,
@@ -21,6 +19,8 @@ class AxisScrollWheel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final int initialItem = (selectedValue - min) ~/ 5;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,6 +31,7 @@ class AxisScrollWheel extends StatelessWidget {
             SizedBox(
               height: 50,
               child: ListWheelScrollView.useDelegate(
+                controller: FixedExtentScrollController(initialItem: initialItem),
                 magnification: 1.05,
                 diameterRatio: 1.2,
                 overAndUnderCenterOpacity: 0.4,
