@@ -206,8 +206,9 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                             Row(
                               children: [
                                 Expanded(
-                                  flex: 2,
+                                  flex: 1,
                                   child: CustomDropdown(
+                                    hintText: "6/6",
                                     keyName: "${widget.prefix}.$eye.distanceVisionVA",
                                     items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
                                     selectedValue: widget.controllers["${widget.prefix}.$eye.distanceVisionVA"]?.text,
@@ -318,8 +319,9 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      flex: 2,
+                                      flex: 1,
                                       child: CustomDropdown(
+                                        hintText: "6/6",
                                         keyName: "${widget.prefix}.$eye.nearVisionVA",
                                         items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
                                         selectedValue: widget.controllers["${widget.prefix}.$eye.nearVisionVA"]?.text,

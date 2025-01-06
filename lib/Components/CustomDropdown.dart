@@ -33,7 +33,11 @@ class CustomDropdown extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         value: items.contains(selectedValue) ? selectedValue : null,
         isExpanded: true,
-        icon: const Icon(Icons.keyboard_arrow_down, size: 24, color: Colors.grey),
+        icon: Icon(
+            Icons.keyboard_arrow_down,
+            size: selectedValue == null ? 18 : 10,
+            color: Colors.grey
+        ),
         hint: Text(
           hintText ?? "Select",
           style: const TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.normal), // Placeholder text style
