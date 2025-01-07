@@ -210,7 +210,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                                   child: CustomDropdown(
                                     hintText: "6/6",
                                     keyName: "${widget.prefix}.$eye.distanceVisionVA",
-                                    items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
+                                    items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60","HM+","PL+","PL-"],
                                     selectedValue: widget.controllers["${widget.prefix}.$eye.distanceVisionVA"]?.text,
                                     onChanged: (value) {
                                       setState(() {
@@ -238,8 +238,8 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                                         ),
                                         activeColor: const Color(0xFF163351),
                                         checkColor: Colors.white,
-                                        side: const BorderSide(
-                                          color: Color(0xFF163351),
+                                        side: BorderSide(
+                                          color: Color(0xFFD3D3D3),
                                           width: 2,
                                         ),
                                       ),
@@ -321,9 +321,9 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                                     Expanded(
                                       flex: 1,
                                       child: CustomDropdown(
-                                        hintText: "6/6",
+                                        hintText: "N5",
                                         keyName: "${widget.prefix}.$eye.nearVisionVA",
-                                        items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
+                                        items: ["N5", "N6", "N8", "N10", "N12", "N14", "N18","N24","N36", "N48", "N60"],
                                         selectedValue: widget.controllers["${widget.prefix}.$eye.nearVisionVA"]?.text,
                                         onChanged: (value) {
                                           setState(() {
@@ -352,7 +352,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                                               activeColor: const Color(0xFF163351),
                                               checkColor: Colors.white,
                                               side: const BorderSide(
-                                                color: Color(0xFF163351),
+                                                color: Color(0xFFD3D3D3),
                                                 width: 2,
                                               ),
                                             ),

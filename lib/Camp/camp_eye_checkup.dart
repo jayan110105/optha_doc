@@ -155,7 +155,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                         fontWeight: FontWeight.bold
                     ),
                     keyName: 'withoutGlasses-$eye-distanceVision',
-                    items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60"],
+                    items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60","HM+","PL+","PL-"],
                     selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
                     onChanged: (value) {
                       setState(() {

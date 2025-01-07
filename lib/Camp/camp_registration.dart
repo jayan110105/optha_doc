@@ -80,7 +80,7 @@ class _CampRegistrationState extends State<CampRegistration> {
   }
 
   void nextStep() {
-    // if (!validateStepFields(step)) return;
+    if (!validateStepFields(step)) return;
     if(step == steps.length - 1)// Validate current step fields
       print("Submit");
     else if (step < steps.length - 1) {

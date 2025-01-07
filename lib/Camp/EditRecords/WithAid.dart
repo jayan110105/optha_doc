@@ -28,16 +28,37 @@ class _WithAidCardState extends State<EditWithAidCard> {
         ),
         const SizedBox(height: 4),
         Expanded(
-          child: CustomDropdown(
-            keyName: label,
-            items: dropdownItems,
-            selectedValue: value,
-            onChanged: onEdit,
-            textStyle: TextStyle(
-              fontSize: isHighlighted ? 18 : 14,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF163351),
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: CustomDropdown(
+                    hintText: "+/-",
+                    keyName: "nearVisionSphereSign",
+                    items: ["+", "-"],
+                    selectedValue: "+",
+                    onChanged: (value) {
+                      setState(() {
+                        // widget.controllers["${widget.prefix}.$eye.nearVisionSphereSign"]?.text = value!;
+                      });
+                    }
+                ),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: CustomDropdown(
+                  keyName: label,
+                  items: dropdownItems,
+                  selectedValue: value,
+                  onChanged: onEdit,
+                  textStyle: TextStyle(
+                    fontSize: isHighlighted ? 18 : 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF163351),
+                  ),
+                ),
+              ),
+            ],
           )
         )
       ],
