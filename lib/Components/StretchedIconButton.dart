@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 class StretchedIconButton extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
-  final IconData icon;
+  final IconData? icon;
   final String label;
   final VoidCallback onPressed;
   final double borderRadius;
 
   const StretchedIconButton({
-    Key? key,
+    super.key,
     required this.backgroundColor,
     required this.textColor,
-    required this.icon,
+    this.icon,
     required this.label,
     required this.onPressed,
     this.borderRadius = 8.0, // Default border radius
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +31,17 @@ class StretchedIconButton extends StatelessWidget {
           ),
         ),
         onPressed: onPressed,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: textColor),
-            const SizedBox(width: 8),
-            Text(label),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) Icon(icon, color: textColor), // Add icon conditionally
+              if (icon != null) const SizedBox(width: 8),
+              Text(label),
+            ],
+          ),
         ),
       ),
     );

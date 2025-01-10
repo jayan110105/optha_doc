@@ -16,22 +16,17 @@ class Home extends StatelessWidget {
             const _HeaderText('OpthaDoc'),
             _HomeImage(
                 imagePath: 'assets/images/homepage.jpg',
-                maxHeight: screenHeight * 0.3
+                maxHeight: screenHeight * 0.4
             ),
             const _SubtitleText('Welcome to OpthaDoc!'),
             const _DescriptionText('Let\'s transform eye care together!'),
             const SizedBox(height: 50),
             _ActionButton(
-              text: 'Camp Mode',
+              text: 'Get Started',
               icon: Icons.festival,
               onPressed: () => Navigator.pushNamed(context, '/camp'),
             ),
             const SizedBox(height: 8),
-            _ActionButton(
-              text: 'Hospital Mode',
-              icon: Icons.apartment,
-              onPressed: () => Navigator.pushNamed(context, '/login'),
-            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -129,25 +124,25 @@ class _ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF163352),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.all(15),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF163352),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
           ),
+          padding: const EdgeInsets.all(15),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: Colors.white, size: 30),
+              Icon(icon, color: Color(0xFFE9E6DB), size: 25),
               const SizedBox(width: 10),
               Text(
                 text,
-                style: const TextStyle(color: Colors.white, fontSize: 18),
+                style: const TextStyle(color: Color(0xFFE9E6DB), fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],
           ),

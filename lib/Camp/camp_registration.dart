@@ -29,6 +29,7 @@ class _CampRegistrationState extends State<CampRegistration> {
   File? _image;
 
   final List<Map<String, dynamic>> steps = [
+    {"id": "token", "title": "Token", "icon": Icons.tag},
     {"id": "photo", "title": "Photo", "icon": Icons.camera_alt},
     {"id": "basic", "title": "Basic Info", "icon": Icons.person},
     {"id": "gender", "title": "Gender", "icon": Icons.group},
@@ -80,10 +81,13 @@ class _CampRegistrationState extends State<CampRegistration> {
   }
 
   void nextStep() {
-    if (!validateStepFields(step)) return;
-    if(step == steps.length - 1)// Validate current step fields
-      print("Submit");
-    else if (step < steps.length - 1) {
+    // if (!validateStepFields(step)) return;
+    if(step == steps.length - 1) {
+      // Validate current step fields
+      setState(() {
+        step++;
+      });
+    } else if (step < steps.length - 1) {
       setState(() {
         step++;
       });
@@ -161,6 +165,29 @@ class _CampRegistrationState extends State<CampRegistration> {
   Widget build(BuildContext context) {
     // Define the widget array for each step
     final stepWidgets = [
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "T4SRGU",
+              style: TextStyle(
+                fontSize: 60,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF163351),
+              ),
+            ),
+            Text(
+              "This is the patient's unique token number. Please provide this to the patient for future reference.",
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF163351).withValues(alpha: 0.6),
+              ),
+              textAlign: TextAlign.center,
+            )
+          ],
+        ),
+      ),
       // Step 1: Photo
       Center(
         child: Column(
@@ -330,6 +357,33 @@ class _CampRegistrationState extends State<CampRegistration> {
           ),
         ],
       ),
+      Column(
+        children: [
+          Text(
+            "Registration complete. What would you like to do next?",
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF163351),
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            textColor: Colors.white,
+            label: "Register Another Patient",
+            onPressed: scanAadhar, // Replace with your onPressed function
+          ),
+          SizedBox(height: 8),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            textColor: Colors.white,
+            label: "Go to Eye Checkup",
+            onPressed: scanAadhar, // Replace with your onPressed function
+          ),
+        ],
+      )
     ];
 
     return Scaffold(
@@ -420,7 +474,7 @@ class _CampRegistrationState extends State<CampRegistration> {
                                   borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
                                 ),
                               ),
-                              onPressed: nextStep,
+                              onPressed: step<stepWidgets.length-1 ? nextStep : null,
                               child: Row(
                                 children: [
                                   Text(step == steps.length - 1 ? "Submit" : "Continue"),

@@ -84,10 +84,10 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Label(text: "Patient ID"),
+          Label(text: "Token"),
           SizedBox(height: 8,),
           InputField(
-              hintText: "Enter patient ID",
+              hintText: "Enter patient token",
               controller: controllers['patientId'],
           ),
           SizedBox(height: 16),

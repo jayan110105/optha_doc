@@ -76,7 +76,7 @@ class _CampRecordsState extends State<CampRecords> {
         child: Column(
           children: [
             Text(
-              "Camp Registration",
+              "View Records",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -85,7 +85,7 @@ class _CampRecordsState extends State<CampRecords> {
             ),
             const SizedBox(height: 8),
             Text(
-              "Register a new patient for the eye camp",
+              "Access and manage patient examination records",
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF163351).withValues(alpha: 0.6),
@@ -94,7 +94,7 @@ class _CampRecordsState extends State<CampRecords> {
             const SizedBox(height: 20),
             CardComponent(
                 child: InputField(
-                    hintText: "Search by name or ID...",
+                    hintText: "Search by name or Token...",
                     onChanged: (value) {
                       setState(() {
                         searchQuery = value;
@@ -128,7 +128,7 @@ class _CampRecordsState extends State<CampRecords> {
                         title: Text(record["name"],
                             style: TextStyle(color: Color(0xFF163351), fontWeight: FontWeight.bold)),
                         subtitle: Text(
-                          "ID: ${record["patientId"]} • ${DateFormat('MMM d, yyyy').format(record["createdAt"])}",
+                          "Token: ${record["patientId"]} • ${DateFormat('MMM d, yyyy').format(record["createdAt"])}",
                           style: TextStyle(color: Color(0xFF163351).withValues(alpha: 0.6)),
                         ),
                         trailing: Icon(Icons.chevron_right,
