@@ -59,7 +59,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
               ),
             ),
           ),
-          ...["left", "right"].map((eye) {
+          ...["right", "left"].map((eye) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Column(
@@ -122,7 +122,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                                   child: CustomDropdown(
                                     hintText: "0.0",
                                     keyName: "${widget.prefix}.$eye.distanceVisionSphere",
-                                    items: List.generate(33, (index) => (index * 0.25).toStringAsFixed(2)),
+                                    items: List.generate(81, (index) => (index * 0.25).toStringAsFixed(2)),
                                     selectedValue: widget.controllers["${widget.prefix}.$eye.distanceVisionSphere"]?.text,
                                     onChanged: (value) {
                                       setState(() {
