@@ -161,6 +161,17 @@ class _CampRegistrationState extends State<CampRegistration> {
     }
   }
 
+  Future<void> scanAddress() async {
+    File? imageFile = await getImage();
+    if (imageFile != null) {
+      String text = await performOCR(imageFile);
+      Map<String, String> extractedData = preprocessAddressText(text);
+      setState(() {
+        controllers["address"]?.text = extractedData['address'] ?? '';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Define the widget array for each step
@@ -354,6 +365,14 @@ class _CampRegistrationState extends State<CampRegistration> {
             isEnabled: true,
             minLines: 5,
             maxLines: null, // Allows unlimited lines
+          ),
+          SizedBox(height: 24),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            textColor: Colors.white,
+            icon: Icons.document_scanner,
+            label: "Scan Address",
+            onPressed: scanAddress, // Replace with your onPressed function
           ),
         ],
       ),

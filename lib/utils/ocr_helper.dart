@@ -18,7 +18,7 @@ Future<String> performOCR(File imageFile) async {
   // Close the recognizer to free up resources
   textRecognizer.close();
 
-  print(extractedText);
+  // print(extractedText);
   return extractedText;
 }
 
@@ -30,6 +30,19 @@ String cleanName(String name) {
       .join(' '); // Join the cleaned words back into a single string
 
   return cleanedName.trim(); // Trim any leading or trailing spaces
+}
+
+String cleanAddress(String address){
+  final RegExp removeLineRegex = RegExp(
+    r'^.*Unique\s+ldentification\s+Authority\s+of\s+india.*$', // Match the specific line
+    caseSensitive: false, // Make it case insensitive
+    multiLine: true, // Ensure multi-line matching
+  );
+
+  // Remove the line
+  final cleanedText = address.replaceAll(removeLineRegex, '').trim();
+
+  return cleanedText;
 }
 
 /// Preprocesses the scanned text to extract Aadhaar details.
@@ -65,6 +78,8 @@ Map<String, String> preprocessAadhaarText(String scannedText) {
   RegExp aadhaarRegex = RegExp(aadhaarPattern);
   String aadhar = aadhaarRegex.firstMatch(normalizedText)?.group(0)?.replaceAll(' ', '') ?? 'Aadhaar number not found';
 
+
+
   // Return a formatted string or a map with extracted data
   return {
     'name': name,
@@ -72,6 +87,32 @@ Map<String, String> preprocessAadhaarText(String scannedText) {
     'gender': gender,
     'aadhar': aadhar,
   };
+}
+
+Map<String, String> preprocessAddressText(String scannedText) {
+
+  final RegExp addressRegex = RegExp(
+    r'Address:(.*?)\d{6}', // Match Address (case-sensitive in the pattern)
+    dotAll: true,
+    caseSensitive: false, // Makes the regex case-insensitive
+  );
+
+  // Extract the address
+  final match = addressRegex.firstMatch(scannedText);
+
+  if (match != null) {
+    // Remove "Address: " prefix
+    final String address = cleanAddress(match.group(0)!.replaceFirst('Address:', '').trim());
+    print(address);
+    return {
+      'address': address,
+    };
+  } else {
+    // print('Address not found');
+    return {
+      'address': 'Address not found',
+    };
+  }
 }
 
 /// Helper function to capitalize the first letter of a string.
