@@ -15,12 +15,22 @@ class Camp extends StatefulWidget {
 class _CampState extends State<Camp> {
   int _selectedIndex = 0;
 
-  final pages = [
+  int initialEyeCheckupStep = 0;
+
+  List<Widget> get pages => [
     const CampDashboard(),
-    const CampRegistration(),
-    const CampEyeCheckup(),
-    const CampRecords()
+    CampRegistration(onNavigateToEyeCheckup: navigateToEyeCheckup),
+    CampEyeCheckup(initialStep: initialEyeCheckupStep),
+    const CampRecords(),
   ];
+
+  void navigateToEyeCheckup(int step) {
+    setState(() {
+      initialEyeCheckupStep = step; // Set the initial step
+      _selectedIndex = 2;          // Navigate to CampEyeCheckup
+      print('Navigating to Eye Checkup with initial step: $initialEyeCheckupStep');
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {

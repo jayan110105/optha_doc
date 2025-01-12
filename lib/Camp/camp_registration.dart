@@ -18,7 +18,10 @@ extension StringExtension on String {
 }
 
 class CampRegistration extends StatefulWidget {
-  const CampRegistration({super.key});
+
+  final Function(int) onNavigateToEyeCheckup;
+
+  const CampRegistration({super.key, required this.onNavigateToEyeCheckup});
 
   @override
   State<CampRegistration> createState() => _CampRegistrationState();
@@ -170,6 +173,19 @@ class _CampRegistrationState extends State<CampRegistration> {
         controllers["address"]?.text = extractedData['address'] ?? '';
       });
     }
+  }
+
+  void resetForm() {
+    setState(() {
+      // Reset all controllers
+      for (var controller in controllers.values) {
+        controller.clear();
+      }
+      // Reset step to 0
+      step = 0;
+      // Reset image
+      _image = null;
+    });
   }
 
   @override
@@ -376,6 +392,7 @@ class _CampRegistrationState extends State<CampRegistration> {
           ),
         ],
       ),
+      // Step 5: Completed
       Column(
         children: [
           Text(
@@ -392,14 +409,18 @@ class _CampRegistrationState extends State<CampRegistration> {
             backgroundColor: const Color(0xFF163351),
             textColor: Colors.white,
             label: "Register Another Patient",
-            onPressed: scanAadhar, // Replace with your onPressed function
+            onPressed: resetForm, // Replace with your onPressed function
           ),
           SizedBox(height: 8),
           StretchedIconButton(
             backgroundColor: const Color(0xFF163351),
             textColor: Colors.white,
             label: "Go to Eye Checkup",
-            onPressed: scanAadhar, // Replace with your onPressed function
+            onPressed: () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                widget.onNavigateToEyeCheckup(1); // Pass step 3 to EyeCheckup after build
+              });
+            }, // Replace with your onPressed function
           ),
         ],
       )
@@ -448,7 +469,7 @@ class _CampRegistrationState extends State<CampRegistration> {
                         ProgressSteps(
                           steps: steps,
                           currentStep: step,
-                          allowStepTap: false,
+                          allowStepTap: true,
                           onStepTapped: (index) {
                             setState(() {
                               step = index;

@@ -3,13 +3,14 @@ import 'package:opthadoc/Components/CustomDropdown.dart';
 import 'package:opthadoc/Components/CustomTextArea.dart';
 import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/InputField.dart';
-import 'package:opthadoc/Components/StretchedIconButton.dart';
 import 'package:opthadoc/Components/VisionMeasurement.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 
 class CampEyeCheckup extends StatefulWidget {
-  const CampEyeCheckup({super.key});
+  final int initialStep;
+
+  const CampEyeCheckup({super.key, this.initialStep = 0});
 
   @override
   State<CampEyeCheckup> createState() => _CampEyeCheckupState();
@@ -21,7 +22,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
   bool isChecked = false;
 
   final List<Map<String, dynamic>> steps = [
-    {"title": "Patient ID", "icon": Icons.search},
+    {"title": "Token", "icon": Icons.tag},
     {"title": "Without Glasses", "icon": Icons.visibility_off},
     {"title": "With Glasses", "icon": Icons.visibility},
     {"title": "With Correction", "icon": "assets/icons/eyeglasses.svg"},
@@ -34,6 +35,11 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
   void initState() {
 
     super.initState();
+
+    step = widget.initialStep;
+
+    print("Initial Step: $step");
+
     for (var eye in ['left', 'right']) {
       controllers['withoutGlasses.$eye.distanceVision'] = TextEditingController();
     }
@@ -84,20 +90,28 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Label(text: "Token"),
+          Label(text: "Patient Token"),
           SizedBox(height: 8,),
           InputField(
               hintText: "Enter patient token",
               controller: controllers['patientId'],
           ),
           SizedBox(height: 16),
-          StretchedIconButton(
-            backgroundColor: const Color(0xFF163351),
-            textColor: Colors.white,
-            icon: Icons.search,
-            label: "Find Patient",
-            onPressed: nextStep, // Replace with your onPressed function
-          ),
+          Text(
+            "Enter the patient's token number to proceed with the eye checkup.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xFF163351).withValues(alpha: 0.6),
+              fontSize: 14,
+            )
+          )
+          // StretchedIconButton(
+          //   backgroundColor: const Color(0xFF163351),
+          //   textColor: Colors.white,
+          //   icon: Icons.search,
+          //   label: "Find Patient",
+          //   onPressed: nextStep, // Replace with your onPressed function
+          // ),
         ],
       ),
       Column(
