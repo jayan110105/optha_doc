@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/home.dart';
 import 'package:opthadoc/Camp/camp.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:io';
 
-void main() {
+void main() async {
+  print('Current working directory: ${Directory.current.path}');
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    print('Failed to load .env file: $e');
+  }
   runApp(const MyApp(initialRoute: '/home'));
 }
 

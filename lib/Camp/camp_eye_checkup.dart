@@ -6,6 +6,7 @@ import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/VisionMeasurement.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
+import 'package:opthadoc/data/DatabaseHelper.dart';
 
 class CampEyeCheckup extends StatefulWidget {
   final int initialStep;
@@ -30,6 +31,34 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
   ];
 
   final Map<String, TextEditingController> controllers = {};
+
+  void saveCheckup() async {
+    final dbHelper = DatabaseHelper.instance;
+
+    // Prepare data for saving
+    final checkupData = {
+      'patientId': controllers['patientId']?.text ?? '',
+      'withoutGlasses': controllers.entries
+          .where((entry) => entry.key.startsWith('withoutGlasses'))
+          .map((entry) => '${entry.key}:${entry.value.text}')
+          .join(','),
+      'withGlasses': controllers.entries
+          .where((entry) => entry.key.startsWith('withGlasses'))
+          .map((entry) => '${entry.key}:${entry.value.text}')
+          .join(','),
+      'withCorrection': controllers.entries
+          .where((entry) => entry.key.startsWith('withCorrection'))
+          .map((entry) => '${entry.key}:${entry.value.text}')
+          .join(','),
+      'remarks': controllers['remarks']?.text ?? '',
+      'complaint': controllers['complaint']?.text ?? '',
+    };
+
+    // Save data to the database
+    final id = await dbHelper.insertEyeCheckup(checkupData);
+    print('Eye Checkup saved with ID: $id');
+  }
+
 
   @override
   void initState() {
@@ -355,7 +384,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                               ),
                             ),
                             onPressed:
-                            step == steps.length - 1 ? () => print("") : nextStep,
+                            step == steps.length - 1 ? () => saveCheckup : nextStep,
                             child: Row(
                               children: [
                                 Text(step == steps.length - 1 ? "Save Checkup" : "Continue"),

@@ -9,6 +9,11 @@ import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:opthadoc/Components/ErrorSnackBar.dart';
 import 'package:opthadoc/utils/ocr_helper.dart';
+import 'package:opthadoc/data/DatabaseHelper.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+bool get isDatabaseDisabled => dotenv.env['DISABLE_DB'] == 'true';
+bool get isValidationDisabled => dotenv.env['DISABLE_VALIDATION'] == 'true';
 
 extension StringExtension on String {
   String capitalize() {
@@ -50,6 +55,34 @@ class _CampRegistrationState extends State<CampRegistration> {
     "complaint": TextEditingController(),
   };
 
+  void saveRegistration() async {
+
+    if (isDatabaseDisabled) {
+      print('Database saving is disabled during testing.');
+      return;
+    }
+
+    final dbHelper = DatabaseHelper.instance;
+
+    // Prepare the data
+    final registration = {
+      'name': controllers['name']?.text ?? '',
+      'age': controllers['age']?.text ?? '',
+      'gender': controllers['gender']?.text ?? '',
+      'aadhar': controllers['aadhar']?.text ?? '',
+      'parent': controllers['parent']?.text ?? '',
+      'phone': controllers['phone']?.text ?? '',
+      'address': controllers['address']?.text ?? '',
+      'complaint': controllers['complaint']?.text ?? '',
+      'photo_path': _image?.path ?? '',
+    };
+
+    // Save the data to the database
+    final id = await dbHelper.insertRegistration(registration);
+    print('Registration saved with ID: $id');
+  }
+
+
   void showCustomSnackBar(BuildContext context, String title, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -84,9 +117,10 @@ class _CampRegistrationState extends State<CampRegistration> {
   }
 
   void nextStep() {
-    // if (!validateStepFields(step)) return;
+    if (!validateStepFields(step)) return;
     if(step == steps.length - 1) {
       // Validate current step fields
+      saveRegistration();
       setState(() {
         step++;
       });
@@ -98,6 +132,12 @@ class _CampRegistrationState extends State<CampRegistration> {
   }
 
   bool validateStepFields(int currentStep) {
+
+    if (isValidationDisabled) {
+      print('Validation is disabled during testing.');
+      return true;
+    }
+
     List<String> requiredFields;
 
     switch (currentStep) {
