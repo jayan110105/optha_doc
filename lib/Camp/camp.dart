@@ -3,7 +3,8 @@ import 'package:opthadoc/Camp/camp_dashboard.dart';
 import 'package:opthadoc/Camp/camp_registration.dart';
 import 'package:opthadoc/Camp/camp_eye_checkup.dart';
 import 'package:opthadoc/Camp/camp_records.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:opthadoc/Camp/camp_examine.dart';
 
 class Camp extends StatefulWidget {
   const Camp({super.key});
@@ -21,6 +22,7 @@ class _CampState extends State<Camp> {
     const CampDashboard(),
     CampRegistration(onNavigateToEyeCheckup: navigateToEyeCheckup),
     CampEyeCheckup(initialStep: initialEyeCheckupStep),
+    const CampExamine(),
     const CampRecords(),
   ];
 
@@ -65,10 +67,21 @@ class _CampState extends State<Camp> {
       unselectedItemColor: Colors.white.withValues(alpha: 0.4),
       currentIndex: _selectedIndex,
       onTap: _onItemTapped,
-      items: const [
+      items: [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.person_add), label: 'Register'),
         BottomNavigationBarItem(icon: Icon(Icons.visibility), label: 'Checkup'),
+        BottomNavigationBarItem(icon: SvgPicture.asset(
+          'assets/icons/stethoscope.svg',
+          colorFilter: ColorFilter.mode(
+            _selectedIndex == 3
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.4),
+            BlendMode.srcIn,
+          ),
+          height: 26.0,
+          width: 26.0,
+        ), label: 'Examine'),
         BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Records'),
       ],
     );
