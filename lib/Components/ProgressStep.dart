@@ -22,67 +22,79 @@ class ProgressSteps extends StatefulWidget {
 class _ProgressStepsState extends State<ProgressSteps> {
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      // spacing: 16.0, // Space between each step
-      alignment: WrapAlignment.spaceBetween,
-      runSpacing: 8.0, // Space between rows when wrapping occurs
-      children: widget.steps.map((step) {
-        int index = widget.steps.indexOf(step);
-        return GestureDetector(
-          onTap: widget.allowStepTap
-              ? () => widget.onStepTapped(index) // Allow tapping if enabled
-              : null,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(
-                backgroundColor: widget.currentStep >= index
-                    ? const Color(0xFF163351)
-                    : const Color(0xFF163351).withValues(alpha: .1),
-                child: widget.currentStep > index
-                    ? const Icon(
-                  Icons.check_circle,
-                  color: Colors.white,
-                )
-                    : (step["icon"] is String
-                    ? SvgPicture.asset(
-                  step["icon"],
-                  colorFilter: ColorFilter.mode(
-                    widget.currentStep >= index
-                        ? Colors.white
-                        : const Color(0xFF163351).withValues(alpha: .4),
-                    BlendMode.srcIn,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Emulate spaceBetween behavior
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: widget.steps.map((step) {
+              int index = widget.steps.indexOf(step);
+              return Padding(
+                padding: const EdgeInsets.only(right: 10.0), // Add spacing between items
+                child: GestureDetector(
+                  onTap: widget.allowStepTap
+                      ? () => widget.onStepTapped(index) // Allow tapping if enabled
+                      : null,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: widget.currentStep >= index
+                            ? const Color(0xFF163351)
+                            : const Color(0xFF163351).withValues(alpha: .1),
+                        child: widget.currentStep > index
+                            ? const Icon(
+                          Icons.check_circle,
+                          color: Colors.white,
+                        )
+                            : (step["icon"] is String
+                            ? SvgPicture.asset(
+                          step["icon"],
+                          colorFilter: ColorFilter.mode(
+                            widget.currentStep >= index
+                                ? Colors.white
+                                : const Color(0xFF163351)
+                                .withValues(alpha: .4),
+                            BlendMode.srcIn,
+                          ),
+                          height: 26.0,
+                          width: 26.0,
+                        )
+                            : Icon(
+                          step["icon"],
+                          color: widget.currentStep >= index
+                              ? Colors.white
+                              : const Color(0xFF163351)
+                              .withValues(alpha: .4),
+                        )),
+                      ),
+                      const SizedBox(height: 8), // Simulates `runSpacing`
+                      SizedBox(
+                        width: 60, // Adjust width for consistent text alignment
+                        child: Text(
+                          step["title"],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: widget.currentStep >= index
+                                ? const Color(0xFF163351)
+                                : Colors.grey[600],
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ),
+                    ],
                   ),
-                  height: 26.0,
-                  width: 26.0,
-                )
-                    : Icon(
-                  step["icon"],
-                  color: widget.currentStep >= index
-                      ? Colors.white
-                      : const Color(0xFF163351).withValues(alpha: .4),
-                )),
-              ),
-              const SizedBox(height: 4),
-              SizedBox(
-                width: 60, // Adjust width as needed for wrapping text
-                child: Text(
-                  step["title"],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: widget.currentStep >= index
-                        ? const Color(0xFF163351)
-                        : Colors.grey[600],
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2, // Allows wrapping to two lines if needed
                 ),
-              ),
-            ],
+              );
+            }).toList(),
           ),
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 }
