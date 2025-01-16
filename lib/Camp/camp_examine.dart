@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
-import 'package:opthadoc/Components/CustomDropdown.dart';
+import 'package:opthadoc/Components/CustomRadioGroup.dart';
 import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
@@ -15,6 +15,18 @@ class CampExamine extends StatefulWidget {
 class _CampExamineState extends State<CampExamine> {
 
   int step = 0;
+
+  final Map<String, String?> selectedValues = {};
+
+  final List<Map<String, String>> questions = [
+    {"label": "Ocular Trauma"},
+    {"label": "Flashes"},
+    {"label": "Floaters"},
+    {"label": "Glaucoma on Rx"},
+    {"label": "Pain/redness"},
+    {"label": "Watering/discharge"},
+    {"label": "History of glasses"},
+  ];
 
   final List<Map<String, dynamic>> steps = [
     {"id": "patient", "title": "Patient", "icon": Icons.person},
@@ -86,9 +98,51 @@ class _CampExamineState extends State<CampExamine> {
                 ),
               ),
             ],
-          )
+          ),
+          SizedBox(height: 16),
+          Label(text: "Complaint RE"),
+          InputField(hintText: "Diminution of vision"),
+          SizedBox(height: 16),
+          Label(text: "Complaint LE"),
+          InputField(hintText: "Diminution of vision"),
+          SizedBox(height: 16),
+          Label(text: "Complaint Duration"),
+          InputField(hintText: "Duration of complaint"),
         ],
-      )
+      ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Patient History",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF163351),
+            ),
+          ),
+          SizedBox(height: 24),
+          // Dynamically generate questions with CustomRadioGroup
+          ...questions.map((question) {
+            final label = question["label"]!;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Label(text: label),
+                CustomRadioGroup(
+                  selectedValue: selectedValues[label],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedValues[label] = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+            );
+          }),
+        ],
+      ),
     ];
 
     return Scaffold(
