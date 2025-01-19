@@ -18,7 +18,6 @@ class CustomCheckbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      // crossAxisAlignment: CrossAxisAlignment.start, // Align items along the center baseline
       children: [
         Checkbox(
           visualDensity: VisualDensity.compact,

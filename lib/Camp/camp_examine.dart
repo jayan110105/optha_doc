@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:opthadoc/Camp/Examine/Comorbid.dart';
+import 'package:opthadoc/Camp/Examine/Diagnosis.dart';
+import 'package:opthadoc/Camp/Examine/Dilated.dart';
+import 'package:opthadoc/Camp/Examine/Exam.dart';
+import 'package:opthadoc/Camp/Examine/PreSurgery.dart';
+import 'package:opthadoc/Camp/Examine/Workup.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
-import 'package:opthadoc/Components/CustomRadioGroup.dart';
-import 'package:opthadoc/Components/CustomTextArea.dart';
-import 'package:opthadoc/Components/InputField.dart';
-import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
-import 'package:opthadoc/Components/CustomCheckbox.dart';
+import 'package:opthadoc/Camp/Examine/Patient.dart';
+import 'package:opthadoc/Camp/Examine/History.dart';
 
 class CampExamine extends StatefulWidget {
   const CampExamine({super.key});
@@ -18,30 +21,6 @@ class _CampExamineState extends State<CampExamine> {
 
   int step = 0;
 
-  final Map<String, String?> selectedValues = {};
-
-  final List<Map<String, String>> questions = [
-    {"label": "Ocular Trauma"},
-    {"label": "Flashes"},
-    {"label": "Floaters"},
-    {"label": "Glaucoma on Rx"},
-    {"label": "Pain/redness"},
-    {"label": "Watering/discharge"},
-    {"label": "History of glasses"},
-  ];
-
-  final Map<String, bool> comorbidities = {
-    "Diabetes mellitus": false,
-    "Hypertension": false,
-    "Heart disease": false,
-    "Asthma": false,
-    "Allergy to dust/meds": false,
-    "Benign prostatic hyperplasia on treatment": false,
-    "Is the patient On Antiplatelets" : false,
-  };
-
-  final Map<String, TextEditingController> controllers = {};
-
   final List<Map<String, dynamic>> steps = [
     {"id": "patient", "title": "Patient", "icon": Icons.person},
     {"id": "history", "title": "History", "icon": Icons.description},
@@ -50,6 +29,7 @@ class _CampExamineState extends State<CampExamine> {
     {"id": "workup", "title": "Workup", "icon": Icons.biotech},
     {"id": "dilated", "title": "Dilated", "icon": Icons.visibility},
     {"id": "diagnosis", "title": "Diagnosis", "icon": Icons.assignment_turned_in},
+    {"id": "pre-surgery ", "title": "Pre-Surgery", "icon": Icons.assignment},
   ];
 
   void nextStep() {
@@ -76,195 +56,17 @@ class _CampExamineState extends State<CampExamine> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    // Initialize controllers for each comorbidity
-    for (var key in comorbidities.keys) {
-      controllers[key] = TextEditingController();
-    }
-  }
-
-  @override
-  void dispose() {
-    // Dispose controllers to avoid memory leaks
-    for (var controller in controllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final List<String> comorbidityKeys = comorbidities.keys.toList();
 
     final stepWidgets = [
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Patient Information",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF163351),
-            ),
-          ),
-          SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Label(text: "Vision RE"),
-                    InputField(hintText: "With PH, BGC, NV")
-                  ],
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Label(text: "Vision LE"),
-                    InputField(hintText: "With PH, BGC, NV")
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          Label(text: "Complaint RE"),
-          InputField(hintText: "Diminution of vision"),
-          SizedBox(height: 16),
-          Label(text: "Complaint LE"),
-          InputField(hintText: "Diminution of vision"),
-          SizedBox(height: 16),
-          Label(text: "Complaint Duration"),
-          InputField(hintText: "Duration of complaint"),
-        ],
-      ),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Patient History",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF163351),
-            ),
-          ),
-          SizedBox(height: 24),
-          // Dynamically generate questions with CustomRadioGroup
-          ...questions.map((question) {
-            final label = question["label"]!;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Label(text: label),
-                CustomRadioGroup(
-                  selectedValue: selectedValues[label],
-                  onChanged: (value) {
-                    setState(() {
-                      selectedValues[label] = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-              ],
-            );
-          }),
-          selectedValues['History of glasses'] == 'yes'
-              ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Label(text: "Are PG comfortable ?"),
-              CustomRadioGroup(
-                selectedValue: selectedValues["Are PG comfortable ?"],
-                onChanged: (value) {
-                  setState(() {
-                    selectedValues["Are PG comfortable ?"] = value;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              Label(text: "Last Glass change"),
-              InputField(hintText: "Enter date or duration"),
-            ],
-          )
-              : SizedBox.shrink(),
-          const SizedBox(height: 16),
-          Label(text: "Previous surgery/laser rx"),
-          CustomRadioGroup(
-            selectedValue: selectedValues["Previous surgery/laser rx"],
-            onChanged: (value) {
-              setState(() {
-                selectedValues["Previous surgery/laser rx"] = value;
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          selectedValues['Previous surgery/laser rx'] == 'yes'
-              ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Label(text: "Details of surgery/procedure"),
-              CustomTextArea(hintText: "Enter surgery details", minLines: 3,),
-            ],
-          )
-              : SizedBox.shrink(),
-        ],
-      ),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Comorbidities and Medications",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF163351),
-            ),
-          ),
-          SizedBox(height: 24),
-          Column(
-            children: [
-              for (int i = 0; i < comorbidityKeys.length; i += 2)
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomCheckbox(
-                        value: comorbidities[comorbidityKeys[i]] ?? false,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            comorbidities[comorbidityKeys[i]] = value ?? false;
-                          });
-                        },
-                        controllers: controllers,
-                        text: comorbidityKeys[i],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    if (i + 1 < comorbidityKeys.length) // Check if next item exists
-                      Expanded(
-                        child: CustomCheckbox(
-                          value: comorbidities[comorbidityKeys[i + 1]] ?? false,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              comorbidities[comorbidityKeys[i + 1]] = value ?? false;
-                            });
-                          },
-                          controllers: controllers,
-                          text: comorbidityKeys[i + 1],
-                        ),
-                      ),
-                  ],
-                ),
-            ],
-          ),
-        ],
-      ),
+      Patient(),
+      History(),
+      Comorbid(),
+      Exam(),
+      Workup(),
+      Dilated(),
+      Diagnosis(),
+      PreSurgery(),
     ];
 
     return Scaffold(
