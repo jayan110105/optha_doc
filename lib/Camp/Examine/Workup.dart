@@ -3,20 +3,22 @@ import 'package:opthadoc/Components/CustomDropdown.dart';
 import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/Label.dart';
 
-class Workup extends StatefulWidget {
-  const Workup({super.key});
+class Workup extends StatelessWidget {
+  final Map<String, dynamic> data;
+  final Function(String key, dynamic value) updateValue;
 
-  @override
-  State<Workup> createState() => _WorkupState();
-}
+  const Workup({
+    super.key,
+    required this.data,
+    required this.updateValue,
+  });
 
-class _WorkupState extends State<Workup> {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Workup",
           style: TextStyle(
             fontSize: 18,
@@ -24,51 +26,47 @@ class _WorkupState extends State<Workup> {
             color: Color(0xFF163351),
           ),
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         Row(
           children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Label(text: "RE Ducts"),
+                  const Label(text: "RE Ducts"),
                   CustomDropdown(
-                    textStyle: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF163351),
-                        fontWeight: FontWeight.bold
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF163351),
+                      fontWeight: FontWeight.bold,
                     ),
-                    keyName: '',
+                    keyName: 're-ducts',
                     items: ["Free", "Blocked", "Partially patent"],
-                    // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                    selectedValue: data['re-ducts'],
                     onChanged: (value) {
-                      setState(() {
-                        // controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                      });
+                      updateValue('re-ducts', value);
                     },
                   ),
                 ],
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Label(text: "LE Ducts"),
+                  const Label(text: "LE Ducts"),
                   CustomDropdown(
-                    textStyle: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF163351),
-                        fontWeight: FontWeight.bold
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF163351),
+                      fontWeight: FontWeight.bold,
                     ),
-                    keyName: '',
+                    keyName: 'le-ducts',
                     items: ["Free", "Blocked", "Partially patent"],
-                    // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                    selectedValue: data['le-ducts'],
                     onChanged: (value) {
-                      setState(() {
-                        // controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                      });
+                      updateValue('le-ducts', value);
                     },
                   ),
                 ],
@@ -76,25 +74,31 @@ class _WorkupState extends State<Workup> {
             ),
           ],
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Label(text: "BP"),
-                  InputField(hintText: "")
+                  const Label(text: "BP"),
+                  InputField(
+                    hintText: "Enter BP value",
+                    controller: data['bp'],
+                  ),
                 ],
               ),
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Label(text: "GRBS"),
-                  InputField(hintText: "")
+                  const Label(text: "GRBS"),
+                  InputField(
+                    hintText: "Enter GRBS value",
+                    controller: data['grbs'],
+                  ),
                 ],
               ),
             ),

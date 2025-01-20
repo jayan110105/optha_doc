@@ -3,51 +3,24 @@ import 'package:opthadoc/Components/CustomCheckbox.dart';
 import 'package:opthadoc/Components/CustomRadioGroup.dart';
 import 'package:opthadoc/Components/Label.dart';
 
-class PreSurgery extends StatefulWidget {
-  const PreSurgery({super.key});
+class PreSurgery extends StatelessWidget {
+  final Map<String, dynamic> data;
+  final Function(String key, dynamic value) updateValue;
 
-  @override
-  State<PreSurgery> createState() => _PreSurgeryState();
-}
-
-class _PreSurgeryState extends State<PreSurgery> {
-
-  final Map<String, String?> selectedValues = {};
-
-  final Map<String, bool> arrival = {
-    "IOP": false,
-    "BSCAN": false,
-    "Systemic evaluation": false,
-  };
-
-  final Map<String, TextEditingController> controllers = {};
-
-  @override
-  void dispose() {
-    // Dispose controllers to avoid memory leaks
-    for (var controller in controllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize controllers for each comorbidity
-    for (var key in arrival.keys) {
-      controllers[key] = TextEditingController();
-    }
-  }
+  const PreSurgery({
+    super.key,
+    required this.data,
+    required this.updateValue,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final List<String> arrivalKeys = arrival.keys.toList();
+    final List<String> arrivalKeys = ["IOP", "BSCAN", "Systemic evaluation"];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Pre-Surgery Evaluation",
           style: TextStyle(
             fontSize: 18,
@@ -55,31 +28,26 @@ class _PreSurgeryState extends State<PreSurgery> {
             color: Color(0xFF163351),
           ),
         ),
-        SizedBox(height: 24),
-        Label(text: "Cardio/Medicine clearance for surgery"),
+        const SizedBox(height: 24),
+        const Label(text: "Cardio/Medicine clearance for surgery"),
         CustomRadioGroup(
-          selectedValue: selectedValues["Cardio/Medicine clearance for surgery"],
+          selectedValue: data["Cardio/Medicine clearance for surgery"],
           onChanged: (value) {
-            setState(() {
-              selectedValues["Cardio/Medicine clearance for surgery"] = value;
-            });
+            updateValue("Cardio/Medicine clearance for surgery", value);
           },
         ),
-        SizedBox(height: 16),
-        Label(text: "Does patient need the following on arrival at KH:"),
-        for (int i = 0; i < arrivalKeys.length; i ++)
+        const SizedBox(height: 16),
+        const Label(text: "Does patient need the following on arrival at KH:"),
+        for (final key in arrivalKeys)
           Row(
             children: [
               Expanded(
                 child: CustomCheckbox(
-                  value: arrival[arrivalKeys[i]] ?? false,
+                  value: data[key] ?? false,
                   onChanged: (bool? value) {
-                    setState(() {
-                      arrival[arrivalKeys[i]] = value ?? false;
-                    });
+                    updateValue(key, value ?? false);
                   },
-                  controllers: controllers,
-                  text: arrivalKeys[i],
+                  text: key,
                 ),
               ),
             ],

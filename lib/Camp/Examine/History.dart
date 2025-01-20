@@ -5,32 +5,24 @@ import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/Label.dart';
 
 class History extends StatefulWidget {
-  const History({super.key});
+  final Map<String, dynamic> controller;
+  final Function(String key, dynamic value) updateValue;
+
+  const History({super.key, required this.controller, required this.updateValue});
 
   @override
   State<History> createState() => _HistoryState();
 }
 
 class _HistoryState extends State<History> {
-
-  final Map<String, String?> selectedValues = {};
-
-  final List<Map<String, String>> questions = [
-    {"label": "Ocular Trauma"},
-    {"label": "Flashes"},
-    {"label": "Floaters"},
-    {"label": "Glaucoma on Rx"},
-    {"label": "Pain/redness"},
-    {"label": "Watering/discharge"},
-    {"label": "History of glasses"},
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final controller = widget.controller;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Patient History",
           style: TextStyle(
             fontSize: 18,
@@ -38,65 +30,64 @@ class _HistoryState extends State<History> {
             color: Color(0xFF163351),
           ),
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         // Dynamically generate questions with CustomRadioGroup
-        ...questions.map((question) {
-          final label = question["label"]!;
+        ...controller.keys.map((key) {
+          if (key == "Are PG comfortable ?" && controller["History of glasses"] != "yes") {
+            return const SizedBox.shrink(); // Skip rendering this question unless relevant
+          }
+          if (key == "Details of surgery/procedure" &&
+              controller["Previous surgery/laser rx"] != "yes") {
+            return const SizedBox.shrink(); // Skip unless surgery is marked "yes"
+          }
+
+          if (key == "Last Glass change" && controller["History of glasses"] != "yes") {
+            return const SizedBox.shrink();
+          }
+
+          if (key == "Details of surgery/procedure") {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Label(text: key),
+                CustomTextArea(
+                  hintText: "Enter surgery details",
+                  minLines: 3,
+                  controller: controller[key],
+                ),
+                const SizedBox(height: 16),
+              ],
+            );
+          }
+
+          if (key == "Last Glass change") {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Label(text: key),
+                InputField(
+                  hintText: "Enter date or duration",
+                  controller: controller[key],
+                ),
+                const SizedBox(height: 16),
+              ],
+            );
+          }
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Label(text: label),
+              Label(text: key),
               CustomRadioGroup(
-                selectedValue: selectedValues[label],
+                selectedValue: controller[key],
                 onChanged: (value) {
-                  setState(() {
-                    selectedValues[label] = value;
-                  });
+                  widget.updateValue(key, value); // Call the passed updateValue function
                 },
               ),
               const SizedBox(height: 16),
             ],
           );
-        }),
-        selectedValues['History of glasses'] == 'yes'
-            ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Label(text: "Are PG comfortable ?"),
-            CustomRadioGroup(
-              selectedValue: selectedValues["Are PG comfortable ?"],
-              onChanged: (value) {
-                setState(() {
-                  selectedValues["Are PG comfortable ?"] = value;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            Label(text: "Last Glass change"),
-            InputField(hintText: "Enter date or duration"),
-          ],
-        )
-            : SizedBox.shrink(),
-        const SizedBox(height: 16),
-        Label(text: "Previous surgery/laser rx"),
-        CustomRadioGroup(
-          selectedValue: selectedValues["Previous surgery/laser rx"],
-          onChanged: (value) {
-            setState(() {
-              selectedValues["Previous surgery/laser rx"] = value;
-            });
-          },
-        ),
-        const SizedBox(height: 16),
-        selectedValues['Previous surgery/laser rx'] == 'yes'
-            ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Label(text: "Details of surgery/procedure"),
-            CustomTextArea(hintText: "Enter surgery details", minLines: 3,),
-          ],
-        )
-            : SizedBox.shrink(),
+        }).toList(),
       ],
     );
   }

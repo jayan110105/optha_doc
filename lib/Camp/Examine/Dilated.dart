@@ -4,31 +4,30 @@ import 'package:opthadoc/Components/CustomRadioGroup.dart';
 import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/Label.dart';
 
-class Dilated extends StatefulWidget {
-  const Dilated({super.key});
+class Dilated extends StatelessWidget {
+  final Map<String, dynamic> data;
+  final Function(String key, dynamic value) updateValue;
 
-  @override
-  State<Dilated> createState() => _DilatedState();
-}
-
-class _DilatedState extends State<Dilated> {
-
-  final List<Map<String, String>> questions = [
-    {"label": "Cataract"},
-    {"label": "Glaucoma"},
-    {"label": "Diabetic retinopathy"},
-    {"label": "ARMD"},
-    {"label": "Optic disc pallor/ atropy"},
-  ];
-
-  final Map<String, String?> selectedValues = {};
+  const Dilated({
+    super.key,
+    required this.data,
+    required this.updateValue,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> questions = [
+      {"label": "Cataract"},
+      {"label": "Glaucoma"},
+      {"label": "Diabetic retinopathy"},
+      {"label": "ARMD"},
+      {"label": "Optic disc pallor/ atrophy"},
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Dilated Examination",
           style: TextStyle(
             fontSize: 18,
@@ -36,50 +35,51 @@ class _DilatedState extends State<Dilated> {
             color: Color(0xFF163351),
           ),
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         ...['right', 'left'].map((eye) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 eye == "right" ? "RE :" : "LE :",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF163351),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "Mydriasis"),
-                        InputField(hintText: "2 to 8 mm")
+                        const Label(text: "Mydriasis"),
+                        InputField(
+                          hintText: "2 to 8 mm",
+                          controller: data['mydriasis-$eye'],
+                        ),
                       ],
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "Fundus"),
+                        const Label(text: "Fundus"),
                         CustomDropdown(
-                          textStyle: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF163351),
-                              fontWeight: FontWeight.bold
+                          textStyle: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF163351),
+                            fontWeight: FontWeight.bold,
                           ),
-                          keyName: '',
+                          keyName: 'fundus-$eye',
                           items: ["Grossly normal", "Abnormal"],
-                          // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                          selectedValue: data['fundus-$eye'],
                           onChanged: (value) {
-                            setState(() {
-                              // controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                            });
+                            updateValue('fundus-$eye', value);
                           },
                         ),
                       ],
@@ -87,31 +87,29 @@ class _DilatedState extends State<Dilated> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ...questions.map((question) {
                 final label = question["label"]!;
+                final key = '$label-$eye';
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(child: Label(text: label)),
                     Expanded(
                       child: CustomRadioGroup(
-                        selectedValue: selectedValues[label],
+                        selectedValue: data[key],
                         onChanged: (value) {
-                          setState(() {
-                            selectedValues[label] = value;
-                          });
+                          updateValue(key, value);
                         },
                       ),
                     ),
-                    const SizedBox(height: 16),
                   ],
                 );
-              }),
+              }).toList(),
               const SizedBox(height: 16),
             ],
           );
-        })
+        }),
       ],
     );
   }

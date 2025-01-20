@@ -2,32 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CustomDropdown.dart';
 import 'package:opthadoc/Components/Label.dart';
 
-class Exam extends StatefulWidget {
-  const Exam({super.key});
+class Exam extends StatelessWidget {
+  final Map<String, String> data;
+  final Function(String key, String value) updateValue;
 
-  @override
-  State<Exam> createState() => _ExamState();
-}
-
-class _ExamState extends State<Exam> {
-
-  final Map<String, TextEditingController> controllers = {};
-
-  @override
-  void dispose() {
-    // Dispose controllers to avoid memory leaks
-    for (var controller in controllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
+  const Exam({super.key, required this.data, required this.updateValue});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Examination : torchlight",
           style: TextStyle(
             fontSize: 18,
@@ -35,64 +21,64 @@ class _ExamState extends State<Exam> {
             color: Color(0xFF163351),
           ),
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
+        // Dynamically generate fields for "right" and "left" eyes
         ...['right', 'left'].map((eye) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 eye == "right" ? "RE :" : "LE :",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF163351),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "Visual Axis"),
+                        const Label(text: "Visual Axis"),
                         CustomDropdown(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                               fontSize: 14,
                               color: Color(0xFF163351),
-                              fontWeight: FontWeight.bold
-                          ),
-                          keyName: 'withoutGlasses-$eye-distanceVision',
-                          items: ["Parallel","Exotropia","esotropia","alternating squint"],
-                          // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                              fontWeight: FontWeight.bold),
+                          keyName: 'visualAxis-$eye',
+                          items: [
+                            "Parallel",
+                            "Exotropia",
+                            "Esotropia",
+                            "Alternating squint"
+                          ],
+                          selectedValue: data['visualAxis-$eye'],
                           onChanged: (value) {
-                            setState(() {
-                              controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                            });
+                            updateValue('visualAxis-$eye', value!);
                           },
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "EOM"),
+                        const Label(text: "EOM"),
                         CustomDropdown(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                               fontSize: 14,
                               color: Color(0xFF163351),
-                              fontWeight: FontWeight.bold
-                          ),
-                          keyName: 'withoutGlasses-$eye-distanceVision',
-                          items: ["Normal","Limited"],
-                          // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                              fontWeight: FontWeight.bold),
+                          keyName: 'eom-$eye',
+                          items: ["Normal", "Limited"],
+                          selectedValue: data['eom-$eye'],
                           onChanged: (value) {
-                            setState(() {
-                              controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                            });
+                            updateValue('eom-$eye', value!);
                           },
                         ),
                       ],
@@ -100,51 +86,51 @@ class _ExamState extends State<Exam> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "Conjunctiva/Sclera"),
+                        const Label(text: "Conjunctiva/Sclera"),
                         CustomDropdown(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                               fontSize: 14,
                               color: Color(0xFF163351),
-                              fontWeight: FontWeight.bold
-                          ),
-                          keyName: 'withoutGlasses-$eye-distanceVision',
-                          items: ["Normal", "Pterygium (grade 1/2/3/4 – Nasal/temporal/both)", "Episcleritis/ Scleritis", "Hordeolum externum", "Hordeolum Internum"],
-                          // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                              fontWeight: FontWeight.bold),
+                          keyName: 'conjunctiva-$eye',
+                          items: [
+                            "Normal",
+                            "Pterygium (grade 1/2/3/4 – Nasal/temporal/both)",
+                            "Episcleritis/ Scleritis",
+                            "Hordeolum externum",
+                            "Hordeolum Internum"
+                          ],
+                          selectedValue: data['conjunctiva-$eye'],
                           onChanged: (value) {
-                            setState(() {
-                              controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                            });
+                            updateValue('conjunctiva-$eye', value!);
                           },
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "Cornea"),
+                        const Label(text: "Cornea"),
                         CustomDropdown(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                               fontSize: 14,
                               color: Color(0xFF163351),
-                              fontWeight: FontWeight.bold
-                          ),
-                          keyName: 'withoutGlasses-$eye-distanceVision',
+                              fontWeight: FontWeight.bold),
+                          keyName: 'cornea-$eye',
                           items: ["Clear", "Opacity", "Hazy"],
-                          // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                          selectedValue: data['cornea-$eye'],
                           onChanged: (value) {
-                            setState(() {
-                              controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                            });
+                            updateValue('cornea-$eye', value!);
                           },
                         ),
                       ],
@@ -152,51 +138,45 @@ class _ExamState extends State<Exam> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "AC"),
+                        const Label(text: "AC"),
                         CustomDropdown(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                               fontSize: 14,
                               color: Color(0xFF163351),
-                              fontWeight: FontWeight.bold
-                          ),
-                          keyName: 'withoutGlasses-$eye-distanceVision',
+                              fontWeight: FontWeight.bold),
+                          keyName: 'ac-$eye',
                           items: ["Normal", "Shallow depth"],
-                          // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                          selectedValue: data['ac-$eye'],
                           onChanged: (value) {
-                            setState(() {
-                              controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                            });
+                            updateValue('ac-$eye', value!);
                           },
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "Pupil Reactions"),
+                        const Label(text: "Pupil Reactions"),
                         CustomDropdown(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                               fontSize: 14,
                               color: Color(0xFF163351),
-                              fontWeight: FontWeight.bold
-                          ),
-                          keyName: 'withoutGlasses-$eye-distanceVision',
+                              fontWeight: FontWeight.bold),
+                          keyName: 'pupilReactions-$eye',
                           items: ["Normal", "RAPD+"],
-                          // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                          selectedValue: data['pupilReactions-$eye'],
                           onChanged: (value) {
-                            setState(() {
-                              controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                            });
+                            updateValue('pupilReactions-$eye', value!);
                           },
                         ),
                       ],
@@ -204,27 +184,31 @@ class _ExamState extends State<Exam> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Label(text: "Lens"),
+                        const Label(text: "Lens"),
                         CustomDropdown(
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                               fontSize: 14,
                               color: Color(0xFF163351),
-                              fontWeight: FontWeight.bold
-                          ),
-                          keyName: 'withoutGlasses-$eye-distanceVision',
-                          items: ["Immature cataract", "Near Mature cataract", "Mature Cataract", "Hypermature Cataract", "PCIOL", "Aphakia"],
-                          // selectedValue: controllers['withoutGlasses.$eye.distanceVision']!.text,
+                              fontWeight: FontWeight.bold),
+                          keyName: 'lens-$eye',
+                          items: [
+                            "Immature cataract",
+                            "Near Mature cataract",
+                            "Mature Cataract",
+                            "Hypermature Cataract",
+                            "PCIOL",
+                            "Aphakia"
+                          ],
+                          selectedValue: data['lens-$eye'],
                           onChanged: (value) {
-                            setState(() {
-                              controllers['withoutGlasses.$eye.distanceVision']!.text = value!;
-                            });
+                            updateValue('lens-$eye', value!);
                           },
                         ),
                       ],
@@ -232,10 +216,10 @@ class _ExamState extends State<Exam> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
             ],
           );
-        })
+        }),
       ],
     );
   }

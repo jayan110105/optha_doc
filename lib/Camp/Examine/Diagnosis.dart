@@ -1,60 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CustomCheckbox.dart';
 
-class Diagnosis extends StatefulWidget {
-  const Diagnosis({super.key});
+class Diagnosis extends StatelessWidget {
+  final Map<String, dynamic> data;
+  final Function(String key, dynamic value) updateValue;
 
-  @override
-  State<Diagnosis> createState() => _DiagnosisState();
-}
-
-class _DiagnosisState extends State<Diagnosis> {
-  final Map<String, bool> diagnosis = {
-    "Immature cataract": false,
-    "Near Mature cataract": false,
-    "Mature Cataract": false,
-    "Hypermature Cataract": false,
-    "PCIOL": false,
-    "Aphakia": false,
-    "Pterygium": false,
-    "Dacryocystitis": false,
-    "Amblyopia": false,
-    "Glaucoma": false,
-    "Diabetic retinopathy": false,
-    "Stye": false,
-    "Conjunctivitis": false,
-    "Dry eye": false,
-    "Allergic conjunctivitis": false,
-  };
-
-  final Map<String, TextEditingController> controllers = {};
-
-  @override
-  void dispose() {
-    // Dispose controllers to avoid memory leaks
-    for (var controller in controllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize controllers for each comorbidity
-    for (var key in diagnosis.keys) {
-      controllers[key] = TextEditingController();
-    }
-  }
+  const Diagnosis({
+    super.key,
+    required this.data,
+    required this.updateValue,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final List<String> diagnosisKeys = diagnosis.keys.toList();
+    final List<String> diagnosisKeys = [
+      "Immature cataract",
+      "Near Mature cataract",
+      "Mature Cataract",
+      "Hypermature Cataract",
+      "PCIOL",
+      "Aphakia",
+      "Pterygium",
+      "Dacryocystitis",
+      "Amblyopia",
+      "Glaucoma",
+      "Diabetic retinopathy",
+      "Stye",
+      "Conjunctivitis",
+      "Dry eye",
+      "Allergic conjunctivitis",
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Diagnosis",
           style: TextStyle(
             fontSize: 18,
@@ -62,52 +42,47 @@ class _DiagnosisState extends State<Diagnosis> {
             color: Color(0xFF163351),
           ),
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         ...['right', 'left', 'both'].map((eye) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 eye == "right" ? "RE :" : eye == "left" ? "LE :" : "BE :",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF163351),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               for (int i = 0; i < diagnosisKeys.length; i += 2)
                 Row(
                   children: [
                     Expanded(
                       child: CustomCheckbox(
-                        value: diagnosis[diagnosisKeys[i]] ?? false,
+                        value: data['${diagnosisKeys[i]}-$eye'] ?? false,
                         onChanged: (bool? value) {
-                          setState(() {
-                            diagnosis[diagnosisKeys[i]] = value ?? false;
-                          });
+                          updateValue('${diagnosisKeys[i]}-$eye', value ?? false);
                         },
-                        controllers: controllers,
                         text: diagnosisKeys[i],
                       ),
                     ),
                     const SizedBox(width: 16),
-                    if (i + 1 < diagnosisKeys.length) // Check if next item exists
+                    if (i + 1 < diagnosisKeys.length)
                       Expanded(
                         child: CustomCheckbox(
-                          value: diagnosis[diagnosisKeys[i + 1]] ?? false,
+                          value: data['${diagnosisKeys[i + 1]}-$eye'] ?? false,
                           onChanged: (bool? value) {
-                            setState(() {
-                              diagnosis[diagnosisKeys[i + 1]] = value ?? false;
-                            });
+                            updateValue(
+                                '${diagnosisKeys[i + 1]}-$eye', value ?? false);
                           },
-                          controllers: controllers,
                           text: diagnosisKeys[i + 1],
                         ),
                       ),
                   ],
                 ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
             ],
           );
         }),

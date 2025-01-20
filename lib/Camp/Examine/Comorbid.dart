@@ -1,43 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CustomCheckbox.dart';
 
-class Comorbid extends StatefulWidget {
-  const Comorbid({super.key});
+class Comorbid extends StatelessWidget {
+  final Map<String, bool> comorbidities;
+  final Function(String key, bool value) updateValue;
 
-  @override
-  State<Comorbid> createState() => _ComorbidState();
-}
-
-class _ComorbidState extends State<Comorbid> {
-  final Map<String, bool> comorbidities = {
-    "Diabetes mellitus": false,
-    "Hypertension": false,
-    "Heart disease": false,
-    "Asthma": false,
-    "Allergy to dust/meds": false,
-    "Benign prostatic hyperplasia on treatment": false,
-    "Is the patient On Antiplatelets" : false,
-  };
-
-  final Map<String, TextEditingController> controllers = {};
-
-  @override
-  void dispose() {
-    // Dispose controllers to avoid memory leaks
-    for (var controller in controllers.values) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize controllers for each comorbidity
-    for (var key in comorbidities.keys) {
-      controllers[key] = TextEditingController();
-    }
-  }
+  const Comorbid({
+    super.key,
+    required this.comorbidities,
+    required this.updateValue,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +18,7 @@ class _ComorbidState extends State<Comorbid> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Comorbidities and Medications",
           style: TextStyle(
             fontSize: 18,
@@ -54,7 +26,7 @@ class _ComorbidState extends State<Comorbid> {
             color: Color(0xFF163351),
           ),
         ),
-        SizedBox(height: 24),
+        const SizedBox(height: 24),
         Column(
           children: [
             for (int i = 0; i < comorbidityKeys.length; i += 2)
@@ -64,11 +36,8 @@ class _ComorbidState extends State<Comorbid> {
                     child: CustomCheckbox(
                       value: comorbidities[comorbidityKeys[i]] ?? false,
                       onChanged: (bool? value) {
-                        setState(() {
-                          comorbidities[comorbidityKeys[i]] = value ?? false;
-                        });
+                        updateValue(comorbidityKeys[i], value ?? false);
                       },
-                      controllers: controllers,
                       text: comorbidityKeys[i],
                     ),
                   ),
@@ -78,11 +47,8 @@ class _ComorbidState extends State<Comorbid> {
                       child: CustomCheckbox(
                         value: comorbidities[comorbidityKeys[i + 1]] ?? false,
                         onChanged: (bool? value) {
-                          setState(() {
-                            comorbidities[comorbidityKeys[i + 1]] = value ?? false;
-                          });
+                          updateValue(comorbidityKeys[i + 1], value ?? false);
                         },
-                        controllers: controllers,
                         text: comorbidityKeys[i + 1],
                       ),
                     ),

@@ -4,14 +4,12 @@ import 'package:opthadoc/Components/Label.dart';
 class CustomCheckbox extends StatelessWidget {
   final bool value;
   final ValueChanged<bool?> onChanged;
-  final Map<String, TextEditingController> controllers;
   final String text; // New required parameter
 
   const CustomCheckbox({
     super.key,
     required this.value,
     required this.onChanged,
-    required this.controllers,
     required this.text, // Add this parameter to the constructor
   });
 
