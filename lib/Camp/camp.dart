@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:opthadoc/Camp/camp_dashboard.dart';
 import 'package:opthadoc/Camp/camp_registration.dart';
 import 'package:opthadoc/Camp/camp_eye_checkup.dart';
-import 'package:opthadoc/Camp/camp_records.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:opthadoc/Camp/camp_examine.dart';
 
@@ -23,14 +22,14 @@ class _CampState extends State<Camp> {
     CampRegistration(onNavigateToEyeCheckup: navigateToEyeCheckup),
     CampEyeCheckup(initialStep: initialEyeCheckupStep),
     const CampExamine(),
-    const CampRecords(),
+    // const CampRecords(),
   ];
 
   void navigateToEyeCheckup(int step) {
     setState(() {
       initialEyeCheckupStep = step; // Set the initial step
       _selectedIndex = 2;          // Navigate to CampEyeCheckup
-      print('Navigating to Eye Checkup with initial step: $initialEyeCheckupStep');
+      // print('Navigating to Eye Checkup with initial step: $initialEyeCheckupStep');
     });
   }
 
@@ -70,7 +69,7 @@ class _CampState extends State<Camp> {
       items: [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.person_add), label: 'Register'),
-        BottomNavigationBarItem(icon: Icon(Icons.visibility), label: 'Checkup'),
+        BottomNavigationBarItem(icon: Icon(Icons.visibility), label: 'Refraction'),
         BottomNavigationBarItem(icon: SvgPicture.asset(
           'assets/icons/stethoscope.svg',
           colorFilter: ColorFilter.mode(
@@ -82,7 +81,7 @@ class _CampState extends State<Camp> {
           height: 26.0,
           width: 26.0,
         ), label: 'Examine'),
-        BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Records'),
+        // BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Records'),
       ],
     );
   }

@@ -33,18 +33,27 @@ class _HistoryState extends State<History> {
         const SizedBox(height: 24),
         // Dynamically generate questions with CustomRadioGroup
         ...controller.keys.map((key) {
+          // Skip irrelevant questions based on logic
           if (key == "Are PG comfortable ?" && controller["History of glasses"] != "yes") {
-            return const SizedBox.shrink(); // Skip rendering this question unless relevant
+            return const SizedBox.shrink();
           }
           if (key == "Details of surgery/procedure" &&
               controller["Previous surgery/laser rx"] != "yes") {
-            return const SizedBox.shrink(); // Skip unless surgery is marked "yes"
+            return const SizedBox.shrink();
           }
-
           if (key == "Last Glass change" && controller["History of glasses"] != "yes") {
             return const SizedBox.shrink();
           }
 
+          // Display dependent questions only when "Ocular Trauma" is "yes"
+          if (["Flashes", "Floaters", "Glaucoma on Rx", "Pain/redness", "Watering/discharge"]
+              .contains(key)) {
+            if (controller["Ocular Trauma"] != "yes") {
+              return const SizedBox.shrink();
+            }
+          }
+
+          // Special handling for text areas and input fields
           if (key == "Details of surgery/procedure") {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,6 +83,7 @@ class _HistoryState extends State<History> {
             );
           }
 
+          // Default rendering for radio group questions
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -87,7 +97,7 @@ class _HistoryState extends State<History> {
               const SizedBox(height: 16),
             ],
           );
-        }).toList(),
+        }),
       ],
     );
   }

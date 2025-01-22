@@ -52,7 +52,6 @@ class _CampRegistrationState extends State<CampRegistration> {
     "parent": TextEditingController(),
     "phone": TextEditingController(),
     "address": TextEditingController(),
-    "complaint": TextEditingController(),
   };
 
   void saveRegistration() async {
@@ -73,7 +72,6 @@ class _CampRegistrationState extends State<CampRegistration> {
       'parent': controllers['parent']?.text ?? '',
       'phone': controllers['phone']?.text ?? '',
       'address': controllers['address']?.text ?? '',
-      'complaint': controllers['complaint']?.text ?? '',
       'photo_path': _image?.path ?? '',
     };
 
@@ -161,7 +159,7 @@ class _CampRegistrationState extends State<CampRegistration> {
         break;
 
       case 3: // Step 4: Details
-        requiredFields = ["aadhar", "parent", "phone", "address", "complaint"];
+        requiredFields = ["aadhar", "parent", "phone", "address"];
         break;
 
       default:
@@ -408,16 +406,6 @@ class _CampRegistrationState extends State<CampRegistration> {
           CustomTextArea(
             controller: controllers["address"],
             hintText: "Enter address",
-            isEnabled: true,
-            minLines: 5,
-            maxLines: null, // Allows unlimited lines
-          ),
-          SizedBox(height: 16),
-          Label(text: "Chief Complaint"),
-          SizedBox(height: 8),
-          CustomTextArea(
-            controller: controllers["complaint"],
-            hintText: "Enter chief complaint",
             isEnabled: true,
             minLines: 5,
             maxLines: null, // Allows unlimited lines

@@ -134,13 +134,6 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
               fontSize: 14,
             )
           )
-          // StretchedIconButton(
-          //   backgroundColor: const Color(0xFF163351),
-          //   textColor: Colors.white,
-          //   icon: Icons.search,
-          //   label: "Find Patient",
-          //   onPressed: nextStep, // Replace with your onPressed function
-          // ),
         ],
       ),
       Column(

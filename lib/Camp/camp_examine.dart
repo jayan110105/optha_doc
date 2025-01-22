@@ -4,11 +4,11 @@ import 'package:opthadoc/Camp/Examine/Diagnosis.dart';
 import 'package:opthadoc/Camp/Examine/Dilated.dart';
 import 'package:opthadoc/Camp/Examine/Exam.dart';
 import 'package:opthadoc/Camp/Examine/PreSurgery.dart';
+import 'package:opthadoc/Camp/Examine/Token.dart';
 import 'package:opthadoc/Camp/Examine/Workup.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
-import 'package:opthadoc/Camp/Examine/Patient.dart';
-import 'package:opthadoc/Camp/Examine/History.dart';
+import 'package:opthadoc/Camp/Examine/Complaint.dart';
 
 class CampExamine extends StatefulWidget {
   const CampExamine({super.key});
@@ -22,8 +22,8 @@ class _CampExamineState extends State<CampExamine> {
   int step = 0;
 
   final List<Map<String, dynamic>> steps = [
-    {"id": "patient", "title": "Patient", "icon": Icons.person},
-    {"id": "history", "title": "History", "icon": Icons.description},
+    {"id":"token", "title": "Token", "icon": Icons.tag},
+    {"id": "complaint", "title": "Complaint", "icon": Icons.chat},
     {"id": "comorbid", "title": "Comorbid", "icon": "assets/icons/vital_signs.svg"},
     {"id": "exam", "title": "Exam", "icon": "assets/icons/stethoscope.svg"},
     {"id": "workup", "title": "Workup", "icon": Icons.biotech},
@@ -32,33 +32,53 @@ class _CampExamineState extends State<CampExamine> {
     {"id": "pre-surgery ", "title": "Pre-Surgery", "icon": Icons.assignment},
   ];
 
-  final Map<String, TextEditingController> patientControllers = {
-    "vision_re": TextEditingController(),
-    "vision_le": TextEditingController(),
-    "complaint_re": TextEditingController(),
-    "complaint_le": TextEditingController(),
-    "complaint_duration": TextEditingController(),
+  final Map<String, dynamic> _patientData = {
+    "vision_re_dv": null, // Distance Vision RE
+    "vision_re_nv": null, // Near Vision RE
+    "vision_le_dv": null, // Distance Vision LE
+    "vision_le_nv": null, // Near Vision LE
+    "years-right": null,
+    "months-right": null,
+    "days-right": null,
+    "years-left": null,
+    "months-left": null,
+    "days-left": null,
   };
 
-  final Map<String, dynamic> historyData = {
-    "Ocular Trauma": null,
-    "Flashes": null,
-    "Floaters": null,
-    "Glaucoma on Rx": null,
-    "Pain/redness": null,
-    "Watering/discharge": null,
-    "History of glasses": null,
-    "Are PG comfortable ?": null,
-    "Last Glass change": TextEditingController(),
-    "Previous surgery/laser rx": null,
-    "Details of surgery/procedure": TextEditingController(),
-  };
+  final TextEditingController _tokenController = TextEditingController();
 
-  void updateHistoryValue(String key, dynamic value) {
-    setState(() {
-      historyData[key] = value;
-    });
+  void _updateValue(String key, dynamic value) {
+    if (_patientData.containsKey(key)) {
+      setState(() {
+        _patientData[key] = value;
+      });
+    } else if (_historyData.containsKey(key)) {
+      setState(() {
+        _historyData[key] = value;
+      });
+    }
   }
+
+  final Map<String, dynamic> _historyData = {
+    for (var eye in ['right', 'left'])
+      for (var label in [
+        "Ocular Trauma",
+        "Flashes",
+        "Floaters",
+        "Glaucoma on Rx",
+        "Pain/redness",
+        "Watering/discharge",
+        "History of glasses",
+        "Are PG comfortable ?",
+        "Last Glass change",
+        "Previous surgery/laser rx",
+        "Details of surgery/procedure",
+      ])
+        if (label == "Last Glass change" || label == "Details of surgery/procedure")
+          "$label-$eye": TextEditingController() // For text-based inputs
+        else
+          "$label-$eye": null, // For radio or dropdown selections
+  };
 
   final Map<String, bool> _comorbidities = {
     "Diabetes mellitus": false,
@@ -116,8 +136,8 @@ class _CampExamineState extends State<CampExamine> {
   }
 
   final Map<String, dynamic> _dilatedData = {
-    "mydriasis-right": TextEditingController(),
-    "mydriasis-left": TextEditingController(),
+    "mydriasis-right": null,
+    "mydriasis-left": null,
     "fundus-right": "",
     "fundus-left": "",
     "Cataract-right": null,
@@ -209,8 +229,9 @@ class _CampExamineState extends State<CampExamine> {
   Widget build(BuildContext context) {
 
     final stepWidgets = [
-      Patient(controllers: patientControllers,),
-      History(controller: historyData, updateValue: updateHistoryValue,),
+      Token(controller: _tokenController),
+      Complaint(patientData: _patientData, historyData: _historyData, updateValue: _updateValue,),
+      // History(controller: historyData, updateValue: updateHistoryValue,),
       Comorbid(comorbidities: _comorbidities, updateValue: _updateComorbidity,),
       Exam(data: _examData, updateValue: _updateExamValue,),
       Workup(data: _workupData, updateValue: _updateWorkupValue,),

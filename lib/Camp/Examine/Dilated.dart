@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CustomDropdown.dart';
 import 'package:opthadoc/Components/CustomRadioGroup.dart';
-import 'package:opthadoc/Components/InputField.dart';
 import 'package:opthadoc/Components/Label.dart';
 
 class Dilated extends StatelessWidget {
@@ -56,9 +55,18 @@ class Dilated extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Label(text: "Mydriasis"),
-                        InputField(
-                          hintText: "2 to 8 mm",
-                          controller: data['mydriasis-$eye'],
+                        CustomDropdown(
+                          textStyle: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF163351),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          keyName: 'mydriasis-$eye',
+                          items: List.generate(8, (index) => "${index + 1} mm"),
+                          selectedValue: data['mydriasis-$eye'],
+                          onChanged: (value) {
+                            updateValue('mydriasis-$eye', value!);
+                          },
                         ),
                       ],
                     ),
@@ -79,7 +87,7 @@ class Dilated extends StatelessWidget {
                           items: ["Grossly normal", "Abnormal"],
                           selectedValue: data['fundus-$eye'],
                           onChanged: (value) {
-                            updateValue('fundus-$eye', value);
+                            updateValue('fundus-$eye', value!);
                           },
                         ),
                       ],
@@ -105,7 +113,7 @@ class Dilated extends StatelessWidget {
                     ),
                   ],
                 );
-              }).toList(),
+              }),
               const SizedBox(height: 16),
             ],
           );
