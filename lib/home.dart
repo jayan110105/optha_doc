@@ -24,7 +24,7 @@ class Home extends StatelessWidget {
             _ActionButton(
               text: 'Get Started',
               icon: Icons.festival,
-              onPressed: () => Navigator.pushNamed(context, '/camp'),
+              onPressed: () => Navigator.pushNamed(context, '/CampVerification'),
             ),
             const SizedBox(height: 8),
             const SizedBox(height: 8),

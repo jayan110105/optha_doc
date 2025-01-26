@@ -46,20 +46,6 @@ class _CampExamineState extends State<CampExamine> {
     "days-left": null,
   };
 
-  final TextEditingController _tokenController = TextEditingController();
-
-  void _updateValue(String key, dynamic value) {
-    if (_patientData.containsKey(key)) {
-      setState(() {
-        _patientData[key] = value;
-      });
-    } else if (_historyData.containsKey(key)) {
-      setState(() {
-        _historyData[key] = value;
-      });
-    }
-  }
-
   final Map<String, dynamic> _historyData = {
     for (var eye in ['right', 'left'])
       for (var label in [
@@ -108,33 +94,12 @@ class _CampExamineState extends State<CampExamine> {
     "lens-left": "",
   };
 
-  // Function to update values in the controller
-  void _updateExamValue(String key, String value) {
-    setState(() {
-      _examData[key] = value;
-    });
-  }
-
-  // Function to update values in the controller
-  void _updateComorbidity(String key, bool value) {
-    setState(() {
-      _comorbidities[key] = value;
-    });
-  }
-
   final Map<String, dynamic> _workupData = {
     "re-ducts": "",
     "le-ducts": "",
     "bp": TextEditingController(),
     "grbs": TextEditingController(),
   };
-
-  // Function to update values in the controller
-  void _updateWorkupValue(String key, dynamic value) {
-    setState(() {
-      _workupData[key] = value;
-    });
-  }
 
   final Map<String, dynamic> _dilatedData = {
     "mydriasis-right": null,
@@ -152,13 +117,6 @@ class _CampExamineState extends State<CampExamine> {
     "Optic disc pallor/ atrophy-right": null,
     "Optic disc pallor/ atrophy-left": null,
   };
-
-  // Function to update values in the controller
-  void _updateDilatedValue(String key, dynamic value) {
-    setState(() {
-      _dilatedData[key] = value;
-    });
-  }
 
   final Map<String, dynamic> _diagnosisData = {
     for (var eye in ['right', 'left', 'both'])
@@ -182,19 +140,61 @@ class _CampExamineState extends State<CampExamine> {
         "$label-$eye": false,
   };
 
-  // Function to update values in the controller
-  void _updateDiagnosisValue(String key, dynamic value) {
-    setState(() {
-      _diagnosisData[key] = value;
-    });
-  }
-
   final Map<String, dynamic> _preSurgeryData = {
     "Cardio/Medicine clearance for surgery": null,
     "IOP": false,
     "BSCAN": false,
     "Systemic evaluation": false,
   };
+
+  final TextEditingController _tokenController = TextEditingController();
+
+  void _updateValue(String key, dynamic value) {
+    if (_patientData.containsKey(key)) {
+      setState(() {
+        _patientData[key] = value;
+      });
+    } else if (_historyData.containsKey(key)) {
+      setState(() {
+        _historyData[key] = value;
+      });
+    }
+  }
+
+  // Function to update values in the controller
+  void _updateExamValue(String key, String value) {
+    setState(() {
+      _examData[key] = value;
+    });
+  }
+
+  // Function to update values in the controller
+  void _updateComorbidity(String key, bool value) {
+    setState(() {
+      _comorbidities[key] = value;
+    });
+  }
+
+  // Function to update values in the controller
+  void _updateWorkupValue(String key, dynamic value) {
+    setState(() {
+      _workupData[key] = value;
+    });
+  }
+
+  // Function to update values in the controller
+  void _updateDilatedValue(String key, dynamic value) {
+    setState(() {
+      _dilatedData[key] = value;
+    });
+  }
+
+  // Function to update values in the controller
+  void _updateDiagnosisValue(String key, dynamic value) {
+    setState(() {
+      _diagnosisData[key] = value;
+    });
+  }
 
   // Function to update values in the controller
   void _updatePreSurgeryValue(String key, dynamic value) {
@@ -227,12 +227,27 @@ class _CampExamineState extends State<CampExamine> {
   }
 
   @override
+  void dispose() {
+    _tokenController.dispose();
+    _historyData.forEach((key, value) {
+      if (value is TextEditingController) {
+        value.dispose();
+      }
+    });
+    _workupData.forEach((key, value) {
+      if (value is TextEditingController) {
+        value.dispose();
+      }
+    });
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     final stepWidgets = [
       Token(controller: _tokenController),
       Complaint(patientData: _patientData, historyData: _historyData, updateValue: _updateValue,),
-      // History(controller: historyData, updateValue: updateHistoryValue,),
       Comorbid(comorbidities: _comorbidities, updateValue: _updateComorbidity,),
       Exam(data: _examData, updateValue: _updateExamValue,),
       Workup(data: _workupData, updateValue: _updateWorkupValue,),

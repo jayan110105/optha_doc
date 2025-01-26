@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opthadoc/Camp/Examine/camp_verification.dart';
 import 'package:opthadoc/home.dart';
 import 'package:opthadoc/Camp/camp.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -53,6 +54,14 @@ class MyApp extends StatelessWidget {
     return {
       '/home': (context) => const Home(),
       '/camp': (context) => const Camp(),
+      '/CampVerification': (context) => CampVerification(
+        onSubmit: (code) {
+          // Handle the submitted code here
+          print("Camp code entered: $code");
+          // Navigate to another page or perform an action
+          Navigator.pushNamed(context, '/camp');
+        },
+      ),
     };
   }
 }
