@@ -9,6 +9,7 @@ import 'package:opthadoc/Camp/Examine/Workup.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Camp/Examine/Complaint.dart';
+import 'package:opthadoc/Output/Examine.dart';
 
 class CampExamine extends StatefulWidget {
   const CampExamine({super.key});
@@ -328,7 +329,7 @@ class _CampExamineState extends State<CampExamine> {
                                   borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
                                 ),
                               ),
-                              onPressed: step<stepWidgets.length-1 ? nextStep : null,
+                              onPressed: step<stepWidgets.length-1 ? nextStep : generateExamine,
                               child: Row(
                                 children: [
                                   Text(step == steps.length - 1 ? "Submit" : "Continue"),
