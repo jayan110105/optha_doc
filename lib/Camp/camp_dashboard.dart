@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 
 class CampDashboard extends StatelessWidget {
-  const CampDashboard({super.key});
+  final String campCode;
+
+  const CampDashboard({super.key, required this.campCode});
 
   Widget _buildHeader(BuildContext context) {
     return Container(
@@ -33,7 +35,7 @@ class CampDashboard extends StatelessWidget {
                 ),
               ),
               Text(
-                'Guest Access',
+                'Camp Code: $campCode',
                 style: TextStyle(
                   color: const Color(0xFF163351).withValues(alpha: 0.6),
                   fontSize: 14.0,

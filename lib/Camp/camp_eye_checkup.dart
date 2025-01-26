@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CustomDropdown.dart';
-import 'package:opthadoc/Components/CustomTextArea.dart';
 import 'package:opthadoc/Components/Label.dart';
 import 'package:opthadoc/Components/InputField.dart';
+import 'package:opthadoc/Components/StretchedIconButton.dart';
 import 'package:opthadoc/Components/VisionMeasurement.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
@@ -11,8 +11,9 @@ import 'package:opthadoc/Output/Refraction.dart';
 
 class CampEyeCheckup extends StatefulWidget {
   final int initialStep;
+  final Function(int) onNavigateToExamine;
 
-  const CampEyeCheckup({super.key, this.initialStep = 0});
+  const CampEyeCheckup({super.key, this.initialStep = 0, required this.onNavigateToExamine});
 
   @override
   State<CampEyeCheckup> createState() => _CampEyeCheckupState();
@@ -52,7 +53,6 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           .map((entry) => '${entry.key}:${entry.value.text}')
           .join(','),
       'remarks': controllers['remarks']?.text ?? '',
-      'complaint': controllers['complaint']?.text ?? '',
     };
 
     // Save data to the database
@@ -97,7 +97,6 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
     controllers['bifocal'] = TextEditingController();
     controllers['color'] = TextEditingController();
     controllers['remarks'] = TextEditingController();
-    controllers['complaint'] = TextEditingController();
   }
 
   @override
@@ -109,8 +108,41 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
     super.dispose();
   }
 
-  void nextStep() => setState(() => step = (step + 1).clamp(0, steps.length - 1));
-  void prevStep() => setState(() => step = (step - 1).clamp(0, steps.length - 1));
+  void resetForm() {
+    setState(() {
+      // Reset all text controllers
+      for (var controller in controllers.values) {
+        controller.text = '';
+      }
+      // Reset step to the first step
+      step = 0;
+    });
+
+    print("Form has been reset!");
+  }
+
+  void nextStep() {
+    // if (!validateStepFields(step)) return;
+    if(step == steps.length - 1) {
+      // Validate current step fields
+      // saveRegistration();
+      setState(() {
+        step++;
+      });
+    } else if (step < steps.length - 1) {
+      setState(() {
+        step++;
+      });
+    }
+  }
+
+  void prevStep() {
+    if (step > 0) {
+      setState(() {
+        step--;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -279,17 +311,49 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
               },
           ),
           SizedBox(height: 16),
-          Label(text: "Brief Complaint"),
-          SizedBox(height: 8),
-          CustomTextArea(
-              hintText: "Enter patient's complaint",
-              isEnabled: true,
-              minLines: 3,
-              maxLines: null,
-              controller: controllers['complaint'],
-          )
         ],
       ),
+      Column(
+        children: [
+          Text(
+            "Refraction test complete. What would you like to do next?",
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF163351),
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            textColor: Colors.white,
+            label: "Test Another Patient",
+            onPressed: resetForm, // Replace with your onPressed function
+          ),
+          SizedBox(height: 8),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            textColor: Colors.white,
+            label: "Go to Examination",
+            onPressed: () {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                widget.onNavigateToExamine(1); // Pass step 3 to EyeCheckup after build
+              });
+            }, // Replace with your onPressed function
+          ),
+          SizedBox(height: 8),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            icon: Icons.share,
+            textColor: Colors.white,
+            label: "Share PDF",
+            onPressed: () {
+              generateRefraction();
+            }, // Replace with your onPressed function
+          ),
+        ],
+      )
     ];
 
     return Scaffold(
@@ -310,7 +374,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              "Eye Checkup",
+                              "Refraction Test",
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -319,7 +383,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              "Perform an eye checkup for the patient",
+                              "Perform a refraction test for the patient",
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF163351).withValues(alpha: 0.6),
@@ -377,7 +441,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                                 borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
                               ),
                             ),
-                            onPressed: step<stepWidgets.length-1 ? nextStep : generateRefraction,
+                            onPressed: step<stepWidgets.length-1 ? nextStep : null,
                             child: Row(
                               children: [
                                 Text(step == steps.length - 1 ? "Save Checkup" : "Continue"),

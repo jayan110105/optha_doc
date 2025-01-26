@@ -9,10 +9,12 @@ import 'package:opthadoc/Camp/Examine/Workup.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Camp/Examine/Complaint.dart';
+import 'package:opthadoc/Components/StretchedIconButton.dart';
 import 'package:opthadoc/Output/Examine.dart';
 
 class CampExamine extends StatefulWidget {
-  const CampExamine({super.key});
+  final int initialStep;
+  const CampExamine({super.key, this.initialStep = 0});
 
   @override
   State<CampExamine> createState() => _CampExamineState();
@@ -226,6 +228,41 @@ class _CampExamineState extends State<CampExamine> {
     }
   }
 
+  void resetForm() {
+    setState(() {
+      // Reset all map data to their initial state
+      _patientData.updateAll((key, value) => null);
+      _historyData.forEach((key, value) {
+        if (value is TextEditingController) {
+          value.clear();
+        } else {
+          _historyData[key] = null;
+        }
+      });
+      _comorbidities.updateAll((key, value) => false);
+      _examData.updateAll((key, value) => "");
+      _workupData.forEach((key, value) {
+        if (value is TextEditingController) {
+          value.clear();
+        } else {
+          _workupData[key] = "";
+        }
+      });
+      _dilatedData.updateAll((key, value) => null);
+      _diagnosisData.updateAll((key, value) => false);
+      _preSurgeryData.updateAll((key, value) => null);
+
+      // Reset the token controller
+      _tokenController.clear();
+
+      // Reset the step to the first step
+      step = 0;
+    });
+
+    print("Form has been reset!");
+  }
+
+
   @override
   void dispose() {
     _tokenController.dispose();
@@ -243,6 +280,12 @@ class _CampExamineState extends State<CampExamine> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    step = widget.initialStep;
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     final stepWidgets = [
@@ -254,6 +297,36 @@ class _CampExamineState extends State<CampExamine> {
       Dilated(data: _dilatedData, updateValue: _updateDilatedValue,),
       Diagnosis(data: _diagnosisData, updateValue: _updateDiagnosisValue,),
       PreSurgery(data: _preSurgeryData, updateValue: _updatePreSurgeryValue,),
+      Column(
+        children: [
+          Text(
+            "Examination complete. What would you like to do next?",
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF163351),
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 16),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            textColor: Colors.white,
+            label: "Examine Another Patient",
+            onPressed: resetForm, // Replace with your onPressed function
+          ),
+          SizedBox(height: 8),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            icon: Icons.share,
+            textColor: Colors.white,
+            label: "Share PDF",
+            onPressed: () {
+              generateExamine();
+            }, // Replace with your onPressed function
+          ),
+        ],
+      )
     ];
 
     return Scaffold(
@@ -277,7 +350,7 @@ class _CampExamineState extends State<CampExamine> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "Camp Registration",
+                                "Camp Examination",
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -286,7 +359,7 @@ class _CampExamineState extends State<CampExamine> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                "Register a new patient for the eye camp",
+                                "Medical Examination Form",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Color(0xFF163351).withValues(alpha: 0.6),
@@ -344,7 +417,7 @@ class _CampExamineState extends State<CampExamine> {
                                   borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
                                 ),
                               ),
-                              onPressed: step<stepWidgets.length-1 ? nextStep : generateExamine,
+                              onPressed: step<stepWidgets.length-1 ? nextStep : null,
                               child: Row(
                                 children: [
                                   Text(step == steps.length - 1 ? "Submit" : "Continue"),

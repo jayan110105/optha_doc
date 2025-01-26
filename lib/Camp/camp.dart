@@ -18,12 +18,13 @@ class _CampState extends State<Camp> {
   int _selectedIndex = 0;
 
   int initialEyeCheckupStep = 0;
+  int initialExamineStep = 0;
 
   List<Widget> get pages => [
-    const CampDashboard(),
+    CampDashboard(campCode: widget.campCode),
     CampRegistration(onNavigateToEyeCheckup: navigateToEyeCheckup, campCode: widget.campCode),
-    CampEyeCheckup(initialStep: initialEyeCheckupStep),
-    const CampExamine(),
+    CampEyeCheckup(initialStep: initialEyeCheckupStep, onNavigateToExamine: navigateToExamine),
+    CampExamine(initialStep: initialExamineStep,),
     // const CampRecords(),
   ];
 
@@ -31,6 +32,14 @@ class _CampState extends State<Camp> {
     setState(() {
       initialEyeCheckupStep = step; // Set the initial step
       _selectedIndex = 2;          // Navigate to CampEyeCheckup
+      // print('Navigating to Eye Checkup with initial step: $initialEyeCheckupStep');
+    });
+  }
+
+  void navigateToExamine(int step) {
+    setState(() {
+      initialExamineStep = step; // Set the initial step
+      _selectedIndex = 3;          // Navigate to CampEyeCheckup
       // print('Navigating to Eye Checkup with initial step: $initialEyeCheckupStep');
     });
   }
