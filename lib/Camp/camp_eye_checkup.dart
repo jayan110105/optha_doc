@@ -7,6 +7,7 @@ import 'package:opthadoc/Components/VisionMeasurement.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:opthadoc/data/DatabaseHelper.dart';
+import 'package:opthadoc/Output/Refraction.dart';
 
 class CampEyeCheckup extends StatefulWidget {
   final int initialStep;
@@ -376,8 +377,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                                 borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
                               ),
                             ),
-                            onPressed:
-                            step == steps.length - 1 ? () => saveCheckup : nextStep,
+                            onPressed: step<stepWidgets.length-1 ? nextStep : generateRefraction,
                             child: Row(
                               children: [
                                 Text(step == steps.length - 1 ? "Save Checkup" : "Continue"),
