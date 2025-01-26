@@ -11,6 +11,7 @@ import 'package:opthadoc/Components/ErrorSnackBar.dart';
 import 'package:opthadoc/utils/ocr_helper.dart';
 import 'package:opthadoc/data/DatabaseHelper.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:opthadoc/Output/Registration.dart';
 
 bool get isDatabaseDisabled => dotenv.env['DISABLE_DB'] == 'true';
 bool get isValidationDisabled => dotenv.env['DISABLE_VALIDATION'] == 'true';
@@ -448,6 +449,16 @@ class _CampRegistrationState extends State<CampRegistration> {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 widget.onNavigateToEyeCheckup(1); // Pass step 3 to EyeCheckup after build
               });
+            }, // Replace with your onPressed function
+          ),
+          SizedBox(height: 8),
+          StretchedIconButton(
+            backgroundColor: const Color(0xFF163351),
+            icon: Icons.share,
+            textColor: Colors.white,
+            label: "Share PDF",
+            onPressed: () {
+              generateDetailsPDF(controllers);
             }, // Replace with your onPressed function
           ),
         ],
