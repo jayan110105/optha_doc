@@ -12,6 +12,7 @@ import 'package:opthadoc/utils/ocr_helper.dart';
 import 'package:opthadoc/data/DatabaseHelper.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:opthadoc/Output/Registration.dart';
+import 'package:intl/intl.dart';
 
 bool get isDatabaseDisabled => dotenv.env['DISABLE_DB'] == 'true';
 bool get isValidationDisabled => dotenv.env['DISABLE_VALIDATION'] == 'true';
@@ -26,8 +27,9 @@ extension StringExtension on String {
 class CampRegistration extends StatefulWidget {
 
   final Function(int) onNavigateToEyeCheckup;
+  final String campCode;
 
-  const CampRegistration({super.key, required this.onNavigateToEyeCheckup});
+  const CampRegistration({super.key, required this.onNavigateToEyeCheckup, required this.campCode});
 
   @override
   State<CampRegistration> createState() => _CampRegistrationState();
@@ -227,6 +229,15 @@ class _CampRegistrationState extends State<CampRegistration> {
     });
   }
 
+  String generateToken() {
+    // Get the current UTC time
+    final now = DateTime.now().toUtc();
+    // Format the date as YYYYMMDDHHMMSS
+    final formattedDate = DateFormat('yyyyMMddHHmmss').format(now);
+    // Combine the station code and formatted date
+    return '${widget.campCode}-$formattedDate';
+  }
+
   @override
   Widget build(BuildContext context) {
     // Define the widget array for each step
@@ -236,9 +247,9 @@ class _CampRegistrationState extends State<CampRegistration> {
         child: Column(
           children: [
             Text(
-              "T4SRGU",
+              generateToken(),
               style: TextStyle(
-                fontSize: 60,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF163351),
               ),
@@ -246,7 +257,7 @@ class _CampRegistrationState extends State<CampRegistration> {
             Text(
               "This is the patient's unique token number. Please provide this to the patient for future reference.",
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: Color(0xFF163351).withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,

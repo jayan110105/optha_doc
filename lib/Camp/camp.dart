@@ -6,7 +6,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:opthadoc/Camp/camp_examine.dart';
 
 class Camp extends StatefulWidget {
-  const Camp({super.key});
+  final String campCode;
+
+  const Camp({super.key, required this.campCode});
 
   @override
   State<Camp> createState() => _CampState();
@@ -19,7 +21,7 @@ class _CampState extends State<Camp> {
 
   List<Widget> get pages => [
     const CampDashboard(),
-    CampRegistration(onNavigateToEyeCheckup: navigateToEyeCheckup),
+    CampRegistration(onNavigateToEyeCheckup: navigateToEyeCheckup, campCode: widget.campCode),
     CampEyeCheckup(initialStep: initialEyeCheckupStep),
     const CampExamine(),
     // const CampRecords(),

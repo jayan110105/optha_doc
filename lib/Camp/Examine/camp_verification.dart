@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:opthadoc/Camp/camp.dart';
 
 class CampVerification extends StatefulWidget {
-  final Function(String) onSubmit;
-
-  const CampVerification({super.key, required this.onSubmit});
+  const CampVerification({super.key});
 
   @override
   State<CampVerification> createState() => _CampVerificationState();
@@ -27,7 +26,7 @@ class _CampVerificationState extends State<CampVerification> {
 
     // Submit if all fields are filled
     if (_controllers.every((controller) => controller.text.isNotEmpty) && value.isNotEmpty) {
-      widget.onSubmit(_controllers.map((controller) => controller.text).join());
+      navigateToCampHome();
     }
   }
 
@@ -53,6 +52,16 @@ class _CampVerificationState extends State<CampVerification> {
     }
     _keyboardFocusNode.dispose();
     super.dispose();
+  }
+
+  void navigateToCampHome() {
+    final campCode = _controllers.map((controller) => controller.text).join();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Camp(campCode: campCode),
+      ),
+    );
   }
 
   @override
@@ -138,7 +147,7 @@ class _CampVerificationState extends State<CampVerification> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _controllers.every((controller) => controller.text.isNotEmpty)
-                        ? () => widget.onSubmit(_controllers.map((controller) => controller.text).join())
+                        ? () => navigateToCampHome
                         : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF163351), // Updated to use `backgroundColor`

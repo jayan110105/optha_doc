@@ -53,15 +53,7 @@ class MyApp extends StatelessWidget {
   Map<String, WidgetBuilder> _buildRoutes() {
     return {
       '/home': (context) => const Home(),
-      '/camp': (context) => const Camp(),
-      '/CampVerification': (context) => CampVerification(
-        onSubmit: (code) {
-          // Handle the submitted code here
-          print("Camp code entered: $code");
-          // Navigate to another page or perform an action
-          Navigator.pushNamed(context, '/camp');
-        },
-      ),
+      '/CampVerification': (context) => CampVerification(),
     };
   }
 }
