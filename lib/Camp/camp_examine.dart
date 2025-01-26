@@ -14,7 +14,8 @@ import 'package:opthadoc/Output/Examine.dart';
 
 class CampExamine extends StatefulWidget {
   final int initialStep;
-  const CampExamine({super.key, this.initialStep = 0});
+  final String? initialPatientToken;
+  const CampExamine({super.key, this.initialStep = 0, this.initialPatientToken});
 
   @override
   State<CampExamine> createState() => _CampExamineState();
@@ -283,6 +284,8 @@ class _CampExamineState extends State<CampExamine> {
   void initState() {
     super.initState();
     step = widget.initialStep;
+
+    _tokenController.text = widget.initialPatientToken ?? '' ;
   }
 
   @override

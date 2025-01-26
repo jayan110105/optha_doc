@@ -12,7 +12,7 @@ import 'package:opthadoc/Output/Refraction.dart';
 class CampEyeCheckup extends StatefulWidget {
   final int initialStep;
   final String? initialPatientToken;
-  final Function(int) onNavigateToExamine;
+  final Function(int, String) onNavigateToExamine;
 
   const CampEyeCheckup({super.key, this.initialStep = 0, required this.onNavigateToExamine, this.initialPatientToken});
 
@@ -341,7 +341,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
             label: "Go to Examination",
             onPressed: () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                widget.onNavigateToExamine(1); // Pass step 3 to EyeCheckup after build
+                widget.onNavigateToExamine(1, controllers['patientToken']!.text); // Pass step 3 to EyeCheckup after build
               });
             }, // Replace with your onPressed function
           ),

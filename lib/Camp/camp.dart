@@ -25,24 +25,24 @@ class _CampState extends State<Camp> {
     CampDashboard(campCode: widget.campCode),
     CampRegistration(onNavigateToEyeCheckup: navigateToEyeCheckup, campCode: widget.campCode),
     CampEyeCheckup(initialStep: initialEyeCheckupStep, onNavigateToExamine: navigateToExamine, initialPatientToken: initialPatientToken,),
-    CampExamine(initialStep: initialExamineStep,),
+    CampExamine(initialStep: initialExamineStep, initialPatientToken: initialPatientToken,),
     // const CampRecords(),
   ];
 
-  void navigateToEyeCheckup(int step, String PatientToken) {
+  void navigateToEyeCheckup(int step, String patientToken) {
     setState(() {
       initialEyeCheckupStep = step; // Set the initial step
       _selectedIndex = 2; // Navigate to CampEyeCheckup
-      initialPatientToken = PatientToken;
+      initialPatientToken = patientToken;
       // print('Navigating to Eye Checkup with initial step: $initialEyeCheckupStep');
     });
   }
 
-  void navigateToExamine(int step) {
+  void navigateToExamine(int step, String patientToken) {
     setState(() {
       initialExamineStep = step; // Set the initial step
-      _selectedIndex = 3;          // Navigate to CampEyeCheckup
-      // print('Navigating to Eye Checkup with initial step: $initialEyeCheckupStep');
+      _selectedIndex = 3;
+      initialPatientToken = patientToken;
     });
   }
 
