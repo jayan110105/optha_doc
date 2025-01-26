@@ -26,7 +26,7 @@ extension StringExtension on String {
 
 class CampRegistration extends StatefulWidget {
 
-  final Function(int) onNavigateToEyeCheckup;
+  final Function(int, String) onNavigateToEyeCheckup;
   final String campCode;
 
   const CampRegistration({super.key, required this.onNavigateToEyeCheckup, required this.campCode});
@@ -38,6 +38,7 @@ class CampRegistration extends StatefulWidget {
 class _CampRegistrationState extends State<CampRegistration> {
   int step = 0;
   File? _image;
+  String? token;
 
   final List<Map<String, dynamic>> steps = [
     {"id": "token", "title": "Token", "icon": Icons.tag},
@@ -48,6 +49,7 @@ class _CampRegistrationState extends State<CampRegistration> {
   ];
 
   final Map<String, TextEditingController> controllers = {
+    "token": TextEditingController(),
     "name": TextEditingController(),
     "age": TextEditingController(),
     "gender": TextEditingController(),
@@ -56,6 +58,15 @@ class _CampRegistrationState extends State<CampRegistration> {
     "phone": TextEditingController(),
     "address": TextEditingController(),
   };
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Generate the token once and set it in the controller
+    token = generateToken();
+    controllers["token"]?.text = token!;
+  }
 
   void saveRegistration() async {
 
@@ -68,6 +79,7 @@ class _CampRegistrationState extends State<CampRegistration> {
 
     // Prepare the data
     final registration = {
+      'token': controllers['token']?.text ?? '',
       'name': controllers['name']?.text ?? '',
       'age': controllers['age']?.text ?? '',
       'gender': controllers['gender']?.text ?? '',
@@ -226,15 +238,15 @@ class _CampRegistrationState extends State<CampRegistration> {
       step = 0;
       // Reset image
       _image = null;
+
+      token = generateToken();
+      controllers["token"]?.text = token!;
     });
   }
 
   String generateToken() {
-    // Get the current UTC time
     final now = DateTime.now().toUtc();
-    // Format the date as YYYYMMDDHHMMSS
     final formattedDate = DateFormat('yyyyMMddHHmmss').format(now);
-    // Combine the station code and formatted date
     return '${widget.campCode}-$formattedDate';
   }
 
@@ -247,7 +259,7 @@ class _CampRegistrationState extends State<CampRegistration> {
         child: Column(
           children: [
             Text(
-              generateToken(),
+              token!,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -458,7 +470,7 @@ class _CampRegistrationState extends State<CampRegistration> {
             label: "Go to Eye Checkup",
             onPressed: () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                widget.onNavigateToEyeCheckup(1); // Pass step 3 to EyeCheckup after build
+                widget.onNavigateToEyeCheckup(1, controllers['token']!.text ); // Pass step 3 to EyeCheckup after build
               });
             }, // Replace with your onPressed function
           ),

@@ -11,9 +11,10 @@ import 'package:opthadoc/Output/Refraction.dart';
 
 class CampEyeCheckup extends StatefulWidget {
   final int initialStep;
+  final String? initialPatientToken;
   final Function(int) onNavigateToExamine;
 
-  const CampEyeCheckup({super.key, this.initialStep = 0, required this.onNavigateToExamine});
+  const CampEyeCheckup({super.key, this.initialStep = 0, required this.onNavigateToExamine, this.initialPatientToken});
 
   @override
   State<CampEyeCheckup> createState() => _CampEyeCheckupState();
@@ -39,7 +40,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
 
     // Prepare data for saving
     final checkupData = {
-      'patientId': controllers['patientId']?.text ?? '',
+      'patientToken': controllers['patientToken']?.text ?? '',
       'withoutGlasses': controllers.entries
           .where((entry) => entry.key.startsWith('withoutGlasses'))
           .map((entry) => '${entry.key}:${entry.value.text}')
@@ -92,7 +93,9 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       controllers['$prefix.nearVisionRequired'] = TextEditingController(text: 'No');
     }
 
-    controllers['patientId'] = TextEditingController();
+    controllers['patientToken'] = TextEditingController(
+      text: widget.initialPatientToken ?? '', // Initialize with initialPatientToken if provided
+    );
 
     controllers['bifocal'] = TextEditingController();
     controllers['color'] = TextEditingController();
@@ -156,7 +159,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           SizedBox(height: 8,),
           InputField(
               hintText: "Enter patient token",
-              controller: controllers['patientId'],
+              controller: controllers['patientToken'],
           ),
           SizedBox(height: 16),
           Text(
