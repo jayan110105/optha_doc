@@ -8,13 +8,16 @@ import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:opthadoc/data/DatabaseHelper.dart';
 import 'package:opthadoc/Output/Refraction.dart';
+import 'package:intl/intl.dart';
+
 
 class CampEyeCheckup extends StatefulWidget {
   final int initialStep;
   final String? initialPatientToken;
+  final String campCode;
   final Function(int, String) onNavigateToExamine;
 
-  const CampEyeCheckup({super.key, this.initialStep = 0, required this.onNavigateToExamine, this.initialPatientToken});
+  const CampEyeCheckup({super.key, this.initialStep = 0, required this.onNavigateToExamine, this.initialPatientToken, required this.campCode});
 
   @override
   State<CampEyeCheckup> createState() => _CampEyeCheckupState();
@@ -157,9 +160,24 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
         children: [
           Label(text: "Patient Token"),
           SizedBox(height: 8,),
-          InputField(
-              hintText: "Enter patient token",
-              controller: controllers['patientToken'],
+          Row(
+            children: [
+              Text(
+                "${widget.campCode}-${DateFormat('yyyyMMdd').format(DateTime.now())}-",
+                style: TextStyle(
+                  color: Color(0xFF163351),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: InputField(
+                    hintText: "Enter patient token",
+                    controller: controllers['patientToken'],
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 16),
           Text(

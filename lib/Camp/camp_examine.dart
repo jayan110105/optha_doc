@@ -15,7 +15,8 @@ import 'package:opthadoc/Output/Examine.dart';
 class CampExamine extends StatefulWidget {
   final int initialStep;
   final String? initialPatientToken;
-  const CampExamine({super.key, this.initialStep = 0, this.initialPatientToken});
+  final String campCode;
+  const CampExamine({super.key, this.initialStep = 0, this.initialPatientToken, required this.campCode});
 
   @override
   State<CampExamine> createState() => _CampExamineState();
@@ -292,7 +293,7 @@ class _CampExamineState extends State<CampExamine> {
   Widget build(BuildContext context) {
 
     final stepWidgets = [
-      Token(controller: _tokenController),
+      Token(controller: _tokenController, campCode: widget.campCode,),
       Complaint(patientData: _patientData, historyData: _historyData, updateValue: _updateValue,),
       Comorbid(comorbidities: _comorbidities, updateValue: _updateComorbidity,),
       Exam(data: _examData, updateValue: _updateExamValue,),

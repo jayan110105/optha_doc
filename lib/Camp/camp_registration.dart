@@ -245,8 +245,8 @@ class _CampRegistrationState extends State<CampRegistration> {
   }
 
   String generateToken() {
-    final now = DateTime.now().toUtc();
-    final formattedDate = DateFormat('yyyyMMddHHmmss').format(now);
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyyMMdd-HHmmss').format(now); // Adjusted format
     return '${widget.campCode}-$formattedDate';
   }
 
@@ -470,7 +470,8 @@ class _CampRegistrationState extends State<CampRegistration> {
             label: "Go to Eye Checkup",
             onPressed: () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                widget.onNavigateToEyeCheckup(1, controllers['token']!.text ); // Pass step 3 to EyeCheckup after build
+                String tokenText = controllers['token']!.text;
+                widget.onNavigateToEyeCheckup(1, tokenText.substring(tokenText.length - 6)); // Pass step 3 to EyeCheckup after build
               });
             }, // Replace with your onPressed function
           ),

@@ -24,8 +24,8 @@ class _CampState extends State<Camp> {
   List<Widget> get pages => [
     CampDashboard(campCode: widget.campCode),
     CampRegistration(onNavigateToEyeCheckup: navigateToEyeCheckup, campCode: widget.campCode),
-    CampEyeCheckup(initialStep: initialEyeCheckupStep, onNavigateToExamine: navigateToExamine, initialPatientToken: initialPatientToken,),
-    CampExamine(initialStep: initialExamineStep, initialPatientToken: initialPatientToken,),
+    CampEyeCheckup(initialStep: initialEyeCheckupStep, onNavigateToExamine: navigateToExamine, initialPatientToken: initialPatientToken, campCode: widget.campCode),
+    CampExamine(initialStep: initialExamineStep, initialPatientToken: initialPatientToken, campCode: widget.campCode),
     // const CampRecords(),
   ];
 
