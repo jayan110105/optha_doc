@@ -370,7 +370,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
             textColor: Colors.white,
             label: "Share PDF",
             onPressed: () {
-              generateRefraction();
+              generateRefraction(controllers);
             }, // Replace with your onPressed function
           ),
         ],
