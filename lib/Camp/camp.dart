@@ -19,7 +19,7 @@ class _CampState extends State<Camp> {
 
   int initialEyeCheckupStep = 0;
   int initialExamineStep = 0;
-  String? initialPatientToken = null;
+  String? initialPatientToken;
 
   List<Widget> get pages => [
     CampDashboard(campCode: widget.campCode),
