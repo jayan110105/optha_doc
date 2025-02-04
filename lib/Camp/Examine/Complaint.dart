@@ -19,13 +19,16 @@ class Complaint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> historyKeys = [
+    final List<String> historyKeysPerEye = [
       "Ocular Trauma",
       "Flashes",
       "Floaters",
       "Glaucoma on Rx",
       "Pain/redness",
       "Watering/discharge",
+    ];
+
+    final List<String> historyKeysOnce = [
       "History of glasses",
       "Are PG comfortable ?",
       "Last Glass change",
@@ -197,49 +200,8 @@ class Complaint extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                ...historyKeys.map((key) {
+                ...historyKeysPerEye.map((key) {
                   final keyWithEye = "$key-$eye";
-
-                  if (key == "Are PG comfortable ?" &&
-                      historyData["History of glasses-$eye"] != "yes") {
-                    return const SizedBox.shrink();
-                  }
-                  if (key == "Details of surgery/procedure" &&
-                      historyData["Previous surgery/laser rx-$eye"] != "yes") {
-                    return const SizedBox.shrink();
-                  }
-                  if (key == "Last Glass change" &&
-                      historyData["History of glasses-$eye"] != "yes") {
-                    return const SizedBox.shrink();
-                  }
-
-                  if (["Flashes", "Floaters", "Glaucoma on Rx", "Pain/redness", "Watering/discharge"]
-                      .contains(key)) {
-                    if (historyData["Ocular Trauma-$eye"] != "yes") {
-                      return const SizedBox.shrink();
-                    }
-                  }
-
-                  if (key == "Details of surgery/procedure" ||
-                      key == "Last Glass change") {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Label(text: key),
-                        key == "Details of surgery/procedure"
-                            ? CustomTextArea(
-                          hintText: "Enter surgery details",
-                          minLines: 3,
-                          controller: historyData[keyWithEye],
-                        )
-                            : InputField(
-                          hintText: "Enter date or duration",
-                          controller: historyData[keyWithEye],
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                    );
-                  }
 
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,6 +217,56 @@ class Complaint extends StatelessWidget {
                     ],
                   );
                 }),
+              ],
+            );
+          }),
+          const SizedBox(height: 16),
+          const Text(
+            "Additional History",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF163351),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...historyKeysOnce.where((key) {
+            // Show these fields **only if "History of glasses" is "yes"**
+            if (["Are PG comfortable ?", "Last Glass change"].contains(key) &&
+                historyData["History of glasses"] != "yes") {
+              return false;
+            }
+
+            // Show "Details of surgery/procedure" only if "Previous surgery/laser rx" is "yes"
+            if (key == "Details of surgery/procedure" &&
+                historyData["Previous surgery/laser rx"] != "yes") {
+              return false;
+            }
+
+            return true; // Show other keys normally
+          }).map((key) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Label(text: key),
+                key == "Details of surgery/procedure"
+                    ? CustomTextArea(
+                  hintText: "Enter surgery details",
+                  minLines: 3,
+                  controller: historyData[key], // Use single key (no left/right)
+                )
+                    : key == "Last Glass change"
+                    ? InputField(
+                  hintText: "Enter date or duration",
+                  controller: historyData[key],
+                )
+                    : CustomRadioGroup(
+                  selectedValue: historyData[key],
+                  onChanged: (value) {
+                    updateValue(key, value);
+                  },
+                ),
+                const SizedBox(height: 16),
               ],
             );
           }),

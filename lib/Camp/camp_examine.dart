@@ -59,17 +59,17 @@ class _CampExamineState extends State<CampExamine> {
         "Glaucoma on Rx",
         "Pain/redness",
         "Watering/discharge",
-        "History of glasses",
-        "Are PG comfortable ?",
-        "Last Glass change",
-        "Previous surgery/laser rx",
-        "Details of surgery/procedure",
       ])
-        if (label == "Last Glass change" || label == "Details of surgery/procedure")
-          "$label-$eye": TextEditingController() // For text-based inputs
-        else
-          "$label-$eye": null, // For radio or dropdown selections
+        "$label-$eye": null, // For radio or dropdown selections
+
+    // **Only one instance of these fields (not per eye)**
+    "History of glasses": null,
+    "Are PG comfortable ?": null,
+    "Last Glass change": TextEditingController(), // Text input
+    "Previous surgery/laser rx": null,
+    "Details of surgery/procedure": TextEditingController(), // Text input
   };
+
 
   final Map<String, bool> _comorbidities = {
     "Diabetes mellitus": false,
@@ -326,7 +326,16 @@ class _CampExamineState extends State<CampExamine> {
             textColor: Colors.white,
             label: "Share PDF",
             onPressed: () {
-              generateExamine();
+              generateExamine(
+                _patientData,
+                _historyData,
+                _comorbidities,
+                _examData,
+                _workupData,
+                _dilatedData,
+                _diagnosisData,
+                _preSurgeryData,
+              );
             }, // Replace with your onPressed function
           ),
         ],
