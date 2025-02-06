@@ -144,6 +144,14 @@ class Complaint extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 16),
+                Label(text: "Diminution of vision"),
+                CustomRadioGroup(
+                  selectedValue: historyData["Diminution of vision-$eye"],
+                  onChanged: (value) {
+                    updateValue("Diminution of vision-$eye", value);
+                  },
+                ),
+                const SizedBox(height: 16),
                 Label(text: "Complaint Duration",),
                 Row(
                   children: [
@@ -213,10 +221,20 @@ class Complaint extends StatelessWidget {
                           updateValue(keyWithEye, value);
                         },
                       ),
+                      // Show "Nature of Trauma" field only if "Ocular Trauma" is "yes"
+                      if (key == "Ocular Trauma" && historyData[keyWithEye] == "yes") ...[
+                        const SizedBox(height: 8),
+                        Label(text: "Nature of Trauma"),
+                        InputField(
+                          hintText: "Enter nature of trauma",
+                          controller: historyData["Nature of Trauma-$eye"],
+                        ),
+                      ],
                       const SizedBox(height: 16),
                     ],
                   );
                 }),
+
               ],
             );
           }),

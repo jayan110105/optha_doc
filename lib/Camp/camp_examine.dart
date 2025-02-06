@@ -53,6 +53,7 @@ class _CampExamineState extends State<CampExamine> {
   final Map<String, dynamic> _historyData = {
     for (var eye in ['right', 'left'])
       for (var label in [
+        "Diminution of vision",
         "Ocular Trauma",
         "Flashes",
         "Floaters",
@@ -61,6 +62,9 @@ class _CampExamineState extends State<CampExamine> {
         "Watering/discharge",
       ])
         "$label-$eye": null, // For radio or dropdown selections
+
+    for (var eye in ['right', 'left'])
+      "Nature of Trauma-$eye": TextEditingController(),
 
     // **Only one instance of these fields (not per eye)**
     "History of glasses": null,

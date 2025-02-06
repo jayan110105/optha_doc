@@ -2,6 +2,20 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
+String getDurationString(Map<String, dynamic> patientData, String eye) {
+  int years = int.tryParse(patientData['years-$eye']?.toString() ?? '0') ?? 0;
+  int months = int.tryParse(patientData['months-$eye']?.toString() ?? '0') ?? 0;
+  int days = int.tryParse(patientData['days-$eye']?.toString() ?? '0') ?? 0;
+
+  List<String> parts = [];
+
+  if (years > 0) parts.add("$years year${years > 1 ? 's' : ''}");
+  if (months > 0) parts.add("$months month${months > 1 ? 's' : ''}");
+  if (days > 0) parts.add("$days day${days > 1 ? 's' : ''}");
+
+  return parts.isNotEmpty ? parts.join(", ") : "N/A";
+}
+
 Future<void> generateExamine(
     Map<String, dynamic> patientData,
     Map<String, dynamic> historyData,
@@ -13,6 +27,8 @@ Future<void> generateExamine(
     Map<String, dynamic> preSurgeryData,
   ) async {
   final pdf = pw.Document();
+
+  final activeComorbidities = comorbidities.entries.where((entry) => entry.value).toList();
 
   pdf.addPage(
     pw.MultiPage(
@@ -78,14 +94,14 @@ Future<void> generateExamine(
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                    'RE',
+                    patientData['vision_re_dv'] ?? 'NA',
                     style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                    'LE',
+                    patientData['vision_le_dv'] ?? 'NA',
                     style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                 ),
@@ -103,14 +119,14 @@ Future<void> generateExamine(
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(8.0),
                     child: pw.Text(
-                      'RE',
+                      patientData['vision_re_nv'] ?? 'NA',
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                     ),
                   ),
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(8.0),
                     child: pw.Text(
-                      'LE',
+                      patientData['vision_le_nv'] ?? 'NA',
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                     ),
                   ),
@@ -194,13 +210,13 @@ Future<void> generateExamine(
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
                           child: pw.Text(
-                            'YES',
+                            (historyData['Diminution of vision-right'] ?? 'NO').toString().toUpperCase(),
                           ),
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
                           child: pw.Text(
-                            'NO',
+                            (historyData['Diminution of vision-left'] ?? 'NO').toString().toUpperCase(),
                           ),
                         ),
                       ],
@@ -231,13 +247,13 @@ Future<void> generateExamine(
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
                           child: pw.Text(
-                            'YES',
+                            getDurationString(patientData, "right"),
                           ),
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
                           child: pw.Text(
-                            'NO',
+                            getDurationString(patientData, "left"),
                           ),
                         ),
                       ],
@@ -284,29 +300,74 @@ Future<void> generateExamine(
               ],
             ),
             // Row 2 with nested table
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'If yes, Nature of trauma - or NA',
-                            style: pw.TextStyle(),
+            if (historyData['Nature of Trauma-left'] != null &&
+                historyData['Nature of Trauma-left'].text.trim().isNotEmpty) ...[
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(1),
+                      1: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Nature of Trauma - RE',
+                              style: pw.TextStyle(),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              historyData['Nature of Trauma-right'].text,
+                              style: pw.TextStyle(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+            if (historyData['Nature of Trauma-left'] != null &&
+                historyData['Nature of Trauma-left'].text.trim().isNotEmpty) ...[
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(1),
+                      1: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Nature of Trauma - LE',
+                              style: pw.TextStyle(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              historyData['Nature of Trauma-left'].text,
+                              style: pw.TextStyle(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
             // Row 3 with nested table
             pw.TableRow(
               children: [
@@ -535,79 +596,79 @@ Future<void> generateExamine(
               ],
             ),
             // Row 2 with nested table
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                    3: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'If yes, are PG comfortable ?',
-                            style: pw.TextStyle(),
+            if (historyData['History of glasses'] == "yes") ...[
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(3),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'are PG comfortable ?',
+                              style: pw.TextStyle(),
+                            ),
                           ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('YES'),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('NO'),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('NA'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Are PG comfortable ?'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
             // Row 3 with nested table
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(3),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Last Glass change',
-                            style: pw.TextStyle(),
+            if (historyData['History of glasses'] == "yes") ...[
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(3),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Last Glass change',
+                              style: pw.TextStyle(),
+                            ),
                           ),
-                        ),
-                        pw.SizedBox()
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              historyData['Last Glass change'].text ?? 'NA',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
             // Row 4 with nested table
             pw.TableRow(
               children: [
                 pw.Table(
                   border: pw.TableBorder.all(),
                   columnWidths: {
-                    0: pw.FlexColumnWidth(2),
+                    0: pw.FlexColumnWidth(1),
                     1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
                   },
                   children: [
                     pw.TableRow(
@@ -621,33 +682,8 @@ Future<void> generateExamine(
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('YES'),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('NO'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
                           child: pw.Text(
-                            'If Yes, Details of surgery/procedure: or NA',
-                            style: pw.TextStyle(),
+                            (historyData['Previous surgery/laser rx'] ?? 'NO').toString().toUpperCase(),
                           ),
                         ),
                       ],
@@ -656,168 +692,81 @@ Future<void> generateExamine(
                 ),
               ],
             ),
+            if (historyData['Previous surgery/laser rx'] == "yes") ...[
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(1),
+                      1: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Details of surgery/procedure:',
+                              style: pw.TextStyle(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              historyData['Details of surgery/procedure'].text ?? 'NA',
+                              style: pw.TextStyle(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ]
           ],
         ),
         pw.SizedBox(height: 20),
-        pw.Center(
-          child: pw.Text(
-            'Comorbidities and Medications:',
-            style: pw.TextStyle(
-              fontSize: 16,
-              fontWeight: pw.FontWeight.bold,
+        if (activeComorbidities.isNotEmpty) ...[
+          pw.Center(
+            child: pw.Text(
+              'Comorbidities and Medications:',
+              style: pw.TextStyle(
+                fontSize: 16,
+                fontWeight: pw.FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        pw.SizedBox(height: 10),
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(2),
-            1: pw.FlexColumnWidth(1),
-            2: pw.FlexColumnWidth(1),
-          },
-          children: [
-            // Diabetes mellitus row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Diabetes mellitus',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
+          pw.SizedBox(height: 10),
+          pw.Table(
+            border: pw.TableBorder.all(),
+            columnWidths: {
+              0: pw.FlexColumnWidth(2),
+              1: pw.FlexColumnWidth(2),
+            },
+            children: [
+              // Diabetes mellitus row
+              ...activeComorbidities.map(
+                    (entry) => pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        entry.key,
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('YES'),
+                    ),
+                  ],
                 ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES'),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('NO'),
-                ),
-              ],
-            ),
-            // Hypertension row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Hypertension',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES'),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('NO'),
-                ),
-              ],
-            ),
-            // Heart disease row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Heart disease',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES'),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('NO'),
-                ),
-              ],
-            ),
-            // Asthma row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'Asthma',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES'),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('NO'),
-                ),
-              ],
-            ),
-            // Allergy to dust/meds row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'Allergy to dust/ meds',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES'),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('NO'),
-                ),
-              ],
-            ),
-            // Benign prostatic hyperplasia row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Benign prostatic hyperplasia on treatment',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES'),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('NO'),
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Is the patient On Antiplatelets:',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES'),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('NO'),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
         pw.SizedBox(height: 20),
         pw.Center(
           child: pw.Text(
@@ -872,11 +821,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Parallel\nExotropia/esotropia/\nalternating squint'),
+                  child: pw.Text(
+                      examData["visualAxis-right"] ?? ' '
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Parallel\nExotropia/esotropia/\nalternating squint'),
+                  child: pw.Text(
+                      examData["visualAxis-left"] ?? ' '
+                  ),
                 ),
               ],
             ),
@@ -892,11 +845,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Normal\nLimited'),
+                  child: pw.Text(
+                      examData["eom-right"] ?? ' '
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Normal\nLimited'),
+                  child: pw.Text(
+                      examData["eom-right"] ?? ' '
+                  ),
                 ),
               ],
             ),
@@ -913,13 +870,13 @@ Future<void> generateExamine(
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                    'Normal\nPterygium (grade 1/2/3/4 -\nNasal/temporal/both)\nEpiscleritis/ Scleritis\nHordeolum externum\nHordeolum Internum',
+                      examData["conjunctiva-right"] ?? ' '
                   ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                    'Normal\nPterygium (grade 1/2/3/4 -\nNasal/temporal/both)\nEpiscleritis/ Scleritis\nHordeolum externum\nHordeolum Internum',
+                      examData["conjunctiva-left"] ?? ' '
                   ),
                 ),
               ],
@@ -936,11 +893,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Clear/Opacity/Hazy'),
+                  child: pw.Text(
+                      examData["cornea-right"] ?? ' '
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Clear/Opacity/Hazy'),
+                  child: pw.Text(
+                      examData["cornea-left"] ?? ' '
+                  ),
                 ),
               ],
             ),
@@ -956,11 +917,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Normal\nshallow depth'),
+                  child: pw.Text(
+                      examData["ac-right"] ?? ' '
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Normal\nshallow depth'),
+                  child: pw.Text(
+                      examData["ac-left"] ?? ' '
+                  ),
                 ),
               ],
             ),
@@ -976,11 +941,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Normal/RAPD+'),
+                  child: pw.Text(
+                      examData["pupilReactions-right"] ?? ' '
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Normal/RAPD+'),
+                  child: pw.Text(
+                      examData["pupilReactions-left"] ?? ' '
+                  ),
                 ),
               ],
             ),
@@ -997,13 +966,13 @@ Future<void> generateExamine(
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                    'Immature cataract/\nNear Mature cataract/\nMature Cataract\nHypermature Cataract\nPCIOL\nAphakia',
+                      examData["lens-right"] ?? ' '
                   ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                    'Immature cataract/\nNear Mature cataract/\nMature Cataract\nHypermature Cataract\nPCIOL\nAphakia',
+                      examData["lens-left"] ?? ' '
                   ),
                 ),
               ],
@@ -1064,11 +1033,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Free/blocked/partially patent'),
+                  child: pw.Text(
+                      workupData["re-ducts"] ?? ' '
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('Free/blocked/partially patent'),
+                  child: pw.Text(
+                      workupData["le-ducts"] ?? ' '
+                  ),
                 ),
               ],
             ),
@@ -1079,7 +1052,8 @@ Future<void> generateExamine(
         pw.Table(
           border: pw.TableBorder.all(),
           columnWidths: {
-            0: pw.FlexColumnWidth(3), // Full width
+            0: pw.FlexColumnWidth(1), // Full width
+            1: pw.FlexColumnWidth(2),
           },
           children: [
             pw.TableRow(
@@ -1091,6 +1065,12 @@ Future<void> generateExamine(
                     style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                 ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.all(8.0),
+                  child: pw.Text(
+                    workupData["bp"].text ?? ' ',
+                  ),
+                ),
               ],
             ),
             pw.TableRow(
@@ -1100,6 +1080,12 @@ Future<void> generateExamine(
                   child: pw.Text(
                     'GRBS -',
                     style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
+                ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.all(8.0),
+                  child: pw.Text(
+                    workupData["grbs"].text ?? ' ',
                   ),
                 ),
               ],
@@ -1151,11 +1137,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('2 to 8 mm'),
+                  child: pw.Text(
+                      dilatedData["mydriasis-right"] ?? ' '
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('2 to 8 mm'),
+                  child: pw.Text(
+                      dilatedData["mydriasis-left"] ?? ' '
+                  ),
                 ),
               ],
             ),
@@ -1171,11 +1161,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('grossly normal/\nabnormal'),
+                  child: pw.Text(
+                      dilatedData["fundus-right"] ?? ' '
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('grossly normal/\nabnormal'),
+                  child: pw.Text(
+                      dilatedData["fundus-left"] ?? ' '
+                  ),
                 ),
               ],
             ),
@@ -1191,11 +1185,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['Cataract-right'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['Cataract-left'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
               ],
             ),
@@ -1211,11 +1209,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['Glaucoma-right'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['Glaucoma-left'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
               ],
             ),
@@ -1231,11 +1233,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['Diabetic retinopathy-right'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['Diabetic retinopathy-left'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
               ],
             ),
@@ -1251,11 +1257,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['ARMD-right'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['ARMD-left'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
               ],
             ),
@@ -1271,11 +1281,15 @@ Future<void> generateExamine(
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['Optic disc pallor/ atrophy-right'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('YES/ NO'),
+                  child: pw.Text(
+                    (dilatedData['Optic disc pallor/ atrophy-left'] ?? 'NO').toString().toUpperCase(),
+                  ),
                 ),
               ],
             ),

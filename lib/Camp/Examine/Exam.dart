@@ -102,7 +102,7 @@ class Exam extends StatelessWidget {
                           keyName: 'conjunctiva-$eye',
                           items: [
                             "Normal",
-                            "Pterygium (grade 1/2/3/4 – Nasal/temporal/both)",
+                            "Pterygium (grade 1/2/3/4 - Nasal/temporal/both)",
                             "Episcleritis/ Scleritis",
                             "Hordeolum externum",
                             "Hordeolum Internum"
