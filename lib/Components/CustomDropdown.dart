@@ -7,6 +7,7 @@ class CustomDropdown extends StatelessWidget {
   final ValueChanged<String?> onChanged;
   final TextStyle? textStyle;
   final String? hintText;
+  final double? hintFontSize; // New parameter for hint font size
 
   const CustomDropdown({
     required this.keyName,
@@ -15,6 +16,7 @@ class CustomDropdown extends StatelessWidget {
     required this.onChanged,
     this.textStyle,
     this.hintText,
+    this.hintFontSize, // Accept font size for hint
     super.key,
   });
 
@@ -34,13 +36,17 @@ class CustomDropdown extends StatelessWidget {
         value: items.contains(selectedValue) ? selectedValue : null,
         isExpanded: true,
         icon: Icon(
-            Icons.keyboard_arrow_down,
-            size: selectedValue == null ? 18 : 10,
-            color: Colors.grey
+          Icons.keyboard_arrow_down,
+          size: selectedValue == null ? 18 : 10,
+          color: Colors.grey,
         ),
         hint: Text(
           hintText ?? "Select",
-          style: const TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.normal), // Placeholder text style
+          style: TextStyle(
+            color: Colors.grey,
+            fontSize: hintFontSize ?? 14, // Apply hintFontSize
+            fontWeight: FontWeight.normal,
+          ),
         ),
         style: textStyle ??
             const TextStyle(

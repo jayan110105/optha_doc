@@ -486,111 +486,108 @@ class _CampExamineState extends State<CampExamine> {
     return Scaffold(
       backgroundColor: const Color(0xFFE9E7DB),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Title, Progress Steps, etc.
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Camp Examination",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF163351),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Medical Examination Form",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF163351).withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        ProgressSteps(
-                          steps: steps,
-                          currentStep: step,
-                          allowStepTap: true,
-                          onStepTapped: (index) {
-                            setState(() {
-                              step = index;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        CardComponent(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: stepWidgets[step],
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Title, Progress Steps, etc.
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white, // Matches the bg-background color
-                                foregroundColor: const Color(0xFF163351),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
-                                ),
-                              ),
-                              onPressed: step > 0 ? prevStep : null,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.arrow_back_ios,
-                                    color: step > 0 ? Color(0xFF163351): Colors.grey[500],
-                                  ),
-                                  SizedBox(width: 8,),
-                                  Text("Back")],
+                            Text(
+                              "Camp Examination",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF163351),
                               ),
                             ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xFF163351), // Button background color
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
-                                ),
-                              ),
-                              onPressed: step<stepWidgets.length-1 ? nextStep : null,
-                              child: Row(
-                                children: [
-                                  Text(step == steps.length - 1 ? "Submit" : "Continue"),
-                                  if (step < steps.length - 1) ...[
-                                    SizedBox(width: 8), // Adds spacing if not the last step
-                                    Icon(Icons.arrow_forward_ios, color: Colors.white),
-                                  ],
-                                ],
+                            const SizedBox(height: 8),
+                            Text(
+                              "Medical Examination Form",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF163351).withValues(alpha: 0.6),
                               ),
                             ),
                           ],
-                        )
-                      ],
-                    ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ProgressSteps(
+                        steps: steps,
+                        currentStep: step,
+                        allowStepTap: true,
+                        onStepTapped: (index) {
+                          setState(() {
+                            step = index;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      CardComponent(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: stepWidgets[step],
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white, // Matches the bg-background color
+                              foregroundColor: const Color(0xFF163351),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
+                              ),
+                            ),
+                            onPressed: step > 0 ? prevStep : null,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.arrow_back_ios,
+                                  color: step > 0 ? Color(0xFF163351): Colors.grey[500],
+                                ),
+                                SizedBox(width: 8,),
+                                Text("Back")],
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF163351), // Button background color
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8), // Rounded border with 0 radius
+                              ),
+                            ),
+                            onPressed: step<stepWidgets.length-1 ? nextStep : null,
+                            child: Row(
+                              children: [
+                                Text(step == steps.length - 1 ? "Submit" : "Continue"),
+                                if (step < steps.length - 1) ...[
+                                  SizedBox(width: 8), // Adds spacing if not the last step
+                                  Icon(Icons.arrow_forward_ios, color: Colors.white),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

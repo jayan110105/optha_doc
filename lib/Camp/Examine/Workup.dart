@@ -83,7 +83,7 @@ class Workup extends StatelessWidget {
                 children: [
                   const Label(text: "BP"),
                   InputField(
-                    hintText: "Enter BP value",
+                    hintText: "Enter BP",
                     isNumber: true,
                     controller: data['bp'],
                   ),
@@ -97,7 +97,7 @@ class Workup extends StatelessWidget {
                 children: [
                   const Label(text: "GRBS"),
                   InputField(
-                    hintText: "Enter GRBS value",
+                    hintText: "Enter GRBS",
                     isNumber: true,
                     controller: data['grbs'],
                   ),

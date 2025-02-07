@@ -157,7 +157,7 @@ class Complaint extends StatelessWidget {
                   children: [
                     Expanded(
                       child: CustomDropdown(
-                        hintText: "Years",
+                        hintText: "Year",
                         textStyle: const TextStyle(
                           fontSize: 14,
                           color: Color(0xFF163351),
@@ -169,12 +169,13 @@ class Complaint extends StatelessWidget {
                         onChanged: (value) {
                           updateValue('years-$eye', value!);
                         },
+                        hintFontSize: 13,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: CustomDropdown(
-                        hintText: "Months",
+                        hintText: "Month",
                         textStyle: const TextStyle(
                           fontSize: 14,
                           color: Color(0xFF163351),
@@ -186,12 +187,13 @@ class Complaint extends StatelessWidget {
                         onChanged: (value) {
                           updateValue('months-$eye', value!);
                         },
+                        hintFontSize: 13,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: CustomDropdown(
-                        hintText: "Days",
+                        hintText: "Day",
                         textStyle: const TextStyle(
                           fontSize: 14,
                           color: Color(0xFF163351),
@@ -203,6 +205,7 @@ class Complaint extends StatelessWidget {
                         onChanged: (value) {
                           updateValue('days-$eye', value!);
                         },
+                        hintFontSize: 13,
                       ),
                     ),
                   ],
