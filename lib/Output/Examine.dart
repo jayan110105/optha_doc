@@ -30,6 +30,28 @@ Future<void> generateExamine(
 
   final activeComorbidities = comorbidities.entries.where((entry) => entry.value).toList();
 
+  final filteredDiagnoses = [
+    'Immature cataract',
+    'Near Mature cataract',
+    'Mature Cataract',
+    'Hypermature Cataract',
+    'PCIOL',
+    'Aphakia',
+    'Pterygium',
+    'Dacryocystitis',
+    'Amblyopia',
+    'Glaucoma',
+    'Diabetic retinopathy',
+    'Stye',
+    'Conjunctivitis',
+    'Dry eye',
+    'Allergic conjunctivitis'
+  ].where((diagnosis) =>
+  diagnosisData['$diagnosis-right'] == true ||
+      diagnosisData['$diagnosis-left'] == true ||
+      diagnosisData['$diagnosis-both'] == true
+  ).toList();
+
   pdf.addPage(
     pw.MultiPage(
       build: (context) => [
@@ -300,8 +322,8 @@ Future<void> generateExamine(
               ],
             ),
             // Row 2 with nested table
-            if (historyData['Nature of Trauma-left'] != null &&
-                historyData['Nature of Trauma-left'].text.trim().isNotEmpty) ...[
+            if (historyData['Nature of Trauma-right'] != null &&
+                historyData['Nature of Trauma-right'].text.trim().isNotEmpty) ...[
               pw.TableRow(
                 children: [
                   pw.Table(
@@ -1339,23 +1361,8 @@ Future<void> generateExamine(
               ],
             ),
             // Diagnosis Rows
-            ...[
-              'Immature cataract',
-              'Near Mature cataract',
-              'Mature Cataract',
-              'Hypermature Cataract',
-              'PCIOL',
-              'Aphakia',
-              'Pterygium',
-              'Dacryocystitis',
-              'Amblyopia',
-              'Glaucoma',
-              'Diabetic retinopathy',
-              'Stye',
-              'Conjunctivitis',
-              'Dry eye',
-              'Allergic conjunctivitis'
-            ].map(
+
+            ...filteredDiagnoses.map(
                   (diagnosis) => pw.TableRow(
                 children: [
                   pw.Padding(
@@ -1364,15 +1371,21 @@ Future<void> generateExamine(
                   ),
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(''),
+                    child: pw.Text(
+                      diagnosisData['$diagnosis-right'] == true ? 'YES' : 'NO',
+                    ),
                   ),
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(''),
+                    child: pw.Text(
+                      diagnosisData['$diagnosis-left'] == true ? 'YES' : 'NO',
+                    ),
                   ),
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(''),
+                    child: pw.Text(
+                      diagnosisData['$diagnosis-both'] == true ? 'YES' : 'NO',
+                    ),
                   ),
                 ],
               ),
@@ -1384,8 +1397,7 @@ Future<void> generateExamine(
           border: pw.TableBorder.all(),
           columnWidths: {
             0: pw.FlexColumnWidth(2), // Label column
-            1: pw.FlexColumnWidth(1), // YES column
-            2: pw.FlexColumnWidth(1), // NO column
+            1: pw.FlexColumnWidth(2), // YES column
           },
           children: [
             pw.TableRow(
@@ -1400,14 +1412,7 @@ Future<void> generateExamine(
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                      'YES',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'NO',
+                      (preSurgeryData['Cardio/Medicine clearance for surgery'] ?? 'NO').toString().toUpperCase(),
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                 ),
@@ -1429,8 +1434,7 @@ Future<void> generateExamine(
           border: pw.TableBorder.all(),
           columnWidths: {
             0: pw.FlexColumnWidth(2), // Label column
-            1: pw.FlexColumnWidth(1), // YES column
-            2: pw.FlexColumnWidth(1), // NO column
+            1: pw.FlexColumnWidth(2), // YES column
           },
           children: [
             pw.TableRow(
@@ -1445,14 +1449,7 @@ Future<void> generateExamine(
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                      'YES',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'NO',
+                      preSurgeryData['IOP'] == true ? 'YES' : 'NO',
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                 ),
@@ -1470,14 +1467,7 @@ Future<void> generateExamine(
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                      'YES',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'NO',
+                    preSurgeryData['BSCAN'] == true ? 'YES' : 'NO',
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                 ),
@@ -1495,14 +1485,7 @@ Future<void> generateExamine(
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
                   child: pw.Text(
-                      'YES',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'NO',
+                    preSurgeryData['Systemic evaluation'] == true ? 'YES' : 'NO',
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   ),
                 ),
