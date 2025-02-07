@@ -7,6 +7,7 @@ import 'package:opthadoc/Camp/Examine/PreSurgery.dart';
 import 'package:opthadoc/Camp/Examine/Token.dart';
 import 'package:opthadoc/Camp/Examine/Workup.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
+import 'package:opthadoc/Components/ErrorSnackBar.dart';
 import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Camp/Examine/Complaint.dart';
 import 'package:opthadoc/Components/StretchedIconButton.dart';
@@ -212,7 +213,7 @@ class _CampExamineState extends State<CampExamine> {
   }
 
   void nextStep() {
-    // if (!validateStepFields(step)) return;
+    if (!validateStepFields(step)) return;
     if(step == steps.length - 1) {
       // Validate current step fields
       // saveRegistration();
@@ -232,6 +233,133 @@ class _CampExamineState extends State<CampExamine> {
         step--;
       });
     }
+  }
+
+  bool validateStepFields(int currentStep) {
+    List<String> requiredFields;
+
+    // 🔹 Map field names to user-friendly labels
+    Map<String, String> fieldLabels = {
+      "token": "Patient Token",
+      "vision_re_dv": "Right Eye Distance Vision",
+      "vision_le_dv": "Left Eye Distance Vision",
+      "visualAxis-right": "Right Eye Visual Axis",
+      "visualAxis-left": "Left Eye Visual Axis",
+      "eom-right": "Right Eye Extraocular Movements",
+      "eom-left": "Left Eye Extraocular Movements",
+      "conjunctiva-right": "Right Eye Conjunctiva",
+      "conjunctiva-left": "Left Eye Conjunctiva",
+      "cornea-right": "Right Eye Cornea",
+      "cornea-left": "Left Eye Cornea",
+      "ac-right": "Right Eye Anterior Chamber",
+      "ac-left": "Left Eye Anterior Chamber",
+      "pupilReactions-right": "Right Eye Pupil Reactions",
+      "pupilReactions-left": "Left Eye Pupil Reactions",
+      "lens-right": "Right Eye Lens",
+      "lens-left": "Left Eye Lens",
+    };
+
+    switch (currentStep) {
+      case 0: // Step 0: Token
+        requiredFields = ["token"];
+        break;
+
+      case 1: // Step 1: Complaint
+        requiredFields = ["vision_re_dv", "vision_le_dv"];
+        break;
+
+      case 3: // Step 3: Examination
+        requiredFields = [
+          "visualAxis-right",
+          "visualAxis-left",
+          "eom-right",
+          "eom-left",
+          "conjunctiva-right",
+          "conjunctiva-left",
+          "cornea-right",
+          "cornea-left",
+          "ac-right",
+          "ac-left",
+          "pupilReactions-right",
+          "pupilReactions-left",
+          "lens-right",
+          "lens-left",
+        ];
+        break;
+
+      case 4: // Step 4: Workup
+        requiredFields = [];
+        break;
+
+      case 5: // Step 5: Dilated
+        requiredFields = [];
+        break;
+
+      case 6: // Step 6: Diagnosis
+        requiredFields = [];
+        break;
+
+      case 7: // Step 7: Pre-Surgery
+        requiredFields = [];
+        break;
+
+      default:
+        return true; // No validation needed for undefined steps
+    }
+
+    for (var field in requiredFields) {
+      final fieldValue = _getFieldValue(field);
+
+      if (fieldValue == null || fieldValue.toString().isEmpty) {
+        showCustomSnackBar(
+          context,
+          "${fieldLabels[field] ?? field} is required",
+          "Please enter the ${fieldLabels[field]?.toLowerCase() ?? field.replaceAll('_', ' ')} to proceed.",
+        );
+        return false;
+      }
+    }
+
+    return true; // All fields are valid
+  }
+
+  dynamic _getFieldValue(String key) {
+    if (key == "token") {
+      return _tokenController.text; // Fetch token from the controller
+    }else if (_patientData.containsKey(key)) {
+      return _patientData[key];
+    } else if (_historyData.containsKey(key)) {
+      final value = _historyData[key];
+      return value is TextEditingController ? value.text : value;
+    } else if (_comorbidities.containsKey(key)) {
+      return _comorbidities[key];
+    } else if (_examData.containsKey(key)) {
+      return _examData[key];
+    } else if (_workupData.containsKey(key)) {
+      final value = _workupData[key];
+      return value is TextEditingController ? value.text : value;
+    } else if (_dilatedData.containsKey(key)) {
+      return _dilatedData[key];
+    } else if (_diagnosisData.containsKey(key)) {
+      return _diagnosisData[key];
+    } else if (_preSurgeryData.containsKey(key)) {
+      return _preSurgeryData[key];
+    }
+    return null;
+  }
+
+  void showCustomSnackBar(BuildContext context, String title, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        content: ErrorSnackBar(
+          title: title,
+          message: message,
+        ),
+      ),
+    );
   }
 
   void resetForm() {

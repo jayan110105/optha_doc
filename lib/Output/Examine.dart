@@ -52,6 +52,18 @@ Future<void> generateExamine(
       diagnosisData['$diagnosis-both'] == true
   ).toList();
 
+  bool hasWorkupData =
+      (workupData["re-ducts"]?.trim().isNotEmpty ?? false) ||
+      (workupData["le-ducts"]?.trim().isNotEmpty ?? false) ||
+      (workupData["bp"]?.text.trim().isNotEmpty ?? false) ||
+      (workupData["grbs"]?.text.trim().isNotEmpty ?? false);
+
+  bool hasMydriasis = (dilatedData["mydriasis-right"]?.trim().isNotEmpty ?? false) ||
+      (dilatedData["mydriasis-left"]?.trim().isNotEmpty ?? false);
+
+  bool hasFundus = (dilatedData["fundus-right"]?.trim().isNotEmpty ?? false) ||
+      (dilatedData["fundus-left"]?.trim().isNotEmpty ?? false);
+
   pdf.addPage(
     pw.MultiPage(
       build: (context) => [
@@ -1002,118 +1014,132 @@ Future<void> generateExamine(
           ],
         ),
         pw.SizedBox(height: 20),
-        pw.Center(
-          child: pw.Text(
-            'Workup:',
-            style: pw.TextStyle(
-              fontSize: 16,
-              fontWeight: pw.FontWeight.bold,
+        if (hasWorkupData) ...[
+          pw.Center(
+            child: pw.Text(
+              'Workup:',
+              style: pw.TextStyle(
+                fontSize: 16,
+                fontWeight: pw.FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        pw.SizedBox(height: 10),
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(2), // First column
-            1: pw.FlexColumnWidth(1), // Second column (RE)
-            2: pw.FlexColumnWidth(1), // Third column (LE)
-          },
-          children: [
-            // Header Row
-            pw.TableRow(
+          pw.SizedBox(height: 10),
+
+          // Table for RE & LE Ducts
+          pw.Table(
+            border: pw.TableBorder.all(),
+            columnWidths: {
+              0: pw.FlexColumnWidth(2), // First column
+              1: pw.FlexColumnWidth(1), // Second column (RE)
+              2: pw.FlexColumnWidth(1), // Third column (LE)
+            },
+            children: [
+              // Header Row
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(''),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'RE:',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'LE:',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Ducts Row (Only Add If Non-Empty)
+              if ((workupData["re-ducts"]?.trim().isNotEmpty ?? false) ||
+                  (workupData["le-ducts"]?.trim().isNotEmpty ?? false))
+                pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        'Ducts',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        workupData["re-ducts"] ?? ' ',
+                      ),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        workupData["le-ducts"] ?? ' ',
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+
+          pw.SizedBox(height: 20),
+
+          // BP and GRBS Rows (Only Add If Non-Empty)
+          if ((workupData["bp"]?.text.trim().isNotEmpty ?? false) ||
+              (workupData["grbs"]?.text.trim().isNotEmpty ?? false))
+            pw.Table(
+              border: pw.TableBorder.all(),
+              columnWidths: {
+                0: pw.FlexColumnWidth(1), // Full width
+                1: pw.FlexColumnWidth(2),
+              },
               children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(''),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'RE:',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                if (workupData["bp"]?.text.trim().isNotEmpty ?? false)
+                  pw.TableRow(
+                    children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(
+                          'BP -',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(
+                          workupData["bp"].text,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'LE:',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+
+                if (workupData["grbs"]?.text.trim().isNotEmpty ?? false)
+                  pw.TableRow(
+                    children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(
+                          'GRBS -',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                        ),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(
+                          workupData["grbs"].text,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
               ],
             ),
-            // Ducts Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Ducts',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      workupData["re-ducts"] ?? ' '
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      workupData["le-ducts"] ?? ' '
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        pw.SizedBox(height: 20),
-        // BP and GRBS rows
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(1), // Full width
-            1: pw.FlexColumnWidth(2),
-          },
-          children: [
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'BP -',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    workupData["bp"].text ?? ' ',
-                  ),
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'GRBS -',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    workupData["grbs"].text ?? ' ',
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+        ],
         pw.SizedBox(height: 20),
         pw.Text(
           'Dilated Evaluation',
@@ -1148,53 +1174,47 @@ Future<void> generateExamine(
               ],
             ),
             // Mydriasis Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Mydriasis',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            if (hasMydriasis)
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'Mydriasis',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
                   ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      dilatedData["mydriasis-right"] ?? ' '
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(dilatedData["mydriasis-right"] ?? ' '),
                   ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      dilatedData["mydriasis-left"] ?? ' '
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(dilatedData["mydriasis-left"] ?? ' '),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             // Fundus Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Fundus',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            if (hasFundus)
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'Fundus',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
                   ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      dilatedData["fundus-right"] ?? ' '
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(dilatedData["fundus-right"] ?? ' '),
                   ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      dilatedData["fundus-left"] ?? ' '
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(dilatedData["fundus-left"] ?? ' '),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             // Cataract Row
             pw.TableRow(
               children: [
@@ -1318,80 +1338,82 @@ Future<void> generateExamine(
           ],
         ),
         pw.SizedBox(height: 20),
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(3), // Diagnosis column
-            1: pw.FlexColumnWidth(1), // Right eye column
-            2: pw.FlexColumnWidth(1), // Left eye column
-            3: pw.FlexColumnWidth(1), // Both eyes column
-          },
-          children: [
-            // Header Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Diagnosis :',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Right eye',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Left eye',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Both eyes',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-            // Diagnosis Rows
-
-            ...filteredDiagnoses.map(
-                  (diagnosis) => pw.TableRow(
+        if (filteredDiagnoses.isNotEmpty) ...[
+          pw.Table(
+            border: pw.TableBorder.all(),
+            columnWidths: {
+              0: pw.FlexColumnWidth(3), // Diagnosis column
+              1: pw.FlexColumnWidth(1), // Right eye column
+              2: pw.FlexColumnWidth(1), // Left eye column
+              3: pw.FlexColumnWidth(1), // Both eyes column
+            },
+            children: [
+              // Header Row
+              pw.TableRow(
                 children: [
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(diagnosis),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
                     child: pw.Text(
-                      diagnosisData['$diagnosis-right'] == true ? 'YES' : 'NO',
+                      'Diagnosis :',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                     ),
                   ),
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(8.0),
                     child: pw.Text(
-                      diagnosisData['$diagnosis-left'] == true ? 'YES' : 'NO',
+                      'Right eye',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                     ),
                   ),
                   pw.Padding(
                     padding: const pw.EdgeInsets.all(8.0),
                     child: pw.Text(
-                      diagnosisData['$diagnosis-both'] == true ? 'YES' : 'NO',
+                      'Left eye',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'Both eyes',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
+
+              // Diagnosis Rows
+              ...filteredDiagnoses.map(
+                    (diagnosis) => pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(diagnosis),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        diagnosisData['$diagnosis-right'] == true ? 'YES' : 'NO',
+                      ),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        diagnosisData['$diagnosis-left'] == true ? 'YES' : 'NO',
+                      ),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        diagnosisData['$diagnosis-both'] == true ? 'YES' : 'NO',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
         pw.SizedBox(height: 20),
         pw.Table(
           border: pw.TableBorder.all(),
