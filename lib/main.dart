@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Camp/Examine/camp_verification.dart';
 import 'package:opthadoc/home.dart';
-import 'package:opthadoc/Camp/camp.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
+
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   print('Current working directory: ${Directory.current.path}');
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       debugShowCheckedModeBanner: false,
       theme: _buildThemeData(),
       initialRoute: initialRoute,

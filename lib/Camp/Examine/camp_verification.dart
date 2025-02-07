@@ -157,7 +157,7 @@ class _CampVerificationState extends State<CampVerification> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text("Enter Camp Home"),
+                    child: const Text("Enter Camp"),
                   ),
                 ),
               ],

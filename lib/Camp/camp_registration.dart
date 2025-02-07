@@ -8,6 +8,7 @@ import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:opthadoc/Components/ErrorSnackBar.dart';
+import 'package:opthadoc/main.dart';
 import 'package:opthadoc/utils/ocr_helper.dart';
 import 'package:opthadoc/data/DatabaseHelper.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -97,11 +98,14 @@ class _CampRegistrationState extends State<CampRegistration> {
 
 
   void showCustomSnackBar(BuildContext context, String title, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+
+    scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2), // Ensures it disappears after a while
         content: ErrorSnackBar(
           title: title,
           message: message,
@@ -109,6 +113,7 @@ class _CampRegistrationState extends State<CampRegistration> {
       ),
     );
   }
+
 
   @override
   void dispose() {
@@ -533,7 +538,7 @@ class _CampRegistrationState extends State<CampRegistration> {
                       ProgressSteps(
                         steps: steps,
                         currentStep: step,
-                        allowStepTap: true,
+                        allowStepTap: false,
                         onStepTapped: (index) {
                           setState(() {
                             step = index;

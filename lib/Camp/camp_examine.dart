@@ -13,6 +13,7 @@ import 'package:opthadoc/Camp/Examine/Complaint.dart';
 import 'package:opthadoc/Components/StretchedIconButton.dart';
 import 'package:opthadoc/Output/Examine.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:opthadoc/main.dart';
 
 bool get isDatabaseDisabled => dotenv.env['DISABLE_DB'] == 'true';
 bool get isValidationDisabled => dotenv.env['DISABLE_VALIDATION'] == 'true';
@@ -358,11 +359,15 @@ class _CampExamineState extends State<CampExamine> {
   }
 
   void showCustomSnackBar(BuildContext context, String title, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    // Remove any existing SnackBar before showing a new one
+    scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+
+    scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2), // Ensures it disappears after a while
         content: ErrorSnackBar(
           title: title,
           message: message,
@@ -370,6 +375,7 @@ class _CampExamineState extends State<CampExamine> {
       ),
     );
   }
+
 
   void resetForm() {
     setState(() {
@@ -524,7 +530,7 @@ class _CampExamineState extends State<CampExamine> {
                       ProgressSteps(
                         steps: steps,
                         currentStep: step,
-                        allowStepTap: true,
+                        allowStepTap: false,
                         onStepTapped: (index) {
                           setState(() {
                             step = index;
