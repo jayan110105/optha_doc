@@ -326,6 +326,7 @@ class _CampRegistrationState extends State<CampRegistration> {
           const SizedBox(height: 8),
           InputField(
             controller: controllers["age"],
+            isNumber: true,
             hintText: "Enter age",
           ),
           SizedBox(height: 24),
@@ -408,6 +409,7 @@ class _CampRegistrationState extends State<CampRegistration> {
           SizedBox(height: 8),
           InputField(
             controller: controllers["aadhar"],
+            isNumber: true,
             hintText: "Enter Aadhaar number",
           ),
           SizedBox(height: 16),
@@ -422,6 +424,7 @@ class _CampRegistrationState extends State<CampRegistration> {
           SizedBox(height: 8),
           InputField(
             controller: controllers["phone"],
+            isNumber: true,
             hintText: "Enter phone number",
           ),
           SizedBox(height: 16),

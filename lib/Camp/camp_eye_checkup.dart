@@ -358,6 +358,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
               Expanded(
                 child: InputField(
                     hintText: "Enter patient token",
+                    isNumber: true,
                     controller: controllers['patientToken'],
                 ),
               ),

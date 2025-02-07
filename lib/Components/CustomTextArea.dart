@@ -22,6 +22,7 @@ class CustomTextArea extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      cursorColor: Color(0xFF163351),
       onChanged: onChanged,
       enabled: isEnabled,
       minLines: minLines,

@@ -4,66 +4,66 @@ class InputField extends StatelessWidget {
   final String hintText;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
-  final TextInputType keyboardType;
   final bool isEnabled;
-  final Icon? prefixIcon; // Optional prefix icon
+  final bool isNumber; // New option for number keypad
+  final Icon? prefixIcon;
 
   const InputField({
     super.key,
     required this.hintText,
     this.controller,
     this.onChanged,
-    this.keyboardType = TextInputType.text,
     this.isEnabled = true,
-    this.prefixIcon, // Optional prefix icon
+    this.isNumber = false, // Defaults to text input
+    this.prefixIcon,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      style: TextStyle(
+      style: const TextStyle(
         fontWeight: FontWeight.w500,
       ),
-      cursorColor: Color(0xFF163351),
+      cursorColor: const Color(0xFF163351),
       controller: controller,
       onChanged: onChanged,
-      keyboardType: keyboardType,
+      keyboardType: isNumber ? TextInputType.number : TextInputType.text, // Switch based on isNumber
       enabled: isEnabled,
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
           fontWeight: FontWeight.normal,
-          fontSize: 14, // Matches "text-sm"
-          color: Colors.grey[400], // Matches "text-muted-foreground"
+          fontSize: 14,
+          color: Colors.grey[400],
         ),
-        prefixIcon: prefixIcon, // Adds the optional prefix icon
+        prefixIcon: prefixIcon,
         prefixIconConstraints: const BoxConstraints(
-          minWidth: 36, // Matches design spacing
+          minWidth: 36,
           minHeight: 36,
         ),
         filled: true,
-        fillColor: const Color(0xFFF9F9F9), // Matches background color
+        fillColor: const Color(0xFFF9F9F9),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12, // Matches "px-3"
-          vertical: 10, // Matches "py-2"
+          horizontal: 12,
+          vertical: 10,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(
-            color: Color(0xFFE0E0E0), // Matches "border-input"
+            color: Color(0xFFE0E0E0),
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(
-            color: Color(0xFF163351), // Matches "focus-visible:ring-ring"
-            width: 2, // Focus ring width
+            color: Color(0xFF163351),
+            width: 2,
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(
-            color: Color(0xFFE0E0E0), // Matches "border-input"
+            color: Color(0xFFE0E0E0),
           ),
         ),
       ),

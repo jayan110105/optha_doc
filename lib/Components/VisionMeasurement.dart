@@ -406,6 +406,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
           const SizedBox(height: 8),
           InputField(
               hintText: "Enter IPD value",
+              isNumber: true,
               controller: widget.controllers['${widget.prefix}.IPD'],
           ),
         ],

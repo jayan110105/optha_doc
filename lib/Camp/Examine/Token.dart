@@ -34,6 +34,7 @@ class Token extends StatelessWidget {
             Expanded(
               child: InputField(
                 hintText: "Enter patient token",
+                isNumber: true,
                 controller: controller,
               ),
             ),
