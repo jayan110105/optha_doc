@@ -9,7 +9,11 @@ import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:opthadoc/data/DatabaseHelper.dart';
 import 'package:opthadoc/Output/Refraction.dart';
 import 'package:opthadoc/Components/ErrorSnackBar.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
+
+bool get isDatabaseDisabled => dotenv.env['DISABLE_DB'] == 'true';
+bool get isValidationDisabled => dotenv.env['DISABLE_VALIDATION'] == 'true';
 
 extension StringExtension on String {
   String capitalize() {
@@ -150,6 +154,12 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
   }
 
   bool validateStepFields(int currentStep) {
+
+    if (isValidationDisabled) {
+      print('Validation is disabled during testing.');
+      return true;
+    }
+
     List<String> requiredFields;
 
     Map<String, String> fieldLabels = {

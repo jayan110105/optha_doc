@@ -12,6 +12,10 @@ import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Camp/Examine/Complaint.dart';
 import 'package:opthadoc/Components/StretchedIconButton.dart';
 import 'package:opthadoc/Output/Examine.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+bool get isDatabaseDisabled => dotenv.env['DISABLE_DB'] == 'true';
+bool get isValidationDisabled => dotenv.env['DISABLE_VALIDATION'] == 'true';
 
 class CampExamine extends StatefulWidget {
   final int initialStep;
@@ -236,9 +240,14 @@ class _CampExamineState extends State<CampExamine> {
   }
 
   bool validateStepFields(int currentStep) {
+
+    if (isValidationDisabled) {
+      print('Validation is disabled during testing.');
+      return true;
+    }
+
     List<String> requiredFields;
 
-    // 🔹 Map field names to user-friendly labels
     Map<String, String> fieldLabels = {
       "token": "Patient Token",
       "vision_re_dv": "Right Eye Distance Vision",
