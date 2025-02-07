@@ -195,7 +195,11 @@ Future<void> generateRefraction(Map<String, TextEditingController> controllers) 
                                 children: [
                                   pw.Padding(
                                     padding: const pw.EdgeInsets.all(8.0),
-                                    child: pw.Text(controllers['withCorrection.right.distanceVisionVA']!.text),
+                                    child: pw.Text(
+                                        controllers['withCorrection.right.distanceVisionVA']!.text +
+                                            (controllers['withCorrection.right.distanceVisionP']!.text == 'Yes' ? ' p' : '')
+                                    )
+
                                   ),
                                 ]
                             ),
@@ -206,7 +210,8 @@ Future<void> generateRefraction(Map<String, TextEditingController> controllers) 
                                   child: pw.Text(
                                     controllers['withCorrection.right.nearVisionVA']!.text.isEmpty
                                         ? 'N/A'
-                                        : controllers['withCorrection.right.nearVisionVA']!.text,
+                                        : controllers['withCorrection.right.nearVisionVA']!.text +
+                                        (controllers['withCorrection.right.nearVisionP']!.text == 'Yes' ? 'p' : '')
                                   ),
                                 ),
                               ],
@@ -257,7 +262,10 @@ Future<void> generateRefraction(Map<String, TextEditingController> controllers) 
                                 children: [
                                   pw.Padding(
                                     padding: const pw.EdgeInsets.all(8.0),
-                                    child: pw.Text(controllers['withCorrection.left.distanceVisionVA']!.text),
+                                    child: pw.Text(
+                                        controllers['withCorrection.left.distanceVisionVA']!.text +
+                                            (controllers['withCorrection.left.distanceVisionP']!.text == 'Yes' ? ' p' : '')
+                                    )
                                   ),
                                 ]
                             ),
@@ -268,7 +276,8 @@ Future<void> generateRefraction(Map<String, TextEditingController> controllers) 
                                   child: pw.Text(
                                     controllers['withCorrection.left.nearVisionVA']?.text.isEmpty ?? true
                                         ? 'N/A'
-                                        : controllers['withCorrection.left.nearVisionVA']!.text,
+                                        : controllers['withCorrection.left.nearVisionVA']!.text +
+                                        (controllers['withCorrection.left.nearVisionP']!.text == 'Yes' ? 'p' : '')
                                   ),
                                 ),
                               ],

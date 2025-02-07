@@ -154,26 +154,26 @@ class _CampRegistrationState extends State<CampRegistration> {
     List<String> requiredFields;
 
     switch (currentStep) {
-      case 0: // Step 1: Photo
-        if (_image == null) {
-          showCustomSnackBar(
-            context,
-            "Photo is required",
-            "Please upload a photo to proceed.",
-          );
-          return false;
-        }
-        return true;
+      // case 1:
+      //   if (_image == null) {
+      //     showCustomSnackBar(
+      //       context,
+      //       "Photo is required",
+      //       "Please upload a photo to proceed.",
+      //     );
+      //     return false;
+      //   }
+      //   return true;
 
-      case 1: // Step 2: Basic Info
+      case 2: // Step 2: Basic Info
         requiredFields = ["name", "age"];
         break;
 
-      case 2: // Step 3: Gender
+      case 3: // Step 3: Gender
         requiredFields = ["gender"];
         break;
 
-      case 3: // Step 4: Details
+      case 4: // Step 4: Details
         requiredFields = ["aadhar", "parent", "phone", "address"];
         break;
 

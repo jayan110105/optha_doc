@@ -8,8 +8,15 @@ import 'package:opthadoc/Components/ProgressStep.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:opthadoc/data/DatabaseHelper.dart';
 import 'package:opthadoc/Output/Refraction.dart';
+import 'package:opthadoc/Components/ErrorSnackBar.dart';
 import 'package:intl/intl.dart';
 
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return '${this[0].toUpperCase()}${substring(1)}';
+  }
+}
 
 class CampEyeCheckup extends StatefulWidget {
   final int initialStep;
@@ -128,7 +135,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
   }
 
   void nextStep() {
-    // if (!validateStepFields(step)) return;
+    if (!validateStepFields(step)) return;
     if(step == steps.length - 1) {
       // Validate current step fields
       // saveRegistration();
@@ -140,6 +147,173 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
         step++;
       });
     }
+  }
+
+  bool validateStepFields(int currentStep) {
+    List<String> requiredFields;
+
+    Map<String, String> fieldLabels = {
+      "patientToken": "Patient Token",
+      "withoutGlasses.left.distanceVision": "Left Eye Distance Vision",
+      "withoutGlasses.right.distanceVision": "Right Eye Distance Vision",
+
+      "withGlasses.left.distanceVisionSphereSign": "Left Eye Sphere (With Glasses)",
+      "withGlasses.left.distanceVisionSphere": "Left Eye Sphere (With Glasses)",
+      "withGlasses.left.cylinderSign": "Left Eye Cylinder (With Glasses)",
+      "withGlasses.left.cylinder": "Left Eye Cylinder (With Glasses)",
+      "withGlasses.left.axis": "Left Eye Axis (With Glasses)",
+      "withGlasses.left.distanceVisionVA": "Left Eye Visual Acuity (With Glasses)",
+
+      "withGlasses.left.nearVisionSphereSign": "Left Eye Sphere (With Glasses)",
+      "withGlasses.left.nearVisionSphere": "Left Eye Sphere (With Glasses)",
+      "withGlasses.left.nearVisionVA": "Left Eye Visual Acuity (With Glasses)",
+
+      "withGlasses.right.distanceVisionSphereSign": "Right Eye Sphere (With Glasses)",
+      "withGlasses.right.distanceVisionSphere": "Right Eye Sphere (With Glasses)",
+      "withGlasses.right.cylinderSign": "Right Eye Cylinder (With Glasses)",
+      "withGlasses.right.cylinder": "Right Eye Cylinder (With Glasses)",
+      "withGlasses.right.axis": "Right Eye Axis (With Glasses)",
+      "withGlasses.right.distanceVisionVA": "Right Eye Visual Acuity (With Glasses)",
+
+      "withGlasses.right.nearVisionSphereSign": "Right Eye Sphere (With Glasses)",
+      "withGlasses.right.nearVisionSphere": "Right Eye Sphere (With Glasses)",
+      "withGlasses.right.nearVisionVA": "Right Eye Visual Acuity (With Glasses)",
+
+      "withGlasses.IPD": "Interpupillary Distance (With Glasses)",
+
+      "withCorrection.left.distanceVisionSphereSign": "Left Eye Sphere (With Correction)",
+      "withCorrection.left.distanceVisionSphere": "Left Eye Sphere (With Correction)",
+      "withCorrection.left.cylinderSign": "Left Eye Cylinder (With Correction)",
+      "withCorrection.left.cylinder": "Left Eye Cylinder (With Correction)",
+      "withCorrection.left.axis": "Left Eye Axis (With Correction)",
+      "withCorrection.left.distanceVisionVA": "Left Eye Visual Acuity (With Correction)",
+
+      "withCorrection.left.nearVisionSphereSign": "Left Eye Sphere (With Correction)",
+      "withCorrection.left.nearVisionSphere": "Left Eye Sphere (With Correction)",
+      "withCorrection.left.nearVisionVA": "Left Eye Visual Acuity (With Correction)",
+
+      "withCorrection.right.distanceVisionSphereSign": "Right Eye Sphere (With Correction)",
+      "withCorrection.right.distanceVisionSphere": "Right Eye Sphere (With Correction)",
+      "withCorrection.right.cylinderSign": "Right Eye Cylinder (With Correction)",
+      "withCorrection.right.cylinder": "Right Eye Cylinder (With Correction)",
+      "withCorrection.right.axis": "Right Eye Axis (With Correction)",
+      "withCorrection.right.distanceVisionVA": "Right Eye Visual Acuity (With Correction)",
+
+      "withCorrection.right.nearVisionSphereSign": "Right Eye Sphere (With Correction)",
+      "withCorrection.right.nearVisionSphere": "Right Eye Sphere (With Correction)",
+      "withCorrection.right.nearVisionVA": "Right Eye Visual Acuity (With Correction)",
+
+      "withCorrection.IPD": "Interpupillary Distance (With Correction)",
+
+      "bifocal": "Bifocal Type",
+      "color": "Lens Color",
+      "remarks": "Remarks",
+    };
+
+    switch (currentStep) {
+      case 0: // Step 0: Token
+        requiredFields = ["patientToken"];
+        break;
+
+      case 1: // Step 1: Without Glasses
+        requiredFields = [
+          "withoutGlasses.left.distanceVision",
+          "withoutGlasses.right.distanceVision"
+        ];
+        break;
+
+      case 2: // Step 2: With Glasses
+        requiredFields = [
+          "withGlasses.left.distanceVisionSphereSign",
+          "withGlasses.left.distanceVisionSphere",
+          "withGlasses.left.cylinderSign",
+          "withGlasses.left.cylinder",
+          "withGlasses.left.axis",
+          "withGlasses.left.distanceVisionVA",
+
+          "withGlasses.right.distanceVisionSphereSign",
+          "withGlasses.right.distanceVisionSphere",
+          "withGlasses.right.cylinderSign",
+          "withGlasses.right.cylinder",
+          "withGlasses.right.axis",
+          "withGlasses.right.distanceVisionVA",
+
+          "withGlasses.IPD",
+        ];
+
+        if(controllers['withGlasses.nearVisionRequired']!.text == "Yes") {
+          requiredFields.add("withGlasses.left.nearVisionSphereSign");
+          requiredFields.add("withGlasses.left.nearVisionSphere");
+          requiredFields.add("withGlasses.left.nearVisionVA");
+          requiredFields.add("withGlasses.right.nearVisionSphereSign");
+          requiredFields.add("withGlasses.right.nearVisionSphere");
+          requiredFields.add("withGlasses.right.nearVisionVA");
+        }
+        break;
+
+      case 3: // Step 3: With Correction
+        requiredFields = [
+          "withCorrection.left.distanceVisionSphereSign",
+          "withCorrection.left.distanceVisionSphere",
+          "withCorrection.left.cylinderSign",
+          "withCorrection.left.cylinder",
+          "withCorrection.left.axis",
+          "withCorrection.left.distanceVisionVA",
+
+          "withCorrection.right.distanceVisionSphereSign",
+          "withCorrection.right.distanceVisionSphere",
+          "withCorrection.right.cylinderSign",
+          "withCorrection.right.cylinder",
+          "withCorrection.right.axis",
+          "withCorrection.right.distanceVisionVA",
+
+          "withCorrection.IPD",
+        ];
+
+        if(controllers['withCorrection.nearVisionRequired']!.text == "Yes") {
+          requiredFields.add("withCorrection.left.nearVisionSphereSign");
+          requiredFields.add("withCorrection.left.nearVisionSphere");
+          requiredFields.add("withCorrection.left.nearVisionVA");
+          requiredFields.add("withCorrection.right.nearVisionSphereSign");
+          requiredFields.add("withCorrection.right.nearVisionSphere");
+          requiredFields.add("withCorrection.right.nearVisionVA");
+        }
+        break;
+
+      case 4: // Step 4: Additional Info
+        requiredFields = ["bifocal", "color", "remarks"];
+        break;
+
+      default:
+        return true; // No validation needed for undefined steps
+    }
+
+    for (var field in requiredFields) {
+      if (controllers[field]?.text.isEmpty ?? true) {
+        showCustomSnackBar(
+          context,
+          "${fieldLabels[field] ?? field} is required",
+          "Please enter the ${fieldLabels[field]?.toLowerCase() ?? field.replaceAll('_', ' ')} to proceed.",
+        );
+        return false;
+      }
+    }
+
+    return true; // All fields are valid
+  }
+
+  void showCustomSnackBar(BuildContext context, String title, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        content: ErrorSnackBar(
+          title: title,
+          message: message,
+        ),
+      ),
+    );
   }
 
   void prevStep() {
