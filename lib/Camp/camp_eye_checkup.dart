@@ -40,6 +40,8 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
 
   bool isChecked = false;
 
+  final ScrollController _scrollController = ScrollController();
+
   final List<Map<String, dynamic>> steps = [
     {"title": "Token", "icon": Icons.tag},
     {"title": "Without Glasses", "icon": Icons.visibility_off},
@@ -72,10 +74,16 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
     };
 
     // Save data to the database
-    final id = await dbHelper.insertEyeCheckup(checkupData);
-    print('Eye Checkup saved with ID: $id');
+    await dbHelper.insertEyeCheckup(checkupData);
   }
 
+  void scrollToTop() {
+    _scrollController.animateTo(
+      0.0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
 
   @override
   void initState() {
@@ -83,8 +91,6 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
     super.initState();
 
     step = widget.initialStep;
-
-    print("Initial Step: $step");
 
     for (var eye in ['left', 'right']) {
       controllers['withoutGlasses.$eye.distanceVision'] = TextEditingController();
@@ -97,6 +103,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
         controllers['$prefix.$eye.cylinderSign'] = TextEditingController();
         controllers['$prefix.$eye.cylinder'] = TextEditingController();
         controllers['$prefix.$eye.axis'] = TextEditingController();
+        controllers['$prefix.$eye.axis']?.text = '0';
         controllers['$prefix.$eye.distanceVisionVA'] = TextEditingController();
         controllers['$prefix.$eye.distanceVisionP'] = TextEditingController();
         controllers['$prefix.$eye.nearVisionSphereSign'] = TextEditingController();
@@ -119,7 +126,6 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
 
   @override
   void dispose() {
-    // Dispose controllers
     for (var controller in controllers.values) {
       controller.dispose();
     }
@@ -128,36 +134,31 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
 
   void resetForm() {
     setState(() {
-      // Reset all text controllers
       for (var controller in controllers.values) {
         controller.text = '';
       }
-      // Reset step to the first step
       step = 0;
     });
-
-    print("Form has been reset!");
   }
 
   void nextStep() {
     if (!validateStepFields(step)) return;
     if(step == steps.length - 1) {
-      // Validate current step fields
-      // saveRegistration();
       setState(() {
         step++;
       });
+      scrollToTop();
     } else if (step < steps.length - 1) {
       setState(() {
         step++;
       });
+      scrollToTop();
     }
   }
 
   bool validateStepFields(int currentStep) {
 
     if (isValidationDisabled) {
-      print('Validation is disabled during testing.');
       return true;
     }
 
@@ -168,34 +169,8 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       "withoutGlasses.left.distanceVision": "Left Eye Distance Vision",
       "withoutGlasses.right.distanceVision": "Right Eye Distance Vision",
 
-      "withGlasses.left.distanceVisionSphereSign": "Left Eye Sphere (With Glasses)",
-      "withGlasses.left.distanceVisionSphere": "Left Eye Sphere (With Glasses)",
-      "withGlasses.left.cylinderSign": "Left Eye Cylinder (With Glasses)",
-      "withGlasses.left.cylinder": "Left Eye Cylinder (With Glasses)",
-      "withGlasses.left.axis": "Left Eye Axis (With Glasses)",
-      "withGlasses.left.distanceVisionVA": "Left Eye Visual Acuity (With Glasses)",
-
-      "withGlasses.left.nearVisionSphereSign": "Left Eye Sphere (With Glasses)",
-      "withGlasses.left.nearVisionSphere": "Left Eye Sphere (With Glasses)",
-      "withGlasses.left.nearVisionVA": "Left Eye Visual Acuity (With Glasses)",
-
-      "withGlasses.right.distanceVisionSphereSign": "Right Eye Sphere (With Glasses)",
-      "withGlasses.right.distanceVisionSphere": "Right Eye Sphere (With Glasses)",
-      "withGlasses.right.cylinderSign": "Right Eye Cylinder (With Glasses)",
-      "withGlasses.right.cylinder": "Right Eye Cylinder (With Glasses)",
-      "withGlasses.right.axis": "Right Eye Axis (With Glasses)",
-      "withGlasses.right.distanceVisionVA": "Right Eye Visual Acuity (With Glasses)",
-
-      "withGlasses.right.nearVisionSphereSign": "Right Eye Sphere (With Glasses)",
-      "withGlasses.right.nearVisionSphere": "Right Eye Sphere (With Glasses)",
-      "withGlasses.right.nearVisionVA": "Right Eye Visual Acuity (With Glasses)",
-
-      "withGlasses.IPD": "Interpupillary Distance (With Glasses)",
-
       "withCorrection.left.distanceVisionSphereSign": "Left Eye Sphere (With Correction)",
       "withCorrection.left.distanceVisionSphere": "Left Eye Sphere (With Correction)",
-      "withCorrection.left.cylinderSign": "Left Eye Cylinder (With Correction)",
-      "withCorrection.left.cylinder": "Left Eye Cylinder (With Correction)",
       "withCorrection.left.axis": "Left Eye Axis (With Correction)",
       "withCorrection.left.distanceVisionVA": "Left Eye Visual Acuity (With Correction)",
 
@@ -213,8 +188,6 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       "withCorrection.right.nearVisionSphereSign": "Right Eye Sphere (With Correction)",
       "withCorrection.right.nearVisionSphere": "Right Eye Sphere (With Correction)",
       "withCorrection.right.nearVisionVA": "Right Eye Visual Acuity (With Correction)",
-
-      "withCorrection.IPD": "Interpupillary Distance (With Correction)",
 
       "bifocal": "Bifocal Type",
       "color": "Lens Color",
@@ -234,51 +207,20 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
         break;
 
       case 2: // Step 2: With Glasses
-        requiredFields = [
-          "withGlasses.left.distanceVisionSphereSign",
-          "withGlasses.left.distanceVisionSphere",
-          "withGlasses.left.cylinderSign",
-          "withGlasses.left.cylinder",
-          "withGlasses.left.axis",
-          "withGlasses.left.distanceVisionVA",
-
-          "withGlasses.right.distanceVisionSphereSign",
-          "withGlasses.right.distanceVisionSphere",
-          "withGlasses.right.cylinderSign",
-          "withGlasses.right.cylinder",
-          "withGlasses.right.axis",
-          "withGlasses.right.distanceVisionVA",
-
-          "withGlasses.IPD",
-        ];
-
-        if(controllers['withGlasses.nearVisionRequired']!.text == "Yes") {
-          requiredFields.add("withGlasses.left.nearVisionSphereSign");
-          requiredFields.add("withGlasses.left.nearVisionSphere");
-          requiredFields.add("withGlasses.left.nearVisionVA");
-          requiredFields.add("withGlasses.right.nearVisionSphereSign");
-          requiredFields.add("withGlasses.right.nearVisionSphere");
-          requiredFields.add("withGlasses.right.nearVisionVA");
-        }
+        requiredFields = [];
         break;
 
       case 3: // Step 3: With Correction
         requiredFields = [
           "withCorrection.left.distanceVisionSphereSign",
           "withCorrection.left.distanceVisionSphere",
-          "withCorrection.left.cylinderSign",
-          "withCorrection.left.cylinder",
           "withCorrection.left.axis",
           "withCorrection.left.distanceVisionVA",
 
           "withCorrection.right.distanceVisionSphereSign",
           "withCorrection.right.distanceVisionSphere",
-          "withCorrection.right.cylinderSign",
-          "withCorrection.right.cylinder",
           "withCorrection.right.axis",
           "withCorrection.right.distanceVisionVA",
-
-          "withCorrection.IPD",
         ];
 
         if(controllers['withCorrection.nearVisionRequired']!.text == "Yes") {
@@ -337,6 +279,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       setState(() {
         step--;
       });
+      scrollToTop();
     }
   }
 
@@ -575,6 +518,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           children: [
             Expanded(
               child: SingleChildScrollView(
+                controller: _scrollController,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(

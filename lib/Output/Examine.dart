@@ -55,7 +55,8 @@ Future<void> generateExamine(
   bool hasWorkupData =
       (workupData["re-ducts"]?.trim().isNotEmpty ?? false) ||
       (workupData["le-ducts"]?.trim().isNotEmpty ?? false) ||
-      (workupData["bp"]?.text.trim().isNotEmpty ?? false) ||
+      (workupData["sbp"]?.text.trim().isNotEmpty ?? false) ||
+      (workupData["dbp"]?.text.trim().isNotEmpty ?? false) ||
       (workupData["grbs"]?.text.trim().isNotEmpty ?? false);
 
   bool hasMydriasis = (dilatedData["mydriasis-right"]?.trim().isNotEmpty ?? false) ||
@@ -63,6 +64,23 @@ Future<void> generateExamine(
 
   bool hasFundus = (dilatedData["fundus-right"]?.trim().isNotEmpty ?? false) ||
       (dilatedData["fundus-left"]?.trim().isNotEmpty ?? false);
+
+  bool shouldIncludeRow(String key) {
+    return (historyData['$key-right'] != null && historyData['$key-right'].toString().toUpperCase() != 'no') ||
+        (historyData['$key-left'] != null && historyData['$key-left'].toString().toUpperCase() != 'no');
+  }
+
+  final List<String> historyKeys = [
+    'Diminution of vision',
+    'Ocular Trauma',
+    'Flashes',
+    'Floaters',
+    'Glaucoma on Rx',
+    'Pain/redness',
+    'Watering/discharge'
+  ];
+
+  final filteredHistoryKeys = historyKeys.where((key) => shouldIncludeRow(key)).toList();
 
   pdf.addPage(
     pw.MultiPage(
@@ -176,468 +194,22 @@ Future<void> generateExamine(
           ),
         ),
         pw.SizedBox(height: 10),
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(1), // Single column for the entire table
-          },
-          children: [
-            // Row 1 with nested table
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            '',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                              'RE:',
-                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                              'LE:',
-                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Diminution of vision:',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Diminution of vision-right'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Diminution of vision-left'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Duration:',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            getDurationString(patientData, "right"),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            getDurationString(patientData, "left"),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Ocular Trauma',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Ocular Trauma-right'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Ocular Trauma-left'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            // Row 2 with nested table
-            if (historyData['Nature of Trauma-right'] != null &&
-                historyData['Nature of Trauma-right'].text.trim().isNotEmpty) ...[
-              pw.TableRow(
-                children: [
-                  pw.Table(
-                    border: pw.TableBorder.all(),
-                    columnWidths: {
-                      0: pw.FlexColumnWidth(1),
-                      1: pw.FlexColumnWidth(1),
-                    },
-                    children: [
-                      pw.TableRow(
-                        children: [
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text(
-                              'Nature of Trauma - RE',
-                              style: pw.TextStyle(),
-                            ),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text(
-                              historyData['Nature of Trauma-right'].text,
-                              style: pw.TextStyle(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-            if (historyData['Nature of Trauma-left'] != null &&
-                historyData['Nature of Trauma-left'].text.trim().isNotEmpty) ...[
-              pw.TableRow(
-                children: [
-                  pw.Table(
-                    border: pw.TableBorder.all(),
-                    columnWidths: {
-                      0: pw.FlexColumnWidth(1),
-                      1: pw.FlexColumnWidth(1),
-                    },
-                    children: [
-                      pw.TableRow(
-                        children: [
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text(
-                              'Nature of Trauma - LE',
-                              style: pw.TextStyle(),
-                            ),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text(
-                              historyData['Nature of Trauma-left'].text,
-                              style: pw.TextStyle(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-            // Row 3 with nested table
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Flashes',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Flashes-right'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Flashes-left'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            // Row 4 with nested table
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Floaters',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Floaters-right'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Floaters-left'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Glaucoma on Rx',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Glaucoma on Rx-right'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Glaucoma on Rx-left'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Pain/ redness',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Pain/redness-right'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Pain/redness-left'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(1),
-                    2: pw.FlexColumnWidth(1),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Watering/ discharge',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Watering/discharge-right'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Watering/discharge-left'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-        pw.SizedBox(height: 20),
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(1), // Single column for the entire table
-          },
-          children: [
-            // Row 1 with nested table
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(2),
-                    1: pw.FlexColumnWidth(2),
-                  },
-                  children: [
-                    pw.TableRow(
-                      children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'History of glasses ',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['History of glasses'] ?? 'NO').toString().toUpperCase(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            // Row 2 with nested table
-            if (historyData['History of glasses'] == "yes") ...[
+        if (filteredHistoryKeys.isNotEmpty) ...[
+          pw.Table(
+            border: pw.TableBorder.all(),
+            columnWidths: {
+              0: pw.FlexColumnWidth(1), // Single column for the entire table
+            },
+            children: [
+              // Row 1 with nested table
               pw.TableRow(
                 children: [
                   pw.Table(
                     border: pw.TableBorder.all(),
                     columnWidths: {
                       0: pw.FlexColumnWidth(2),
-                      1: pw.FlexColumnWidth(3),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
                     },
                     children: [
                       pw.TableRow(
@@ -645,14 +217,22 @@ Future<void> generateExamine(
                           pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
                             child: pw.Text(
-                              'are PG comfortable ?',
-                              style: pw.TextStyle(),
+                              '',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                             ),
                           ),
                           pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
                             child: pw.Text(
-                              (historyData['Are PG comfortable ?'] ?? 'NO').toString().toUpperCase(),
+                                'RE:',
+                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                                'LE:',
+                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16),
                             ),
                           ),
                         ],
@@ -661,16 +241,15 @@ Future<void> generateExamine(
                   ),
                 ],
               ),
-            ],
-            // Row 3 with nested table
-            if (historyData['History of glasses'] == "yes") ...[
+              if(shouldIncludeRow('Diminution of vision'))
               pw.TableRow(
                 children: [
                   pw.Table(
                     border: pw.TableBorder.all(),
                     columnWidths: {
                       0: pw.FlexColumnWidth(2),
-                      1: pw.FlexColumnWidth(3),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
                     },
                     children: [
                       pw.TableRow(
@@ -678,14 +257,357 @@ Future<void> generateExamine(
                           pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
                             child: pw.Text(
-                              'Last Glass change',
-                              style: pw.TextStyle(),
+                              'Diminution of vision:',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                             ),
                           ),
                           pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
                             child: pw.Text(
-                              historyData['Last Glass change'].text ?? 'NA',
+                              (historyData['Diminution of vision-right'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Diminution of vision-left'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if(shouldIncludeRow('Diminution of vision'))
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Duration:',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              getDurationString(patientData, "right"),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              getDurationString(patientData, "left"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if(shouldIncludeRow('Ocular Trauma'))
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Ocular Trauma',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Ocular Trauma-right'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Ocular Trauma-left'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              // Row 2 with nested table
+              if (historyData['Nature of Trauma-right'] != null &&
+                  historyData['Nature of Trauma-right'].text.trim().isNotEmpty) ...[
+                pw.TableRow(
+                  children: [
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(1),
+                        1: pw.FlexColumnWidth(1),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                'Nature of Trauma - RE',
+                                style: pw.TextStyle(),
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                historyData['Nature of Trauma-right'].text,
+                                style: pw.TextStyle(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+              if (historyData['Nature of Trauma-left'] != null &&
+                  historyData['Nature of Trauma-left'].text.trim().isNotEmpty) ...[
+                pw.TableRow(
+                  children: [
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(1),
+                        1: pw.FlexColumnWidth(1),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                'Nature of Trauma - LE',
+                                style: pw.TextStyle(),
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                historyData['Nature of Trauma-left'].text,
+                                style: pw.TextStyle(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+              // Row 3 with nested table
+              if(shouldIncludeRow('Flashes'))
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Flashes',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Flashes-right'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Flashes-left'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              // Row 4 with nested table
+              if(shouldIncludeRow('Floaters'))
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Floaters',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Floaters-right'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Floaters-left'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if(shouldIncludeRow('Glaucoma on Rx'))
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Glaucoma on Rx',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Glaucoma on Rx-right'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Glaucoma on Rx-left'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if(shouldIncludeRow('Pain/redness'))
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Pain/ redness',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Pain/redness-right'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Pain/redness-left'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if(shouldIncludeRow('Watering/discharge'))
+              pw.TableRow(
+                children: [
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(1),
+                      2: pw.FlexColumnWidth(1),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'Watering/ discharge',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Watering/discharge-right'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['Watering/discharge-left'] ?? 'NO').toString().toUpperCase(),
                             ),
                           ),
                         ],
@@ -695,38 +617,117 @@ Future<void> generateExamine(
                 ],
               ),
             ],
-            // Row 4 with nested table
-            pw.TableRow(
-              children: [
-                pw.Table(
-                  border: pw.TableBorder.all(),
-                  columnWidths: {
-                    0: pw.FlexColumnWidth(1),
-                    1: pw.FlexColumnWidth(1),
-                  },
+          ),
+          pw.SizedBox(height: 20),
+        ],
+        if ((historyData['History of glasses'] != null || historyData['History of glasses'] == 'no') &&
+            (historyData['Previous surgery/laser rx'] != null || historyData['Previous surgery/laser rx'] != 'no')) ...[
+          pw.Table(
+            border: pw.TableBorder.all(),
+            columnWidths: {
+              0: pw.FlexColumnWidth(1), // Single column for the entire table
+            },
+            children: [
+              // Row 1 with nested table
+              pw.TableRow(
+                children: [
+                  if (historyData['History of glasses'] != null)
+                  pw.Table(
+                    border: pw.TableBorder.all(),
+                    columnWidths: {
+                      0: pw.FlexColumnWidth(2),
+                      1: pw.FlexColumnWidth(2),
+                    },
+                    children: [
+                      pw.TableRow(
+                        children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              'History of glasses ',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text(
+                              (historyData['History of glasses'] ?? 'NO').toString().toUpperCase(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              // Row 2 with nested table
+              if (historyData['History of glasses'] == "yes") ...[
+                pw.TableRow(
                   children: [
-                    pw.TableRow(
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(2),
+                        1: pw.FlexColumnWidth(3),
+                      },
                       children: [
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            'Previous surgery/laser rx : ',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text(
-                            (historyData['Previous surgery/laser rx'] ?? 'NO').toString().toUpperCase(),
-                          ),
+                        pw.TableRow(
+                          children: [
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                'are PG comfortable ?',
+                                style: pw.TextStyle(),
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                (historyData['Are PG comfortable ?'] ?? 'NO').toString().toUpperCase(),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ],
                 ),
               ],
-            ),
-            if (historyData['Previous surgery/laser rx'] == "yes") ...[
+              // Row 3 with nested table
+              if (historyData['History of glasses'] == "yes") ...[
+                pw.TableRow(
+                  children: [
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(2),
+                        1: pw.FlexColumnWidth(3),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                'Last Glass change',
+                                style: pw.TextStyle(),
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                historyData['Last Glass change'].text ?? 'NA',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+              // Row 4 with nested table
+              if (historyData['Previous surgery/laser rx'] != null)
               pw.TableRow(
                 children: [
                   pw.Table(
@@ -741,15 +742,14 @@ Future<void> generateExamine(
                           pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
                             child: pw.Text(
-                              'Details of surgery/procedure:',
-                              style: pw.TextStyle(),
+                              'Previous surgery/laser rx : ',
+                              style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                             ),
                           ),
                           pw.Padding(
                             padding: const pw.EdgeInsets.all(8.0),
                             child: pw.Text(
-                              historyData['Details of surgery/procedure'].text ?? 'NA',
-                              style: pw.TextStyle(),
+                              (historyData['Previous surgery/laser rx'] ?? 'NO').toString().toUpperCase(),
                             ),
                           ),
                         ],
@@ -758,10 +758,43 @@ Future<void> generateExamine(
                   ),
                 ],
               ),
-            ]
-          ],
-        ),
-        pw.SizedBox(height: 20),
+              if (historyData['Previous surgery/laser rx'] == "yes") ...[
+                pw.TableRow(
+                  children: [
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(1),
+                        1: pw.FlexColumnWidth(1),
+                      },
+                      children: [
+                        pw.TableRow(
+                          children: [
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                'Details of surgery/procedure:',
+                                style: pw.TextStyle(),
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                historyData['Details of surgery/procedure'].text ?? 'NA',
+                                style: pw.TextStyle(),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ]
+            ],
+          ),
+          pw.SizedBox(height: 20),
+        ],
         if (activeComorbidities.isNotEmpty) ...[
           pw.Center(
             child: pw.Text(
@@ -800,8 +833,8 @@ Future<void> generateExamine(
               ),
             ],
           ),
+          pw.SizedBox(height: 20),
         ],
-        pw.SizedBox(height: 20),
         pw.Center(
           child: pw.Text(
             'Examination : torchlight -',
@@ -1091,8 +1124,8 @@ Future<void> generateExamine(
           pw.SizedBox(height: 20),
 
           // BP and GRBS Rows (Only Add If Non-Empty)
-          if ((workupData["bp"]?.text.trim().isNotEmpty ?? false) ||
-              (workupData["grbs"]?.text.trim().isNotEmpty ?? false))
+          if ((workupData["sbp"]?.text.trim().isNotEmpty ?? false) ||
+              (workupData["dbs"]?.text.trim().isNotEmpty ?? false))
             pw.Table(
               border: pw.TableBorder.all(),
               columnWidths: {
@@ -1100,7 +1133,8 @@ Future<void> generateExamine(
                 1: pw.FlexColumnWidth(2),
               },
               children: [
-                if (workupData["bp"]?.text.trim().isNotEmpty ?? false)
+                if ((workupData["sbp"]?.text.trim().isNotEmpty ?? false) ||
+                    (workupData["dbp"]?.text.trim().isNotEmpty ?? false))
                   pw.TableRow(
                     children: [
                       pw.Padding(
@@ -1113,7 +1147,7 @@ Future<void> generateExamine(
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(8.0),
                         child: pw.Text(
-                          workupData["bp"].text,
+                          '${workupData["sbp"].text}/${workupData["dbp"].text} mmHg',
                         ),
                       ),
                     ],

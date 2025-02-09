@@ -199,6 +199,7 @@ class Exam extends StatelessWidget {
                               fontWeight: FontWeight.bold),
                           keyName: 'lens-$eye',
                           items: [
+                            "Clear",
                             "Immature cataract",
                             "Near Mature cataract",
                             "Mature Cataract",

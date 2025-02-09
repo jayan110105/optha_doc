@@ -82,10 +82,24 @@ class Workup extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Label(text: "BP"),
-                  InputField(
-                    hintText: "Enter BP",
-                    isNumber: true,
-                    controller: data['bp'],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InputField(
+                          hintText: "SBP",
+                          isNumber: true,
+                          controller: data['sbp'],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: InputField(
+                          hintText: "DBP",
+                          isNumber: true,
+                          controller: data['dbp'],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

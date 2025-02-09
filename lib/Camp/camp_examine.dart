@@ -32,6 +32,8 @@ class _CampExamineState extends State<CampExamine> {
 
   int step = 0;
 
+  final ScrollController _scrollController = ScrollController();
+
   final List<Map<String, dynamic>> steps = [
     {"id":"token", "title": "Token", "icon": Icons.tag},
     {"id": "complaint", "title": "Complaint", "icon": Icons.chat},
@@ -111,7 +113,8 @@ class _CampExamineState extends State<CampExamine> {
   final Map<String, dynamic> _workupData = {
     "re-ducts": "",
     "le-ducts": "",
-    "bp": TextEditingController(),
+    "sbp": TextEditingController(),
+    "dbp": TextEditingController(),
     "grbs": TextEditingController(),
   };
 
@@ -217,18 +220,26 @@ class _CampExamineState extends State<CampExamine> {
     });
   }
 
+  void scrollToTop() {
+    _scrollController.animateTo(
+      0.0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
   void nextStep() {
     if (!validateStepFields(step)) return;
     if(step == steps.length - 1) {
-      // Validate current step fields
-      // saveRegistration();
       setState(() {
         step++;
       });
+      scrollToTop();
     } else if (step < steps.length - 1) {
       setState(() {
         step++;
       });
+      scrollToTop();
     }
   }
 
@@ -237,6 +248,7 @@ class _CampExamineState extends State<CampExamine> {
       setState(() {
         step--;
       });
+      scrollToTop();
     }
   }
 
@@ -496,6 +508,7 @@ class _CampExamineState extends State<CampExamine> {
           children: [
             Expanded(
               child: SingleChildScrollView(
+                controller: _scrollController,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(

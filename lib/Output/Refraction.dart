@@ -342,7 +342,9 @@ Future<void> generateRefraction(Map<String, TextEditingController> controllers) 
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                          child: pw.Text("${controllers['withCorrection.IPD']!.text} mm"),
+                          child: controllers['withCorrection.IPD']!.text.isNotEmpty
+                              ? pw.Text("${controllers['withCorrection.IPD']!.text} mm")
+                              : pw.SizedBox(),
                         ),
                       ]
                     )

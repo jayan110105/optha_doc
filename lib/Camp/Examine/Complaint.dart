@@ -73,14 +73,14 @@ class Complaint extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Label(text: "Vision RE (NV)"),
+                    const Label(text: "Vision LE (DV)"),
                     CustomDropdown(
-                      hintText: "Select NV",
-                      keyName: "vision_re_nv",
-                      items: ["N5", "N6", "N8", "N10", "N12", "N14", "N18","N24","N36", "N48", "N60"],
-                      selectedValue: patientData["vision_re_nv"],
+                      hintText: "Select DV",
+                      keyName: 'vision_le_dv',
+                      items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60","HM+","PL+","PL-"],
+                      selectedValue: patientData["vision_le_dv"],
                       onChanged: (value) {
-                        updateValue("vision_re_nv", value!);
+                        updateValue("vision_le_dv", value!);
                       },
                     ),
                   ],
@@ -95,14 +95,14 @@ class Complaint extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Label(text: "Vision LE (DV)"),
+                    const Label(text: "Vision RE (NV)"),
                     CustomDropdown(
-                      hintText: "Select DV",
-                      keyName: 'vision_le_dv',
-                      items: ["6/6", "6/9", "6/12", "6/18", "6/24", "6/36", "6/60","3/60","1/60","HM+","PL+","PL-"],
-                      selectedValue: patientData["vision_le_dv"],
+                      hintText: "Select NV",
+                      keyName: "vision_re_nv",
+                      items: ["N5", "N6", "N8", "N10", "N12", "N14", "N18","N24","N36", "N48", "N60"],
+                      selectedValue: patientData["vision_re_nv"],
                       onChanged: (value) {
-                        updateValue("vision_le_dv", value!);
+                        updateValue("vision_re_nv", value!);
                       },
                     ),
                   ],
