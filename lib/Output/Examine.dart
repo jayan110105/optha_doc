@@ -751,168 +751,38 @@ Future<void> generateExamine(
           },
           children: [
             buildTableRow('', 'RE:', 'LE:', boldValues: true),
-            // Mydriasis Row
+
             if (hasMydriasis)
-              pw.TableRow(
-                children: [
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(
-                      'Mydriasis',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(dilatedData["mydriasis-right"] ?? ' '),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(dilatedData["mydriasis-left"] ?? ' '),
-                  ),
-                ],
-              ),
-            // Fundus Row
+              buildTableRow('Mydriasis', dilatedData["mydriasis-right"] ?? ' ', dilatedData["mydriasis-left"] ?? ' '),
+
             if (hasFundus)
-              pw.TableRow(
-                children: [
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(
-                      'Fundus',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(dilatedData["fundus-right"] ?? ' '),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(dilatedData["fundus-left"] ?? ' '),
-                  ),
-                ],
-              ),
-            // Cataract Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Cataract',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['Cataract-right'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['Cataract-left'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-              ],
+              buildTableRow('Fundus', dilatedData["fundus-right"] ?? ' ', dilatedData["fundus-left"] ?? ' '),
+
+            buildTableRow('Cataract',
+                (dilatedData['Cataract-right'] ?? 'NO').toString().toUpperCase(),
+                (dilatedData['Cataract-left'] ?? 'NO').toString().toUpperCase(),
             ),
-            // Glaucoma Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Glaucoma',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['Glaucoma-right'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['Glaucoma-left'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-              ],
+
+            buildTableRow('Glaucoma',
+                (dilatedData['Glaucoma-right'] ?? 'NO').toString().toUpperCase(),
+                (dilatedData['Glaucoma-left'] ?? 'NO').toString().toUpperCase()
             ),
-            // Diabetic Retinopathy Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Diabetic retinopathy',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['Diabetic retinopathy-right'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['Diabetic retinopathy-left'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-              ],
+
+            buildTableRow('Diabetic retinopathy',
+                (dilatedData['Diabetic retinopathy-right'] ?? 'NO').toString().toUpperCase(),
+                (dilatedData['Diabetic retinopathy-left'] ?? 'NO').toString().toUpperCase()
             ),
-            // ARMD Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'ARMD',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['ARMD-right'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['ARMD-left'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-              ],
+
+            buildTableRow('ARMD',
+                (dilatedData['ARMD-right'] ?? 'NO').toString().toUpperCase(),
+                (dilatedData['ARMD-left'] ?? 'NO').toString().toUpperCase()
             ),
-            // Optic Disc Pallor Row
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Optic disc pallor/ atropy',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['Optic disc pallor/ atrophy-right'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    (dilatedData['Optic disc pallor/ atrophy-left'] ?? 'NO').toString().toUpperCase(),
-                  ),
-                ),
-              ],
+
+            buildTableRow('Optic disc pallor/ atropy',
+                (dilatedData['Optic disc pallor/ atrophy-right'] ?? 'NO').toString().toUpperCase(),
+                (dilatedData['Optic disc pallor/ atrophy-left'] ?? 'NO').toString().toUpperCase()
             ),
+
           ],
         ),
         pw.SizedBox(height: 20),
@@ -923,72 +793,17 @@ Future<void> generateExamine(
               0: pw.FlexColumnWidth(3), // Diagnosis column
               1: pw.FlexColumnWidth(1), // Right eye column
               2: pw.FlexColumnWidth(1), // Left eye column
-              3: pw.FlexColumnWidth(1), // Both eyes column
             },
             children: [
-              // Header Row
-              pw.TableRow(
-                children: [
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(
-                      'Diagnosis :',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(
-                      'Right eye',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(
-                      'Left eye',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(
-                      'Both eyes',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ),
-                ],
+              buildTableRow('Diagnosis :', 'Right eye', 'Left eye', boldValues: true),
+
+              ...filteredDiagnoses.map(
+                (diagnosis) => buildTableRow(diagnosis,
+                    diagnosisData['$diagnosis-right'] == true ? 'YES' : 'NO',
+                    diagnosisData['$diagnosis-left'] == true ? 'YES' : 'NO'
+                )
               ),
 
-              // Diagnosis Rows
-              ...filteredDiagnoses.map(
-                    (diagnosis) => pw.TableRow(
-                  children: [
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text(diagnosis),
-                    ),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text(
-                        diagnosisData['$diagnosis-right'] == true ? 'YES' : 'NO',
-                      ),
-                    ),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text(
-                        diagnosisData['$diagnosis-left'] == true ? 'YES' : 'NO',
-                      ),
-                    ),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text(
-                        diagnosisData['$diagnosis-both'] == true ? 'YES' : 'NO',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ],
