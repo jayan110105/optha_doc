@@ -3,17 +3,41 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 String getDurationString(Map<String, dynamic> patientData, String eye) {
-  int years = int.tryParse(patientData['years-$eye']?.toString() ?? '0') ?? 0;
-  int months = int.tryParse(patientData['months-$eye']?.toString() ?? '0') ?? 0;
-  int days = int.tryParse(patientData['days-$eye']?.toString() ?? '0') ?? 0;
+  final durations = ['years', 'months', 'days'].map((unit) {
+    int value = int.tryParse(patientData['$unit-$eye']?.toString() ?? '0') ?? 0;
+    return value > 0 ? '$value $unit${value > 1 ? 's' : ''}' : null;
+  }).where((e) => e != null).join(', ');
 
-  List<String> parts = [];
+  return durations.isNotEmpty ? durations : "N/A";
+}
 
-  if (years > 0) parts.add("$years year${years > 1 ? 's' : ''}");
-  if (months > 0) parts.add("$months month${months > 1 ? 's' : ''}");
-  if (days > 0) parts.add("$days day${days > 1 ? 's' : ''}");
+bool hasNonEmptyValue(String? value) => (value?.trim().isNotEmpty ?? false);
 
-  return parts.isNotEmpty ? parts.join(", ") : "N/A";
+pw.TableRow buildTableRow(String label, String reValue, String leValue, {bool boldValues = false, double fontSize = 12}) {
+  pw.Widget cell(String text, {bool bold = false}) => pw.Padding(
+    padding: const pw.EdgeInsets.all(8.0),
+    child: pw.Text(
+      text,
+      style: pw.TextStyle(fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal, fontSize: fontSize),
+    ),
+  );
+
+  return pw.TableRow(children: [
+    cell(label, bold: true),
+    cell(reValue, bold: boldValues),
+    cell(leValue, bold: boldValues),
+  ]);
+}
+
+pw.TableRow? buildFilteredTableRow(String title, String? right, String? left) {
+  String rightValue = (right ?? 'NO').toUpperCase();
+  String leftValue = (left ?? 'NO').toUpperCase();
+
+  if (rightValue == 'NO' && leftValue == 'NO') {
+    return null; // Exclude this row
+  }
+
+  return buildTableRow(title, rightValue, leftValue);
 }
 
 Future<void> generateExamine(
@@ -30,27 +54,16 @@ Future<void> generateExamine(
 
   final activeComorbidities = comorbidities.entries.where((entry) => entry.value).toList();
 
-  final filteredDiagnoses = [
-    'Immature cataract',
-    'Near Mature cataract',
-    'Mature Cataract',
-    'Hypermature Cataract',
-    'PCIOL',
-    'Aphakia',
-    'Pterygium',
-    'Dacryocystitis',
-    'Amblyopia',
-    'Glaucoma',
-    'Diabetic retinopathy',
-    'Stye',
-    'Conjunctivitis',
-    'Dry eye',
-    'Allergic conjunctivitis'
-  ].where((diagnosis) =>
-  diagnosisData['$diagnosis-right'] == true ||
-      diagnosisData['$diagnosis-left'] == true ||
-      diagnosisData['$diagnosis-both'] == true
-  ).toList();
+  List<String> diagnosisList = [
+    'Immature cataract', 'Near Mature cataract', 'Mature Cataract',
+    'Hypermature Cataract', 'PCIOL', 'Aphakia', 'Pterygium',
+    'Dacryocystitis', 'Amblyopia', 'Glaucoma', 'Diabetic retinopathy',
+    'Stye', 'Conjunctivitis', 'Dry eye', 'Allergic conjunctivitis'
+  ];
+
+  final filteredDiagnoses = diagnosisList
+      .where((d) => ['-right', '-left'].any((s) => diagnosisData[d + s] == true))
+      .toList();
 
   bool hasWorkupData =
       (workupData["re-ducts"]?.trim().isNotEmpty ?? false) ||
@@ -80,49 +93,18 @@ Future<void> generateExamine(
     'Watering/discharge'
   ];
 
+  List<pw.TableRow> diagnosisRows = [
+    buildFilteredTableRow('Cataract', dilatedData['Cataract-right'], dilatedData['Cataract-left']),
+    buildFilteredTableRow('Glaucoma', dilatedData['Glaucoma-right'], dilatedData['Glaucoma-left']),
+    buildFilteredTableRow('Diabetic retinopathy', dilatedData['Diabetic retinopathy-right'], dilatedData['Diabetic retinopathy-left']),
+    buildFilteredTableRow('ARMD', dilatedData['ARMD-right'], dilatedData['ARMD-left']),
+    buildFilteredTableRow('Optic disc pallor/atrophy', dilatedData['Optic disc pallor/atrophy-right'], dilatedData['Optic disc pallor/atrophy-left']),
+  ].where((row) => row != null).cast<pw.TableRow>().toList();
+
+
   final filteredHistoryKeys = historyKeys.where((key) => shouldIncludeRow(key)).toList();
 
-  pw.TableRow buildTableRow(
-      String label,
-      String reValue,
-      String leValue, {
-        bool boldValues = false,
-        double fontSize = 12,
-      }) {
-    return pw.TableRow(
-      children: [
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8.0),
-          child: pw.Text(
-            label,
-            style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: fontSize),
-          ),
-        ),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8.0),
-          child: pw.Text(
-            reValue,
-            style: pw.TextStyle(
-              fontWeight: boldValues ? pw.FontWeight.bold : pw.FontWeight.normal,
-              fontSize: fontSize,
-            ),
-          ),
-        ),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8.0),
-          child: pw.Text(
-            leValue,
-            style: pw.TextStyle(
-              fontWeight: boldValues ? pw.FontWeight.bold : pw.FontWeight.normal,
-              fontSize: fontSize,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-
+  final preSurgeryEntries = preSurgeryData.entries.where((entry) => entry.value == true).toList();
 
   pw.Widget buildSectionHeader(String title, {double fontSize = 16}) {
     return pw.Center(
@@ -157,14 +139,16 @@ Future<void> generateExamine(
           },
           children: [
             buildTableRow('Vision (DV)', patientData['vision_re_dv']??'NA', patientData['vision_le_dv']??'NA', boldValues: true),
-            buildTableRow('Vision (NV)', patientData['vision_re_nv']??'NA', patientData['vision_le_nv']??'NA', boldValues: true),
+            if (hasNonEmptyValue(patientData['vision_re_nv']) || hasNonEmptyValue(patientData['vision_le_nv']))
+              buildTableRow('Vision (NV)', patientData['vision_re_nv'] ?? 'NA', patientData['vision_le_nv'] ?? 'NA', boldValues: true,),
           ],
         ),
 
         pw.SizedBox(height: 10),
-        buildSectionHeader('History'),
-        pw.SizedBox(height: 10),
+
         if (filteredHistoryKeys.isNotEmpty) ...[
+          buildSectionHeader('History'),
+          pw.SizedBox(height: 10),
           pw.Table(
             border: pw.TableBorder.all(),
             columnWidths: {
@@ -311,108 +295,34 @@ Future<void> generateExamine(
                 ),
               ],
               // Row 3 with nested table
-              if(shouldIncludeRow('Flashes'))
-              pw.TableRow(
-                children: [
-                  pw.Table(
-                    border: pw.TableBorder.all(),
-                    columnWidths: {
-                      0: pw.FlexColumnWidth(2),
-                      1: pw.FlexColumnWidth(1),
-                      2: pw.FlexColumnWidth(1),
-                    },
-                    children: [
-                      buildTableRow('Flashes',
-                          (historyData['Flashes-right'] ?? 'NO').toString().toUpperCase(),
-                          (historyData['Flashes-left'] ?? 'NO').toString().toUpperCase()
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              // Row 4 with nested table
-              if(shouldIncludeRow('Floaters'))
-              pw.TableRow(
-                children: [
-                  pw.Table(
-                    border: pw.TableBorder.all(),
-                    columnWidths: {
-                      0: pw.FlexColumnWidth(2),
-                      1: pw.FlexColumnWidth(1),
-                      2: pw.FlexColumnWidth(1),
-                    },
-                    children: [
-                      buildTableRow('Floaters',
-                          (historyData['Floaters-right'] ?? 'NO').toString().toUpperCase(),
-                          (historyData['Floaters-left'] ?? 'NO').toString().toUpperCase()
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              if(shouldIncludeRow('Glaucoma on Rx'))
-              pw.TableRow(
-                children: [
-                  pw.Table(
-                    border: pw.TableBorder.all(),
-                    columnWidths: {
-                      0: pw.FlexColumnWidth(2),
-                      1: pw.FlexColumnWidth(1),
-                      2: pw.FlexColumnWidth(1),
-                    },
-                    children: [
-                      buildTableRow('Glaucoma on Rx',
-                          (historyData['Glaucoma on Rx-right'] ?? 'NO').toString().toUpperCase(),
-                          (historyData['Glaucoma on Rx-left'] ?? 'NO').toString().toUpperCase()
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              if(shouldIncludeRow('Pain/redness'))
-              pw.TableRow(
-                children: [
-                  pw.Table(
-                    border: pw.TableBorder.all(),
-                    columnWidths: {
-                      0: pw.FlexColumnWidth(2),
-                      1: pw.FlexColumnWidth(1),
-                      2: pw.FlexColumnWidth(1),
-                    },
-                    children: [
-                      buildTableRow('Pain/ redness',
-                          (historyData['Pain/redness-right'] ?? 'NO').toString().toUpperCase(),
-                          (historyData['Pain/redness-left'] ?? 'NO').toString().toUpperCase()
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              if(shouldIncludeRow('Watering/discharge'))
-              pw.TableRow(
-                children: [
-                  pw.Table(
-                    border: pw.TableBorder.all(),
-                    columnWidths: {
-                      0: pw.FlexColumnWidth(2),
-                      1: pw.FlexColumnWidth(1),
-                      2: pw.FlexColumnWidth(1),
-                    },
-                    children: [
-                      buildTableRow('Watering/ discharge',
-                          (historyData['Watering/discharge-right'] ?? 'NO').toString().toUpperCase(),
-                          (historyData['Watering/discharge-left'] ?? 'NO').toString().toUpperCase()
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+              for (var key in filteredHistoryKeys.where((k) => k != 'Diminution of vision' && k != 'Ocular Trauma'))
+                pw.TableRow(
+                  children: [
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(2),
+                        1: pw.FlexColumnWidth(1),
+                        2: pw.FlexColumnWidth(1),
+                      },
+                      children: [
+                        buildTableRow(
+                          key,
+                          (historyData['$key-right'] ?? 'NO').toString().toUpperCase(),
+                          (historyData['$key-left'] ?? 'NO').toString().toUpperCase(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
             ],
           ),
           pw.SizedBox(height: 20),
         ],
         if ((historyData['History of glasses'] != null || historyData['History of glasses'] == 'no') &&
             (historyData['Previous surgery/laser rx'] != null || historyData['Previous surgery/laser rx'] != 'no')) ...[
+          buildSectionHeader('Additional History'),
+          pw.SizedBox(height: 10),
           pw.Table(
             border: pw.TableBorder.all(),
             columnWidths: {
@@ -452,7 +362,7 @@ Future<void> generateExamine(
                 ],
               ),
               // Row 2 with nested table
-              if (historyData['History of glasses'] == "yes") ...[
+              if (historyData['History of glasses'] == "yes" && historyData['Are PG comfortable ?'] == "yes") ...[
                 pw.TableRow(
                   children: [
                     pw.Table(
@@ -485,7 +395,7 @@ Future<void> generateExamine(
                 ),
               ],
               // Row 3 with nested table
-              if (historyData['History of glasses'] == "yes") ...[
+              if (historyData['History of glasses'] == "yes" && historyData['Last Glass change'].text.isNotEmpty) ...[
                 pw.TableRow(
                   children: [
                     pw.Table(
@@ -549,7 +459,7 @@ Future<void> generateExamine(
                   ),
                 ],
               ),
-              if (historyData['Previous surgery/laser rx'] == "yes") ...[
+              if (historyData['Previous surgery/laser rx'] == "yes" && historyData['Details of surgery/procedure'].text.isNotEmpty) ...[
                 pw.TableRow(
                   children: [
                     pw.Table(
@@ -626,6 +536,7 @@ Future<void> generateExamine(
           ),
           pw.SizedBox(height: 20),
         ],
+
         pw.Center(
           child: pw.Text(
             'Examination : torchlight -',
@@ -667,24 +578,22 @@ Future<void> generateExamine(
           pw.SizedBox(height: 10),
 
           // Table for RE & LE Ducts
-          pw.Table(
-            border: pw.TableBorder.all(),
-            columnWidths: {
-              0: pw.FlexColumnWidth(2), // First column
-              1: pw.FlexColumnWidth(1), // Second column (RE)
-              2: pw.FlexColumnWidth(1), // Third column (LE)
-            },
-            children: [
-              buildTableRow('', 'RE:', 'LE:', boldValues: true),
-
-              if ((workupData["re-ducts"]?.trim().isNotEmpty ?? false) ||
-                  (workupData["le-ducts"]?.trim().isNotEmpty ?? false))
-                buildTableRow('Ducts', workupData["re-ducts"] ?? ' ', workupData["le-ducts"] ?? ' '),
-            ],
-          ),
-
-          pw.SizedBox(height: 20),
-
+          if ((workupData["re-ducts"]?.trim().isNotEmpty ?? false) ||
+          (workupData["le-ducts"]?.trim().isNotEmpty ?? false))...[
+            pw.Table(
+              border: pw.TableBorder.all(),
+              columnWidths: {
+                0: pw.FlexColumnWidth(2), // First column
+                1: pw.FlexColumnWidth(1), // Second column (RE)
+                2: pw.FlexColumnWidth(1), // Third column (LE)
+              },
+              children: [
+                    buildTableRow('', 'RE:', 'LE:', boldValues: true),
+                    buildTableRow('Ducts', workupData["re-ducts"] ?? ' ', workupData["le-ducts"] ?? ' '),
+              ],
+            ),
+            pw.SizedBox(height: 20)
+          ],
           // BP and GRBS Rows (Only Add If Non-Empty)
           if ((workupData["sbp"]?.text.trim().isNotEmpty ?? false) ||
               (workupData["dbs"]?.text.trim().isNotEmpty ?? false))
@@ -735,57 +644,37 @@ Future<void> generateExamine(
                   ),
               ],
             ),
+            pw.SizedBox(height: 20),
         ],
-        pw.SizedBox(height: 20),
-        pw.Text(
-          'Dilated Evaluation',
-          style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
-        ),
-        pw.SizedBox(height: 10),
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(2), // First column (label)
-            1: pw.FlexColumnWidth(1), // Second column (RE)
-            2: pw.FlexColumnWidth(1), // Third column (LE)
-          },
-          children: [
-            buildTableRow('', 'RE:', 'LE:', boldValues: true),
 
-            if (hasMydriasis)
-              buildTableRow('Mydriasis', dilatedData["mydriasis-right"] ?? ' ', dilatedData["mydriasis-left"] ?? ' '),
+        if(!hasMydriasis && !hasFundus && diagnosisRows.isNotEmpty) ... [
+          pw.Text(
+            'Dilated Evaluation',
+            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+          ),
+          pw.SizedBox(height: 10),
+          pw.Table(
+            border: pw.TableBorder.all(),
+            columnWidths: {
+              0: pw.FlexColumnWidth(2), // First column (label)
+              1: pw.FlexColumnWidth(1), // Second column (RE)
+              2: pw.FlexColumnWidth(1), // Third column (LE)
+            },
+            children: [
 
-            if (hasFundus)
-              buildTableRow('Fundus', dilatedData["fundus-right"] ?? ' ', dilatedData["fundus-left"] ?? ' '),
+              buildTableRow('', 'RE:', 'LE:', boldValues: true),
 
-            buildTableRow('Cataract',
-                (dilatedData['Cataract-right'] ?? 'NO').toString().toUpperCase(),
-                (dilatedData['Cataract-left'] ?? 'NO').toString().toUpperCase(),
-            ),
+              if (hasMydriasis)
+                buildTableRow('Mydriasis', dilatedData["mydriasis-right"] ?? ' ', dilatedData["mydriasis-left"] ?? ' '),
 
-            buildTableRow('Glaucoma',
-                (dilatedData['Glaucoma-right'] ?? 'NO').toString().toUpperCase(),
-                (dilatedData['Glaucoma-left'] ?? 'NO').toString().toUpperCase()
-            ),
+              if (hasFundus)
+                buildTableRow('Fundus', dilatedData["fundus-right"] ?? ' ', dilatedData["fundus-left"] ?? ' '),
 
-            buildTableRow('Diabetic retinopathy',
-                (dilatedData['Diabetic retinopathy-right'] ?? 'NO').toString().toUpperCase(),
-                (dilatedData['Diabetic retinopathy-left'] ?? 'NO').toString().toUpperCase()
-            ),
-
-            buildTableRow('ARMD',
-                (dilatedData['ARMD-right'] ?? 'NO').toString().toUpperCase(),
-                (dilatedData['ARMD-left'] ?? 'NO').toString().toUpperCase()
-            ),
-
-            buildTableRow('Optic disc pallor/ atropy',
-                (dilatedData['Optic disc pallor/ atrophy-right'] ?? 'NO').toString().toUpperCase(),
-                (dilatedData['Optic disc pallor/ atrophy-left'] ?? 'NO').toString().toUpperCase()
-            ),
-
-          ],
-        ),
-        pw.SizedBox(height: 20),
+              ...diagnosisRows,
+            ],
+          ),
+          pw.SizedBox(height: 20),
+        ],
         if (filteredDiagnoses.isNotEmpty) ...[
           pw.Table(
             border: pw.TableBorder.all(),
@@ -806,108 +695,77 @@ Future<void> generateExamine(
 
             ],
           ),
+          pw.SizedBox(height: 20),
         ],
-        pw.SizedBox(height: 20),
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(2), // Label column
-            1: pw.FlexColumnWidth(2), // YES column
-          },
-          children: [
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    'Cardio/Medicine clearance for surgery:',
-                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+
+        if ((preSurgeryData['Cardio/Medicine clearance for surgery'] ?? 'NO').toString().toUpperCase() != 'NO')...[
+          pw.Table(
+            border: pw.TableBorder.all(),
+            columnWidths: {
+              0: pw.FlexColumnWidth(2), // Label column
+              1: pw.FlexColumnWidth(2), // YES column
+            },
+            children: [
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'Cardio/Medicine clearance for surgery:',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
                   ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
                       (preSurgeryData['Cardio/Medicine clearance for surgery'] ?? 'NO').toString().toUpperCase(),
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        pw.SizedBox(height: 20),
-        // Does patient need the following table
-        pw.Text(
-          'Does patient need the following on arrival at KH:',
-          style: pw.TextStyle(
-            fontSize: 16,
-            fontWeight: pw.FontWeight.bold,
+                ],
+              ),
+            ],
           ),
-        ),
-        pw.SizedBox(height: 10),
-        pw.Table(
-          border: pw.TableBorder.all(),
-          columnWidths: {
-            0: pw.FlexColumnWidth(2), // Label column
-            1: pw.FlexColumnWidth(2), // YES column
-          },
-          children: [
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'IOP',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      preSurgeryData['IOP'] == true ? 'YES' : 'NO',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-              ],
+          pw.SizedBox(height: 20),
+        ],
+        // Does patient need the following table
+        if (preSurgeryEntries.isNotEmpty) ...[
+          pw.Text(
+            'Does patient need the following on arrival at KH:',
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
             ),
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'BSCAN',
+          ),
+          pw.SizedBox(height: 10),
+          pw.Table(
+            border: pw.TableBorder.all(),
+            columnWidths: {
+              0: pw.FlexColumnWidth(2), // Label column
+              1: pw.FlexColumnWidth(2), // YES column
+            },
+            children: preSurgeryEntries.map((entry) {
+              return pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      entry.key, // Key as the label
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
                   ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    preSurgeryData['BSCAN'] == true ? 'YES' : 'NO',
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'YES', // Since only true values are considered
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            pw.TableRow(
-              children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                      'Systemic evaluation',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(
-                    preSurgeryData['Systemic evaluation'] == true ? 'YES' : 'NO',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                ],
+              );
+            }).toList(),
+          ),
+        ]
       ],
     ),
   );

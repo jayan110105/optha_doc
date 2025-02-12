@@ -543,7 +543,7 @@ class _CampExamineState extends State<CampExamine> {
                       ProgressSteps(
                         steps: steps,
                         currentStep: step,
-                        allowStepTap: false,
+                        allowStepTap: isValidationDisabled,
                         onStepTapped: (index) {
                           setState(() {
                             step = index;
