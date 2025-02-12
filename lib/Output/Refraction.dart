@@ -178,8 +178,13 @@ Future<void> generateRefraction(Map<String, TextEditingController> controllers) 
                             pw.TableRow(
                                 children: [
                                   pw.Padding(
-                                    padding: const pw.EdgeInsets.all(8.0),
-                                    child: pw.Text('N.V'),
+                                    padding: const pw.EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                                    child: pw.Row(
+                                      children: [
+                                        pw.Text('N.V'),
+                                        pw.Text('(Add)', style: pw.TextStyle(fontSize: 10)),
+                                      ]
+                                    )
                                   ),
                                 ]
                             ),

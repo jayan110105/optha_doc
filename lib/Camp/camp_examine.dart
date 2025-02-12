@@ -136,7 +136,7 @@ class _CampExamineState extends State<CampExamine> {
   };
 
   final Map<String, dynamic> _diagnosisData = {
-    for (var eye in ['right', 'left', 'both'])
+    for (var eye in ['right', 'left'])
       for (var label in [
         "Immature cataract",
         "Near Mature cataract",

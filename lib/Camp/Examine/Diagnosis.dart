@@ -43,7 +43,7 @@ class Diagnosis extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        ...['right', 'left', 'both'].map((eye) {
+        ...['right', 'left'].map((eye) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -51,7 +51,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
           Padding(
             padding: EdgeInsets.only(bottom: 8.0),
             child: Text(
-              'With Glasses',
+              widget.prefix == 'With Glasses' ? "With Glasses" : "With BGC",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -260,7 +260,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Near Vision",
+                        "Near Vision (Add)",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF163351).withValues(alpha: 0.6),
