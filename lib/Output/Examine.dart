@@ -119,7 +119,12 @@ Future<void> generateExamine(
 
   final filteredHistoryKeys = historyKeys.where((key) => shouldIncludeRow(key)).toList();
 
-  final preSurgeryEntries = preSurgeryData.entries.where((entry) => entry.value == true).toList();
+  final List<String> preKeysToCheck = ["IOP", "BSCAN", "Systemic evaluation"];
+
+// Filter only entries where the key matches and the value is true
+  final preSurgeryEntries = preSurgeryData.entries
+      .where((entry) => preKeysToCheck.contains(entry.key) && entry.value == true)
+      .toList();
 
   final List<String> keysToCheck = [
     "Select for surgery",
