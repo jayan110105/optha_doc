@@ -61,9 +61,22 @@ Future<void> generateExamine(
     'Stye', 'Conjunctivitis', 'Dry eye', 'Allergic conjunctivitis'
   ];
 
-  final filteredDiagnoses = diagnosisList
-      .where((d) => ['-right', '-left'].any((s) => diagnosisData[d + s] == true))
-      .toList();
+// Create lists to store diagnoses per eye
+  List<String> rightEyeDiagnoses = [];
+  List<String> leftEyeDiagnoses = [];
+
+  for (var diagnosis in diagnosisList) {
+    if (diagnosisData['$diagnosis-right'] == true) {
+      rightEyeDiagnoses.add(diagnosis);
+    }
+    if (diagnosisData['$diagnosis-left'] == true) {
+      leftEyeDiagnoses.add(diagnosis);
+    }
+  }
+
+// Convert lists to comma-separated strings
+  String rightEyeDiagnosesText = rightEyeDiagnoses.isNotEmpty ? rightEyeDiagnoses.join(', ') : 'None';
+  String leftEyeDiagnosesText = leftEyeDiagnoses.isNotEmpty ? leftEyeDiagnoses.join(', ') : 'None';
 
   bool hasWorkupData =
       (workupData["re-ducts"]?.trim().isNotEmpty ?? false) ||
@@ -675,24 +688,61 @@ Future<void> generateExamine(
           ),
           pw.SizedBox(height: 20),
         ],
-        if (filteredDiagnoses.isNotEmpty) ...[
+        if (rightEyeDiagnoses.isNotEmpty || leftEyeDiagnoses.isNotEmpty) ...[
           pw.Table(
             border: pw.TableBorder.all(),
             columnWidths: {
-              0: pw.FlexColumnWidth(3), // Diagnosis column
-              1: pw.FlexColumnWidth(1), // Right eye column
-              2: pw.FlexColumnWidth(1), // Left eye column
+              0: pw.FlexColumnWidth(1), // Eye column
+              1: pw.FlexColumnWidth(3), // Diagnosis column
             },
             children: [
-              buildTableRow('Diagnosis :', 'Right eye', 'Left eye', boldValues: true),
-
-              ...filteredDiagnoses.map(
-                (diagnosis) => buildTableRow(diagnosis,
-                    diagnosisData['$diagnosis-right'] == true ? 'YES' : 'NO',
-                    diagnosisData['$diagnosis-left'] == true ? 'YES' : 'NO'
-                )
+              // Table header
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'Eye',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(
+                      'Diagnosis',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
 
+              // Right Eye Row
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text('Right Eye'),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(rightEyeDiagnosesText),
+                  ),
+                ],
+              ),
+
+              // Left Eye Row
+              pw.TableRow(
+                children: [
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text('Left Eye'),
+                  ),
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.all(8.0),
+                    child: pw.Text(leftEyeDiagnosesText),
+                  ),
+                ],
+              ),
             ],
           ),
           pw.SizedBox(height: 20),
