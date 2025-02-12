@@ -71,29 +71,30 @@ class _CampRegistrationState extends State<CampRegistration> {
 
   void saveRegistration() async {
 
-    if (isDatabaseDisabled) {
-      print('Database saving is disabled during testing.');
-      return;
-    }
-
     final dbHelper = DatabaseHelper.instance;
 
     // Prepare the data
-    final registration = {
+    final registrationData = {
       'token': controllers['token']?.text ?? '',
       'name': controllers['name']?.text ?? '',
-      'age': controllers['age']?.text ?? '',
+      'age': int.tryParse(controllers['age']?.text ?? '0') ?? 0,
       'gender': controllers['gender']?.text ?? '',
       'aadhar': controllers['aadhar']?.text ?? '',
       'parent': controllers['parent']?.text ?? '',
       'phone': controllers['phone']?.text ?? '',
       'address': controllers['address']?.text ?? '',
-      'photo_path': _image?.path ?? '',
+      'photo': _image?.path ?? '',
     };
 
-    // Save the data to the database
-    final id = await dbHelper.insertRegistration(registration);
-    print('Registration saved with ID: $id');
+    // Print the data instead of inserting into the database
+    print('------ Registration Data ------');
+    print(registrationData);
+    print('--------------------------------');
+
+
+    if (!isDatabaseDisabled) {
+      await dbHelper.insertRegistration(registrationData);
+    }
   }
 
 

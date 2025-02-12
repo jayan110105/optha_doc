@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:opthadoc/Camp/Examine/Comorbid.dart';
 import 'package:opthadoc/Camp/Examine/Diagnosis.dart';
 import 'package:opthadoc/Camp/Examine/Dilated.dart';
@@ -13,6 +16,7 @@ import 'package:opthadoc/Camp/Examine/Complaint.dart';
 import 'package:opthadoc/Components/StretchedIconButton.dart';
 import 'package:opthadoc/Output/Examine.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:opthadoc/data/DatabaseHelper.dart';
 import 'package:opthadoc/main.dart';
 
 bool get isDatabaseDisabled => dotenv.env['DISABLE_DB'] == 'true';
@@ -239,6 +243,7 @@ class _CampExamineState extends State<CampExamine> {
   void nextStep() {
     if (!validateStepFields(step)) return;
     if(step == steps.length - 1) {
+      saveExaminationData();
       setState(() {
         step++;
       });
@@ -394,6 +399,203 @@ class _CampExamineState extends State<CampExamine> {
         ),
       ),
     );
+  }
+
+  void printLargeJson(Map<String, dynamic> jsonData) {
+    const JsonEncoder encoder = JsonEncoder.withIndent("  ");
+    String prettyJson = encoder.convert(jsonData);
+
+    // Print JSON in chunks
+    const int chunkSize = 800; // Adjust this if necessary
+    for (int i = 0; i < prettyJson.length; i += chunkSize) {
+      print(prettyJson.substring(i, i + chunkSize > prettyJson.length ? prettyJson.length : i + chunkSize));
+    }
+  }
+
+  Future<void> saveExaminationData() async {
+    final dbHelper = DatabaseHelper.instance;
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+
+    final examinationData = {
+      "patientToken": '${widget.campCode}-${DateFormat('yyyyMMdd').format(DateTime.now())}-${_tokenController.text}' ?? '',
+      "date": formattedDate,
+
+      "visionTest": {
+        "visionRightDV": _patientData['vision_re_dv'] ?? '',
+        "visionRightNV": _patientData['vision_re_nv'] ?? '',
+        "visionLeftDV": _patientData['vision_le_dv'] ?? '',
+        "visionLeftNV": _patientData['vision_le_nv'] ?? '',
+      },
+
+      "complaints": {
+        "rightEye": {
+          "Diminution of vision": _historyData["Diminution of vision-right"] ?? false,
+          "Ocular Trauma": _historyData["Ocular Trauma-right"] ?? false,
+          "Flashes": _historyData["Flashes-right"] ?? false,
+          "Floaters": _historyData["Floaters-right"] ?? false,
+          "Glaucoma on Rx": _historyData["Glaucoma on Rx-right"] ?? false,
+          "Pain": _historyData["Pain/redness-right"] ?? false,
+          "Watering/discharge": _historyData["Watering/discharge-right"] ?? false,
+          "Nature of Trauma": _historyData["Nature of Trauma-right"]?.text ?? '',
+        },
+        "leftEye": {
+          "Diminution of vision": _historyData["Diminution of vision-left"] ?? false,
+          "Ocular Trauma": _historyData["Ocular Trauma-left"] ?? false,
+          "Flashes": _historyData["Flashes-left"] ?? false,
+          "Floaters": _historyData["Floaters-left"] ?? false,
+          "Glaucoma on Rx": _historyData["Glaucoma on Rx-left"] ?? false,
+          "Pain": _historyData["Pain/redness-left"] ?? false,
+          "Watering/discharge": _historyData["Watering/discharge-left"] ?? false,
+          "Nature of Trauma": _historyData["Nature of Trauma-left"]?.text ?? '',
+        },
+        "historyOfGlasses": _historyData["History of glasses"] ?? false,
+        "PGComfortable": _historyData["Are PG comfortable ?"] ?? false,
+        "lastGlassChange": _historyData["Last Glass change"]?.text ?? '',
+        "previousSurgery": _historyData["Previous surgery/laser rx"] ?? false,
+        "surgeryDetails": _historyData["Details of surgery/procedure"]?.text ?? '',
+      },
+
+      "comorbidities": {
+        "Diabetes": _comorbidities["Diabetes mellitus"] ?? false,
+        "Hypertension": _comorbidities["Hypertension"] ?? false,
+        "Heart disease": _comorbidities["Heart disease"] ?? false,
+        "Asthma": _comorbidities["Asthma"] ?? false,
+        "Allergy to dust/meds": _comorbidities["Allergy to dust/meds"] ?? false,
+        "Benign prostatic hyperplasia": _comorbidities["Benign prostatic hyperplasia on treatment"] ?? false,
+        "On Antiplatelets": _comorbidities["Is the patient On Antiplatelets"] ?? false,
+      },
+
+      "examFindings": {
+        "visualAxis": {
+          "right": _examData["visualAxis-right"] ?? '',
+          "left": _examData["visualAxis-left"] ?? '',
+        },
+        "eom": {
+          "right": _examData["eom-right"] ?? '',
+          "left": _examData["eom-left"] ?? '',
+        },
+        "conjunctiva": {
+          "right": _examData["conjunctiva-right"] ?? '',
+          "left": _examData["conjunctiva-left"] ?? '',
+        },
+        "cornea": {
+          "right": _examData["cornea-right"] ?? '',
+          "left": _examData["cornea-left"] ?? '',
+        },
+        "anteriorChamber": {
+          "right": _examData["ac-right"] ?? '',
+          "left": _examData["ac-left"] ?? '',
+        },
+        "pupilReactions": {
+          "right": _examData["pupilReactions-right"] ?? '',
+          "left": _examData["pupilReactions-left"] ?? '',
+        },
+        "lens": {
+          "right": _examData["lens-right"] ?? '',
+          "left": _examData["lens-left"] ?? '',
+        },
+      },
+
+      "workup": {
+        "SBP": _workupData["sbp"]?.text ?? '',
+        "DBP": _workupData["dbp"]?.text ?? '',
+        "GRBS": _workupData["grbs"]?.text ?? '',
+        "re-ducts": _workupData["re-ducts"] ?? '',
+        "le-ducts": _workupData["le-ducts"] ?? '',
+      },
+
+      "dilatedFindings": {
+        "mydriasis": {
+          "right": _dilatedData["mydriasis-right"] ?? false,
+          "left": _dilatedData["mydriasis-left"] ?? false,
+        },
+        "fundus": {
+          "right": _dilatedData["fundus-right"] ?? '',
+          "left": _dilatedData["fundus-left"] ?? '',
+        },
+        "Cataract": {
+          "right": _dilatedData["Cataract-right"] ?? false,
+          "left": _dilatedData["Cataract-left"] ?? false,
+        },
+        "Glaucoma": {
+          "right": _dilatedData["Glaucoma-right"] ?? false,
+          "left": _dilatedData["Glaucoma-left"] ?? false,
+        },
+        "DiabeticRetinopathy": {
+          "right": _dilatedData["Diabetic retinopathy-right"] ?? false,
+          "left": _dilatedData["Diabetic retinopathy-left"] ?? false,
+        },
+        "ARMD": {
+          "right": _dilatedData["ARMD-right"] ?? false,
+          "left": _dilatedData["ARMD-left"] ?? false,
+        },
+        "OpticDiscAtrophy": {
+          "right": _dilatedData["Optic disc pallor/ atrophy-right"] ?? false,
+          "left": _dilatedData["Optic disc pallor/ atrophy-left"] ?? false,
+        }
+      },
+
+      "diagnosis": {
+        "rightEye": {
+          "Immature cataract": _diagnosisData["Immature cataract-right"] ?? false,
+          "Near Mature cataract": _diagnosisData["Near Mature cataract-right"] ?? false,
+          "Mature Cataract": _diagnosisData["Mature Cataract-right"] ?? false,
+          "Hypermature Cataract": _diagnosisData["Hypermature Cataract-right"] ?? false,
+          "PCIOL": _diagnosisData["PCIOL-right"] ?? false,
+          "Aphakia": _diagnosisData["Aphakia-right"] ?? false,
+          "Pterygium": _diagnosisData["Pterygium-right"] ?? false,
+          "Dacryocystitis": _diagnosisData["Dacryocystitis-right"] ?? false,
+          "Amblyopia": _diagnosisData["Amblyopia-right"] ?? false,
+          "Glaucoma": _diagnosisData["Glaucoma-right"] ?? false,
+          "Diabetic retinopathy": _diagnosisData["Diabetic retinopathy-right"] ?? false,
+          "Stye": _diagnosisData["Stye-right"] ?? false,
+          "Conjunctivitis": _diagnosisData["Conjunctivitis-right"] ?? false,
+          "Dry eye": _diagnosisData["Dry eye-right"] ?? false,
+          "Allergic conjunctivitis": _diagnosisData["Allergic conjunctivitis-right"] ?? false,
+        },
+        "leftEye": {
+          "Immature cataract": _diagnosisData["Immature cataract-left"] ?? false,
+          "Near Mature cataract": _diagnosisData["Near Mature cataract-left"] ?? false,
+          "Mature Cataract": _diagnosisData["Mature Cataract-left"] ?? false,
+          "Hypermature Cataract": _diagnosisData["Hypermature Cataract-left"] ?? false,
+          "PCIOL": _diagnosisData["PCIOL-left"] ?? false,
+          "Aphakia": _diagnosisData["Aphakia-left"] ?? false,
+          "Pterygium": _diagnosisData["Pterygium-left"] ?? false,
+          "Dacryocystitis": _diagnosisData["Dacryocystitis-left"] ?? false,
+          "Amblyopia": _diagnosisData["Amblyopia-left"] ?? false,
+          "Glaucoma": _diagnosisData["Glaucoma-left"] ?? false,
+          "Diabetic retinopathy": _diagnosisData["Diabetic retinopathy-left"] ?? false,
+          "Stye": _diagnosisData["Stye-left"] ?? false,
+          "Conjunctivitis": _diagnosisData["Conjunctivitis-left"] ?? false,
+          "Dry eye": _diagnosisData["Dry eye-left"] ?? false,
+          "Allergic conjunctivitis": _diagnosisData["Allergic conjunctivitis-left"] ?? false,
+        },
+        "notes": _diagnosisData["notes"]?.text ?? '',
+      },
+
+      "preSurgeryPlan": {
+        "selectedForSurgery": _preSurgeryData["Select for surgery"] ?? false,
+        "referral": _preSurgeryData["Ref to Higher center/Base hospital"] ?? false,
+        "reviewNextCamp": _preSurgeryData["Review in next camp visit"] ?? false,
+        "medicalFitness": _preSurgeryData["Medical fitness"] ?? false,
+        "observation": _preSurgeryData["Observation"] ?? false,
+        "glassPrescription": _preSurgeryData["Glass prescription"] ?? false,
+        "cardioClearance": _preSurgeryData["Cardio/Medicine clearance for surgery"] ?? false,
+        "IOP": _preSurgeryData["IOP"] ?? false,
+        "BSCAN": _preSurgeryData["BSCAN"] ?? false,
+        "systemicEvaluation": _preSurgeryData["Systemic evaluation"] ?? false,
+      }
+    };
+
+    // Print data for testing before saving
+    print('------ Formatted Examination Data ------');
+    printLargeJson(examinationData);
+    print('----------------------------------------');
+
+    if (!isDatabaseDisabled) {
+      await dbHelper.insertExamination(examinationData);
+    }
   }
 
 

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CustomDropdown.dart';
 import 'package:opthadoc/Components/Label.dart';
@@ -52,29 +53,100 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
 
   final Map<String, TextEditingController> controllers = {};
 
-  void saveCheckup() async {
-    final dbHelper = DatabaseHelper.instance;
+  void printLargeJson(Map<String, dynamic> jsonData) {
+    const JsonEncoder encoder = JsonEncoder.withIndent("  ");
+    String prettyJson = encoder.convert(jsonData);
 
-    // Prepare data for saving
+    // Print JSON in chunks
+    const int chunkSize = 800; // Adjust this if necessary
+    for (int i = 0; i < prettyJson.length; i += chunkSize) {
+      print(prettyJson.substring(i, i + chunkSize > prettyJson.length ? prettyJson.length : i + chunkSize));
+    }
+  }
+
+  Future<void> saveEyeCheckupData() async {
+
+    final dbHelper = DatabaseHelper.instance;
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+
     final checkupData = {
-      'patientToken': controllers['patientToken']?.text ?? '',
-      'withoutGlasses': controllers.entries
-          .where((entry) => entry.key.startsWith('withoutGlasses'))
-          .map((entry) => '${entry.key}:${entry.value.text}')
-          .join(','),
-      'withGlasses': controllers.entries
-          .where((entry) => entry.key.startsWith('withGlasses'))
-          .map((entry) => '${entry.key}:${entry.value.text}')
-          .join(','),
-      'withCorrection': controllers.entries
-          .where((entry) => entry.key.startsWith('withCorrection'))
-          .map((entry) => '${entry.key}:${entry.value.text}')
-          .join(','),
+      'patientToken': '${widget.campCode}-${DateFormat('yyyyMMdd').format(DateTime.now())}-${controllers['patientToken']?.text}',
+      'date': formattedDate,
+
+      // Store vision tests as JSON
+      'withoutGlasses': {
+        'leftVA': controllers['withoutGlasses.left.distanceVision']?.text ?? '',
+        'rightVA': controllers['withoutGlasses.right.distanceVision']?.text ?? '',
+      },
+
+      'withGlasses': {
+        'left': {
+          'sphereSign': controllers['withGlasses.left.distanceVisionSphereSign']?.text ?? '',
+          'sphere': controllers['withGlasses.left.distanceVisionSphere']?.text ?? '',
+          'cylinderSign': controllers['withGlasses.left.cylinderSign']?.text ?? '',
+          'cylinder': controllers['withGlasses.left.cylinder']?.text ?? '',
+          'axis': controllers['withGlasses.left.axis']?.text ?? '',
+          'VA': controllers['withGlasses.left.distanceVisionVA']?.text ?? '',
+        },
+        'right': {
+          'sphereSign': controllers['withGlasses.right.distanceVisionSphereSign']?.text ?? '',
+          'sphere': controllers['withGlasses.right.distanceVisionSphere']?.text ?? '',
+          'cylinderSign': controllers['withGlasses.right.cylinderSign']?.text ?? '',
+          'cylinder': controllers['withGlasses.right.cylinder']?.text ?? '',
+          'axis': controllers['withGlasses.right.axis']?.text ?? '',
+          'VA': controllers['withGlasses.right.distanceVisionVA']?.text ?? '',
+        },
+        'IPD': controllers['withGlasses.IPD']?.text ?? '',
+      },
+
+      'withCorrection': {
+        'left': {
+          'sphereSign': controllers['withCorrection.left.distanceVisionSphereSign']?.text ?? '',
+          'sphere': controllers['withCorrection.left.distanceVisionSphere']?.text ?? '',
+          'cylinderSign': controllers['withCorrection.left.cylinderSign']?.text ?? '',
+          'cylinder': controllers['withCorrection.left.cylinder']?.text ?? '',
+          'axis': controllers['withCorrection.left.axis']?.text ?? '',
+          'VA': controllers['withCorrection.left.distanceVisionVA']?.text ?? '',
+        },
+        'right': {
+          'sphereSign': controllers['withCorrection.right.distanceVisionSphereSign']?.text ?? '',
+          'sphere': controllers['withCorrection.right.distanceVisionSphere']?.text ?? '',
+          'cylinderSign': controllers['withCorrection.right.cylinderSign']?.text ?? '',
+          'cylinder': controllers['withCorrection.right.cylinder']?.text ?? '',
+          'axis': controllers['withCorrection.right.axis']?.text ?? '',
+          'VA': controllers['withCorrection.right.distanceVisionVA']?.text ?? '',
+        },
+        'IPD': controllers['withCorrection.IPD']?.text ?? '',
+      },
+
+      // Near vision
+      'nearVision': {
+        'left': {
+          'sphereSign': controllers['withCorrection.left.nearVisionSphereSign']?.text ?? '',
+          'sphere': controllers['withCorrection.left.nearVisionSphere']?.text ?? '',
+          'VA': controllers['withCorrection.left.nearVisionVA']?.text ?? '',
+        },
+        'right': {
+          'sphereSign': controllers['withCorrection.right.nearVisionSphereSign']?.text ?? '',
+          'sphere': controllers['withCorrection.right.nearVisionSphere']?.text ?? '',
+          'VA': controllers['withCorrection.right.nearVisionVA']?.text ?? '',
+        },
+      },
+
+      'bifocal': controllers['bifocal']?.text ?? '',
+      'color': controllers['color']?.text ?? '',
       'remarks': controllers['remarks']?.text ?? '',
     };
 
-    // Save data to the database
-    await dbHelper.insertEyeCheckup(checkupData);
+    // Print data for testing before saving
+    print('------ Eye Checkup Data ------');
+    printLargeJson(checkupData);
+    print('------------------------------');
+
+    if (!isDatabaseDisabled) {
+      await dbHelper.insertEyeCheckup(checkupData);
+    }
   }
 
   void scrollToTop() {
@@ -144,6 +216,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
   void nextStep() {
     if (!validateStepFields(step)) return;
     if(step == steps.length - 1) {
+      saveEyeCheckupData();
       setState(() {
         step++;
       });

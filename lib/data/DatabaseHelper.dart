@@ -27,28 +27,68 @@ class DatabaseHelper {
       version: 1,
       onCreate: (db, version) {
         db.execute('''
-          CREATE TABLE registrations (
+           CREATE TABLE registrations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            token TEXT UNIQUE,
             name TEXT,
-            age TEXT,
+            age INTEGER,
             gender TEXT,
             aadhar TEXT,
             parent TEXT,
             phone TEXT,
             address TEXT,
-            complaint TEXT,
-            photo_path TEXT
+            photo TEXT
           )
         ''');
         db.execute('''
           CREATE TABLE eye_checkups (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            patientId TEXT,
+            patientToken TEXT UNIQUE,
+            date TEXT,
+
+            -- Vision tests stored as JSON
             withoutGlasses TEXT,
             withGlasses TEXT,
             withCorrection TEXT,
-            remarks TEXT,
-            complaint TEXT
+
+            -- Near Vision stored as JSON
+            nearVision TEXT,
+
+            -- Additional info
+            bifocal TEXT,
+            color TEXT,
+            remarks TEXT
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE examinations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            patientToken TEXT UNIQUE,
+            date TEXT,
+
+            -- Vision Test stored as JSON
+            visionTest TEXT,
+
+            -- Complaints stored as JSON
+            complaints TEXT,
+
+            -- Comorbidities stored as JSON
+            comorbidities TEXT,
+
+            -- Eye Examination stored as JSON
+            examFindings TEXT,
+
+            -- Workup stored as JSON
+            workup TEXT,
+
+            -- Dilated Eye Findings stored as JSON
+            dilatedFindings TEXT,
+
+            -- Diagnosis stored as JSON
+            diagnosis TEXT,
+
+            -- Pre-Surgery Plan stored as JSON
+            preSurgeryPlan TEXT
           )
         ''');
       },
@@ -58,33 +98,31 @@ class DatabaseHelper {
   // Insert a new registration
   Future<int> insertRegistration(Map<String, dynamic> registration) async {
     final db = await database;
-    return await db.insert('registrations', registration);
+    return await db.insert('registrations', registration, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  // Retrieve all registrations
   Future<List<Map<String, dynamic>>> getRegistrations() async {
     final db = await database;
     return await db.query('registrations');
   }
 
-  // Delete a registration by ID
-  Future<int> deleteRegistration(int id) async {
-    final db = await database;
-    return await db.delete('registrations', where: 'id = ?', whereArgs: [id]);
-  }
-
   Future<int> insertEyeCheckup(Map<String, dynamic> checkupData) async {
     final db = await database;
-    return await db.insert('eye_checkups', checkupData);
+    return await db.insert('eye_checkups', checkupData, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Map<String, dynamic>>> getEyeCheckups() async {
     final db = await database;
-    return await db.query('eye_checkups');
+    return await db.query('eye_checkups', orderBy: "date DESC");
   }
 
-  Future<int> deleteEyeCheckup(int id) async {
+  Future<int> insertExamination(Map<String, dynamic> examinationData) async {
     final db = await database;
-    return await db.delete('eye_checkups', where: 'id = ?', whereArgs: [id]);
+    return await db.insert('examinations', examinationData, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<Map<String, dynamic>>> getExaminations() async {
+    final db = await database;
+    return await db.query('examinations', orderBy: "date DESC");
   }
 }
