@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:opthadoc/Camp/Examine/camp_verification.dart';
 import 'package:opthadoc/home.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:io';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
-  print('Current working directory: ${Directory.current.path}');
   try {
     await dotenv.load(fileName: '.env');
   } catch (e) {
@@ -55,7 +52,6 @@ class MyApp extends StatelessWidget {
   Map<String, WidgetBuilder> _buildRoutes() {
     return {
       '/home': (context) => const Home(),
-      '/CampVerification': (context) => CampVerification(),
     };
   }
 }

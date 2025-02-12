@@ -155,6 +155,8 @@ class _CampExamineState extends State<CampExamine> {
         "Allergic conjunctivitis",
       ])
         "$label-$eye": false,
+
+    "notes": TextEditingController()
   };
 
   final Map<String, dynamic> _preSurgeryData = {

@@ -78,6 +78,8 @@ Future<void> generateExamine(
   String rightEyeDiagnosesText = rightEyeDiagnoses.isNotEmpty ? rightEyeDiagnoses.join(', ') : 'None';
   String leftEyeDiagnosesText = leftEyeDiagnoses.isNotEmpty ? leftEyeDiagnoses.join(', ') : 'None';
 
+  String diagnosisNote = diagnosisData['notes']?.text.trim() ?? '';
+
   bool hasWorkupData =
       (workupData["re-ducts"]?.trim().isNotEmpty ?? false) ||
       (workupData["le-ducts"]?.trim().isNotEmpty ?? false) ||
@@ -688,63 +690,97 @@ Future<void> generateExamine(
           ),
           pw.SizedBox(height: 20),
         ],
-        if (rightEyeDiagnoses.isNotEmpty || leftEyeDiagnoses.isNotEmpty) ...[
-          pw.Table(
-            border: pw.TableBorder.all(),
-            columnWidths: {
-              0: pw.FlexColumnWidth(1), // Eye column
-              1: pw.FlexColumnWidth(3), // Diagnosis column
-            },
-            children: [
-              // Table header
-              pw.TableRow(
-                children: [
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(
-                      'Eye',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+        if (rightEyeDiagnoses.isNotEmpty || leftEyeDiagnoses.isNotEmpty || diagnosisNote != '') ...[
+          buildSectionHeader("Diagnosis"),
+          if (rightEyeDiagnoses.isNotEmpty || leftEyeDiagnoses.isNotEmpty) ...[
+            pw.SizedBox(height: 10),
+            pw.Table(
+              border: pw.TableBorder.all(),
+              columnWidths: {
+                0: pw.FlexColumnWidth(1), // Eye column
+                1: pw.FlexColumnWidth(3), // Diagnosis column
+              },
+              children: [
+                // Table header
+                pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        'Eye',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
                     ),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(
-                      'Diagnosis',
-                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        'Diagnosis',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
 
-              // Right Eye Row
-              pw.TableRow(
-                children: [
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text('Right Eye'),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(rightEyeDiagnosesText),
-                  ),
-                ],
-              ),
+                // Right Eye Row
+                pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Right Eye'),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(rightEyeDiagnosesText),
+                    ),
+                  ],
+                ),
 
-              // Left Eye Row
-              pw.TableRow(
-                children: [
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text('Left Eye'),
-                  ),
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.all(8.0),
-                    child: pw.Text(leftEyeDiagnosesText),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                // Left Eye Row
+                pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Left Eye'),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(leftEyeDiagnosesText),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+          if (diagnosisNote.isNotEmpty) ...[
+            pw.SizedBox(height: 10),
+            pw.Table(
+              border: pw.TableBorder.all(),
+              columnWidths: {
+                0: pw.FlexColumnWidth(1), // Label column
+                1: pw.FlexColumnWidth(3), // YES column
+              },
+              children: [
+                pw.TableRow(
+                  children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        'Note',
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text(
+                        diagnosisNote,
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
           pw.SizedBox(height: 20),
         ],
 

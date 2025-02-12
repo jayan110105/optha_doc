@@ -159,16 +159,6 @@ class _CampRegistrationState extends State<CampRegistration> {
     List<String> requiredFields;
 
     switch (currentStep) {
-      // case 1:
-      //   if (_image == null) {
-      //     showCustomSnackBar(
-      //       context,
-      //       "Photo is required",
-      //       "Please upload a photo to proceed.",
-      //     );
-      //     return false;
-      //   }
-      //   return true;
 
       case 2: // Step 2: Basic Info
         requiredFields = ["name", "age"];

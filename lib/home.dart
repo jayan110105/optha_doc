@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:opthadoc/Camp/Examine/camp_verification.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -24,9 +25,13 @@ class Home extends StatelessWidget {
             _ActionButton(
               text: 'Get Started',
               icon: Icons.festival,
-              onPressed: () => Navigator.pushNamed(context, '/CampVerification'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CampVerification(),
+                ),
+              )
             ),
-            const SizedBox(height: 8),
             const SizedBox(height: 8),
           ],
         ),

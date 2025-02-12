@@ -29,6 +29,11 @@ Future<void> generateDetailsPDF(Map<String, TextEditingController> controllers) 
                   '(O.P Registration Slip)',
                   style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
                 ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  '${controllers['token']?.text}',
+                  style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold),
+                ),
               ]
           ),
         ),

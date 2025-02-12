@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CustomCheckbox.dart';
+import 'package:opthadoc/Components/CustomTextArea.dart';
 
 class Diagnosis extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -86,6 +87,22 @@ class Diagnosis extends StatelessWidget {
             ],
           );
         }),
+        Text(
+          "Notes",
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF163351),
+          ),
+        ),
+        const SizedBox(height: 16),
+        CustomTextArea(
+          controller: data["notes"],
+          hintText: "Enter open notes",
+          isEnabled: true,
+          minLines: 5,
+          maxLines: null, // Allows unlimited lines
+        ),
       ],
     );
   }
