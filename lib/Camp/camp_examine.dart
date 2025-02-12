@@ -42,7 +42,7 @@ class _CampExamineState extends State<CampExamine> {
     {"id": "workup", "title": "Workup", "icon": Icons.biotech},
     {"id": "dilated", "title": "Dilated", "icon": Icons.visibility},
     {"id": "diagnosis", "title": "Diagnosis", "icon": Icons.assignment_turned_in},
-    {"id": "pre-surgery ", "title": "Pre-Surgery", "icon": Icons.assignment},
+    {"id": "plan ", "title": "Plan", "icon": Icons.assignment},
   ];
 
   final Map<String, dynamic> _patientData = {
@@ -160,6 +160,12 @@ class _CampExamineState extends State<CampExamine> {
   };
 
   final Map<String, dynamic> _preSurgeryData = {
+    "Select for surgery" : false,
+    "Ref to Higher center/Base hospital" : false,
+    "Review in next camp visit" : false,
+    "Medical fitness" : false,
+    "Observation" : false,
+    "Glass prescription" : false,
     "Cardio/Medicine clearance for surgery": null,
     "IOP": false,
     "BSCAN": false,

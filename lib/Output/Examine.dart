@@ -121,6 +121,20 @@ Future<void> generateExamine(
 
   final preSurgeryEntries = preSurgeryData.entries.where((entry) => entry.value == true).toList();
 
+  final List<String> keysToCheck = [
+    "Select for surgery",
+    "Ref to Higher center/Base hospital",
+    "Review in next camp visit",
+    "Medical fitness",
+    "Observation",
+    "Glass prescription"
+  ];
+
+// Filter the entries that match the specified keys and have `true` values
+  final planEntries = preSurgeryData.entries
+      .where((entry) => keysToCheck.contains(entry.key) && entry.value == true)
+      .toList();
+
   pw.Widget buildSectionHeader(String title, {double fontSize = 16}) {
     return pw.Center(
       child: pw.Text(
@@ -781,6 +795,27 @@ Future<void> generateExamine(
               ],
             ),
           ],
+          pw.SizedBox(height: 20),
+        ],
+
+        if (planEntries.isNotEmpty) ...[
+          pw.Text(
+            'Required Pre-Surgery Actions:',
+            style: pw.TextStyle(
+              fontSize: 16,
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.SizedBox(height: 10),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: planEntries.map((entry) {
+              return pw.Text(
+                '- ${entry.key}', // Bullet point with the label
+                style: pw.TextStyle(fontSize: 14),
+              );
+            }).toList(),
+          ),
           pw.SizedBox(height: 20),
         ],
 

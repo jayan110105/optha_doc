@@ -15,11 +15,40 @@ class PreSurgery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final List<String> planKeys = [
+      "Select for surgery",
+      "Ref to Higher center/Base hospital",
+      "Review in next camp visit",
+      "Medical fitness",
+      "Observation",
+      "Glass prescription",
+    ];
+
     final List<String> arrivalKeys = ["IOP", "BSCAN", "Systemic evaluation"];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const Text(
+          "Plan",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF163351),
+          ),
+        ),
+        const SizedBox(height: 16),
+        ...planKeys.map((key) {
+          return CustomCheckbox(
+            value: data[key] ?? false,
+            onChanged: (bool? value) {
+              updateValue(key, value ?? false);
+            },
+            text: key,
+          );
+        }),
+        const SizedBox(height: 24),
         const Text(
           "Pre-Surgery Evaluation",
           style: TextStyle(
