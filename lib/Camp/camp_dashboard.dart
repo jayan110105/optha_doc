@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
+import 'package:opthadoc/Components/CustomDropdown.dart';
 
-class CampDashboard extends StatelessWidget {
+class CampDashboard extends StatefulWidget {
   final String campCode;
 
   const CampDashboard({super.key, required this.campCode});
+
+  @override
+  State<CampDashboard> createState() => _CampDashboardState();
+}
+
+class _CampDashboardState extends State<CampDashboard> with SingleTickerProviderStateMixin{
+
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   Widget _buildHeader(BuildContext context) {
     return Container(
@@ -35,7 +56,7 @@ class CampDashboard extends StatelessWidget {
                 ),
               ),
               Text(
-                'Camp Code: $campCode',
+                'Camp Code: ${widget.campCode}',
                 style: TextStyle(
                   color: const Color(0xFF163351).withValues(alpha: 0.6),
                   fontSize: 14.0,
@@ -88,36 +109,6 @@ class CampDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentActivityCard() {
-    return CardComponent(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              "Recent Activity",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF163351),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildActivity("Last checkup: 5m ago"),
-                const SizedBox(height: 8.0),
-                _buildActivity("Last registration: 12m ago"),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildStat(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,22 +124,12 @@ class CampDashboard extends StatelessWidget {
         Text(
           value,
           style: const TextStyle(
-            fontSize: 24,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildActivity(String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 14,
-        color: const Color(0xFF163351).withValues(alpha: .6), // text-[#163351]/60
-      ),
     );
   }
 
@@ -169,10 +150,130 @@ class CampDashboard extends StatelessWidget {
                 children: [
                   _buildTodayStatsCard(),
                   SizedBox(height: 16.0),
-                  _buildRecentActivityCard(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Epidemiological Analysis",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF163352),
+                        ),
+                      ),
+                      SizedBox(width: 16.0),
+                      Expanded(
+                        child: CustomDropdown(
+                          hintText: "Select VA",
+                          textStyle: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF163351),
+                              fontWeight: FontWeight.w500
+                          ),
+                          keyName: 'withoutGlasses-distanceVision',
+                          verticalPadding: 0,
+                          items: ["Today", "This Week", "This Month", "All Time"],
+                          selectedValue: "Today",
+                          onChanged: (value) {
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200, // Dull white/grey background for tabs
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: TabBar(
+                  dividerColor: Colors.transparent,
+                  indicatorPadding: const EdgeInsets.symmetric(horizontal: -16.0, vertical: 4),
+                  controller: _tabController,
+                  labelColor: const Color(0xFF163351),
+                  unselectedLabelColor: Colors.grey,
+                  indicator: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    shape: BoxShape.rectangle,
+                  ),
+                  tabs: const [
+                    Tab(text: "Demographics"),
+                    Tab(text: "Case Analysis"),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 500,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - 200),
+                      child: Container(
+                        color: const Color(0xFFE9E6DB),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildTodayStatsCard(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - 200),
+                      child: Container(
+                        color: const Color(0xFFE9E6DB),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Epidemiological Analysis",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF163352),
+                                  ),
+                                ),
+                                const SizedBox(width: 16.0),
+                                Expanded(
+                                  child: CustomDropdown(
+                                    hintText: "Select VA",
+                                    textStyle: const TextStyle(
+                                      fontSize: 14,
+                                      color: Color(0xFF163351),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    keyName: 'withoutGlasses-distanceVision',
+                                    verticalPadding: 0,
+                                    items: const ["Today", "This Week", "This Month", "All Time"],
+                                    selectedValue: "Today",
+                                    onChanged: (value) {},
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
