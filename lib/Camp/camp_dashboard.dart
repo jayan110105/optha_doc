@@ -46,26 +46,32 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
   Future<Map<String, int>> fetchComorbidityCounts() async {
     final exams = await DatabaseHelper.instance.getExaminations();
 
-    // Initialize all to 0
+    // Map raw DB keys to display labels
+    final labelMap = {
+      "Diabetes": "Diabetes",
+      "Hypertension": "Hypertension",
+      "Heart disease": "Heart Disease",
+      "Asthma": "Asthma",
+      "Allergy to dust/meds": "Allergy",
+      "Benign prostatic hyperplasia": "Prostatic Hyperplasia",
+    };
+
+    // Initialize counts with display labels
     final counts = {
-      "Diabetes": 0,
-      "Hypertension": 0,
-      "Heart disease": 0,
-      "Asthma": 0,
-      "Allergy to dust/meds": 0,
-      "Benign prostatic hyperplasia": 0,
-      "On Antiplatelets": 0,
+      for (var label in labelMap.values) label: 0,
     };
 
     for (var entry in exams) {
       final raw = entry['comorbidities'];
+
       if (raw == null || raw.toString().trim().isEmpty) continue;
 
       try {
         final decoded = jsonDecode(raw);
         decoded.forEach((key, value) {
-          if (counts.containsKey(key) && value == true) {
-            counts[key] = counts[key]! + 1;
+          if (labelMap.containsKey(key) && value == true) {
+            final displayLabel = labelMap[key]!;
+            counts[displayLabel] = counts[displayLabel]! + 1;
           }
         });
       } catch (e) {
@@ -73,8 +79,7 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
       }
     }
 
-    print("Comorbidity counts: $counts");
-
+    print("Comorbidity counts (with labels): $counts");
     return counts;
   }
 
@@ -232,6 +237,76 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
 
     setState(() {}); // Update UI after fetch
   }
+
+  Widget genderCard({
+    required String label,
+    required int count,
+    required int totalCount,
+  }) {
+    String percentage = (totalCount == 0 || count == 0)
+        ? "0%"
+        : "${(count / totalCount * 100).toStringAsFixed(1)}%";
+
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Text(
+              count.toString(),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(label, style: const TextStyle(fontSize: 14)),
+            Text(
+              percentage,
+              style: const TextStyle(color: Colors.black45, fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget comorbidityCard({
+    required String label,
+    required int count,
+  }) {
+    return Expanded(
+      child: Container(
+        height: 100,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Text(
+              count.toString(),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 
   @override
   void initState() {
@@ -475,83 +550,11 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              maleCount.toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text("Male", style: const TextStyle(fontSize: 14)),
-                            Text(
-                              maleCount/totalCount == 0 ? "0%" : "${(maleCount/totalCount * 100).toStringAsFixed(1)}%",
-                              style: const TextStyle(color: Colors.black45, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16,),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              femaleCount.toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text("Female", style: const TextStyle(fontSize: 14)),
-                            Text(
-                              femaleCount/totalCount == 0 ? "0%" : "${(maleCount/totalCount * 100).toStringAsFixed(1)}%",
-                              style: const TextStyle(color: Colors.black45, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16,),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              otherCount.toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text("Other", style: const TextStyle(fontSize: 14)),
-                            Text(
-                              otherCount/totalCount == 0 ? "0%" : "${(maleCount/totalCount * 100).toStringAsFixed(1)}%",
-                              style: const TextStyle(color: Colors.black45, fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    genderCard(label: "Male", count: maleCount, totalCount: totalCount),
+                    const SizedBox(width: 16),
+                    genderCard(label: "Female", count: femaleCount, totalCount: totalCount),
+                    const SizedBox(width: 16),
+                    genderCard(label: "Other", count: otherCount, totalCount: totalCount),
                   ],
                 ),
               ],
@@ -711,88 +714,19 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Expanded(
-                      child: Container(
-                        height: 100,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              comorbidityData['Hypertension'].toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4,),
-                            Text(
-                                "Hypertension",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 12)
-                            ),
-                          ],
-                        ),
-                      ),
+                    comorbidityCard(
+                      label: "Hypertension",
+                      count: comorbidityData["Hypertension"] ?? 0,
                     ),
                     SizedBox(width: 16,),
-                    Expanded(
-                      child: Container(
-                        height: 100,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              comorbidityData['Diabetes'].toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4,),
-                            Text(
-                                "Diabetes",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 12)
-                            ),
-                          ],
-                        ),
-                      ),
+                    comorbidityCard(
+                      label: "Diabetes",
+                      count: comorbidityData["Diabetes"] ?? 0,
                     ),
                     SizedBox(width: 16,),
-                    Expanded(
-                      child: Container(
-                        height: 100,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              comorbidityData['Heart disease'].toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4,),
-                            Text(
-                                "Heart Disease",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 12)
-                            ),
-                          ],
-                        ),
-                      ),
+                    comorbidityCard(
+                      label: "Heart Disease",
+                      count: comorbidityData["Heart Disease"] ?? 0,
                     ),
                   ],
                 ),
@@ -800,88 +734,19 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Expanded(
-                      child: Container(
-                        height: 100,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              comorbidityData['Asthma'].toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4,),
-                            Text(
-                                "Asthama",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 12)
-                            ),
-                          ],
-                        ),
-                      ),
+                    comorbidityCard(
+                      label: "Asthma",
+                      count: comorbidityData["Asthma"] ?? 0,
                     ),
                     SizedBox(width: 16,),
-                    Expanded(
-                      child: Container(
-                        height: 100,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              comorbidityData['Allergy to dust/meds'].toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4,),
-                            Text(
-                                "Allergy",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 12)
-                            ),
-                          ],
-                        ),
-                      ),
+                    comorbidityCard(
+                      label: "Allergy",
+                      count: comorbidityData["Allergy"] ?? 0,
                     ),
                     SizedBox(width: 16,),
-                    Expanded(
-                      child: Container(
-                        height: 100,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              comorbidityData['Benign prostatic hyperplasia'].toString(),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 4,),
-                            Text(
-                                "Prostatic Hyperplasia",
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 12)
-                            ),
-                          ],
-                        ),
-                      ),
+                    comorbidityCard(
+                      label: "Prostatic Hyperplasia",
+                      count: comorbidityData["Prostatic Hyperplasia"] ?? 0,
                     ),
                   ],
                 )
