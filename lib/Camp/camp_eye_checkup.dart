@@ -75,12 +75,12 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
       'date': formattedDate,
 
       // Store vision tests as JSON
-      'withoutGlasses': {
+      'withoutGlasses': jsonEncode({
         'leftVA': controllers['withoutGlasses.left.distanceVision']?.text ?? '',
         'rightVA': controllers['withoutGlasses.right.distanceVision']?.text ?? '',
-      },
+      }),
 
-      'withGlasses': {
+      'withGlasses': jsonEncode({
         'left': {
           'sphereSign': controllers['withGlasses.left.distanceVisionSphereSign']?.text ?? '',
           'sphere': controllers['withGlasses.left.distanceVisionSphere']?.text ?? '',
@@ -98,9 +98,9 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           'VA': controllers['withGlasses.right.distanceVisionVA']?.text ?? '',
         },
         'IPD': controllers['withGlasses.IPD']?.text ?? '',
-      },
+      }),
 
-      'withCorrection': {
+      'withCorrection': jsonEncode({
         'left': {
           'sphereSign': controllers['withCorrection.left.distanceVisionSphereSign']?.text ?? '',
           'sphere': controllers['withCorrection.left.distanceVisionSphere']?.text ?? '',
@@ -118,10 +118,10 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           'VA': controllers['withCorrection.right.distanceVisionVA']?.text ?? '',
         },
         'IPD': controllers['withCorrection.IPD']?.text ?? '',
-      },
+      }),
 
       // Near vision
-      'nearVision': {
+      'nearVision': jsonEncode({
         'left': {
           'sphereSign': controllers['withCorrection.left.nearVisionSphereSign']?.text ?? '',
           'sphere': controllers['withCorrection.left.nearVisionSphere']?.text ?? '',
@@ -132,7 +132,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
           'sphere': controllers['withCorrection.right.nearVisionSphere']?.text ?? '',
           'VA': controllers['withCorrection.right.nearVisionVA']?.text ?? '',
         },
-      },
+      }),
 
       'bifocal': controllers['bifocal']?.text ?? '',
       'color': controllers['color']?.text ?? '',

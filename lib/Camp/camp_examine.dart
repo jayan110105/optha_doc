@@ -418,17 +418,17 @@ class _CampExamineState extends State<CampExamine> {
     final formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
     final examinationData = {
-      "patientToken": '${widget.campCode}-${DateFormat('yyyyMMdd').format(DateTime.now())}-${_tokenController.text}' ?? '',
+      "patientToken": '${widget.campCode}-${DateFormat('yyyyMMdd').format(DateTime.now())}-${_tokenController.text}',
       "date": formattedDate,
 
-      "visionTest": {
+      "visionTest": jsonEncode({
         "visionRightDV": _patientData['vision_re_dv'] ?? '',
         "visionRightNV": _patientData['vision_re_nv'] ?? '',
         "visionLeftDV": _patientData['vision_le_dv'] ?? '',
         "visionLeftNV": _patientData['vision_le_nv'] ?? '',
-      },
+      }),
 
-      "complaints": {
+      "complaints": jsonEncode({
         "rightEye": {
           "Diminution of vision": _historyData["Diminution of vision-right"] ?? false,
           "Ocular Trauma": _historyData["Ocular Trauma-right"] ?? false,
@@ -454,9 +454,9 @@ class _CampExamineState extends State<CampExamine> {
         "lastGlassChange": _historyData["Last Glass change"]?.text ?? '',
         "previousSurgery": _historyData["Previous surgery/laser rx"] ?? false,
         "surgeryDetails": _historyData["Details of surgery/procedure"]?.text ?? '',
-      },
+      }),
 
-      "comorbidities": {
+      "comorbidities": jsonEncode({
         "Diabetes": _comorbidities["Diabetes mellitus"] ?? false,
         "Hypertension": _comorbidities["Hypertension"] ?? false,
         "Heart disease": _comorbidities["Heart disease"] ?? false,
@@ -464,9 +464,9 @@ class _CampExamineState extends State<CampExamine> {
         "Allergy to dust/meds": _comorbidities["Allergy to dust/meds"] ?? false,
         "Benign prostatic hyperplasia": _comorbidities["Benign prostatic hyperplasia on treatment"] ?? false,
         "On Antiplatelets": _comorbidities["Is the patient On Antiplatelets"] ?? false,
-      },
+      }),
 
-      "examFindings": {
+      "examFindings": jsonEncode({
         "visualAxis": {
           "right": _examData["visualAxis-right"] ?? '',
           "left": _examData["visualAxis-left"] ?? '',
@@ -495,17 +495,17 @@ class _CampExamineState extends State<CampExamine> {
           "right": _examData["lens-right"] ?? '',
           "left": _examData["lens-left"] ?? '',
         },
-      },
+      }),
 
-      "workup": {
+      "workup": jsonEncode({
         "SBP": _workupData["sbp"]?.text ?? '',
         "DBP": _workupData["dbp"]?.text ?? '',
         "GRBS": _workupData["grbs"]?.text ?? '',
         "re-ducts": _workupData["re-ducts"] ?? '',
         "le-ducts": _workupData["le-ducts"] ?? '',
-      },
+      }),
 
-      "dilatedFindings": {
+      "dilatedFindings": jsonEncode({
         "mydriasis": {
           "right": _dilatedData["mydriasis-right"] ?? false,
           "left": _dilatedData["mydriasis-left"] ?? false,
@@ -534,9 +534,9 @@ class _CampExamineState extends State<CampExamine> {
           "right": _dilatedData["Optic disc pallor/ atrophy-right"] ?? false,
           "left": _dilatedData["Optic disc pallor/ atrophy-left"] ?? false,
         }
-      },
+      }),
 
-      "diagnosis": {
+      "diagnosis": jsonEncode({
         "rightEye": {
           "Immature cataract": _diagnosisData["Immature cataract-right"] ?? false,
           "Near Mature cataract": _diagnosisData["Near Mature cataract-right"] ?? false,
@@ -572,9 +572,9 @@ class _CampExamineState extends State<CampExamine> {
           "Allergic conjunctivitis": _diagnosisData["Allergic conjunctivitis-left"] ?? false,
         },
         "notes": _diagnosisData["notes"]?.text ?? '',
-      },
+      }),
 
-      "preSurgeryPlan": {
+      "preSurgeryPlan": jsonEncode({
         "selectedForSurgery": _preSurgeryData["Select for surgery"] ?? false,
         "referral": _preSurgeryData["Ref to Higher center/Base hospital"] ?? false,
         "reviewNextCamp": _preSurgeryData["Review in next camp visit"] ?? false,
@@ -585,7 +585,7 @@ class _CampExamineState extends State<CampExamine> {
         "IOP": _preSurgeryData["IOP"] ?? false,
         "BSCAN": _preSurgeryData["BSCAN"] ?? false,
         "systemicEvaluation": _preSurgeryData["Systemic evaluation"] ?? false,
-      }
+      })
     };
 
     // Print data for testing before saving

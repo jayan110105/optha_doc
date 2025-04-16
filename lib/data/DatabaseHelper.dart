@@ -116,6 +116,11 @@ class DatabaseHelper {
     return await db.query('eye_checkups', orderBy: "date DESC");
   }
 
+  Future<void> clearEyeCheckups() async {
+    final db = await database;
+    await db.delete('eye_checkups');
+  }
+
   Future<int> insertExamination(Map<String, dynamic> examinationData) async {
     final db = await database;
     return await db.insert('examinations', examinationData, conflictAlgorithm: ConflictAlgorithm.replace);
@@ -124,5 +129,10 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getExaminations() async {
     final db = await database;
     return await db.query('examinations', orderBy: "date DESC");
+  }
+
+  Future<void> clearExamination() async {
+    final db = await database;
+    await db.delete('examinations');
   }
 }
