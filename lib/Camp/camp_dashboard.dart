@@ -3,8 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:opthadoc/Components/CardComponent.dart';
 import 'package:opthadoc/Components/CustomDropdown.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:opthadoc/data/DatabaseHelper.dart';
-import 'dart:convert';
+import 'package:opthadoc/utils/camp_data_service.dart';
 
 class CampDashboard extends StatefulWidget {
   final String campCode;
@@ -19,224 +18,29 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
 
   int _selectedSegment = 0;
 
-  int maleCount = 0;
-  int femaleCount = 0;
-  int otherCount = 0;
-  int get totalCount => maleCount + femaleCount + otherCount;
+  Map<String, int> genderCounts = {
+    'male': 0,
+    'female': 0,
+    'other': 0,
+  };
 
-  int age0_18 = 0;
-  int age19_40 = 0;
-  int age41_60 = 0;
-  int age60plus = 0;
-  int get totalAgeCount => age0_18 + age19_40 + age41_60 + age60plus;
+  int get totalCount => genderCounts.values.reduce((a, b) => a + b);
+
+  Map<String, int> ageGroupCounts = {
+    '0-18': 0,
+    '19-40': 0,
+    '41-60': 0,
+    '60+': 0,
+  };
+
+  int get totalAgeCount => ageGroupCounts.values.reduce((a, b) => a + b);
+
 
   Map<String, int> sphereRangeCounts = {};
 
-  Map<String, List<int>> symptomsData = {
-    'Blurred Vision': [58, 65],
-    'Pain': [15, 18],
-    'Redness': [20, 22],
-    'Watering': [25, 28],
-    'Flashes': [10, 12],
-    'Floaters': [12, 15],
-  };
+  Map<String, List<int>> symptomsData = {};
 
   Map<String, int> comorbidityData = {};
-
-  Future<Map<String, int>> fetchComorbidityCounts() async {
-    final exams = await DatabaseHelper.instance.getExaminations();
-
-    // Map raw DB keys to display labels
-    final labelMap = {
-      "Diabetes": "Diabetes",
-      "Hypertension": "Hypertension",
-      "Heart disease": "Heart Disease",
-      "Asthma": "Asthma",
-      "Allergy to dust/meds": "Allergy",
-      "Benign prostatic hyperplasia": "Prostatic Hyperplasia",
-    };
-
-    // Initialize counts with display labels
-    final counts = {
-      for (var label in labelMap.values) label: 0,
-    };
-
-    for (var entry in exams) {
-      final raw = entry['comorbidities'];
-
-      if (raw == null || raw.toString().trim().isEmpty) continue;
-
-      try {
-        final decoded = jsonDecode(raw);
-        decoded.forEach((key, value) {
-          if (labelMap.containsKey(key) && value == true) {
-            final displayLabel = labelMap[key]!;
-            counts[displayLabel] = counts[displayLabel]! + 1;
-          }
-        });
-      } catch (e) {
-        print("⚠️ Failed to decode comorbidities: $e");
-      }
-    }
-
-    print("Comorbidity counts (with labels): $counts");
-    return counts;
-  }
-
-  Future<Map<String, List<int>>> fetchSymptomsData() async {
-    final exams = await DatabaseHelper.instance.getExaminations();
-
-    final symptomKeys = {
-      'Blurred Vision': 'Diminution of vision',
-      'Pain': 'Pain',
-      'Watering': 'Watering/discharge',
-      'Flashes': 'Flashes',
-      'Floaters': 'Floaters',
-    };
-
-
-    final Map<String, int> rightCounts = {};
-    final Map<String, int> leftCounts = {};
-
-    for (var entry in exams) {
-      final complaintsRaw = entry['complaints'];
-      if (complaintsRaw == null || complaintsRaw.trim().isEmpty) continue;
-
-      try {
-        final complaints = jsonDecode(complaintsRaw);
-
-        final right = complaints['rightEye'] as Map<String, dynamic>;
-        final left = complaints['leftEye'] as Map<String, dynamic>;
-
-        for (var label in symptomKeys.keys) {
-
-          final jsonKey = symptomKeys[label]!;
-
-          // Count if true
-          if ((right[jsonKey] ?? 'no') == 'yes') {
-            rightCounts[label] = (rightCounts[label] ?? 0) + 1;
-          }
-          if ((left[jsonKey] ?? 'no') == 'yes') {
-            leftCounts[label] = (leftCounts[label] ?? 0) + 1;
-          }
-        }
-      } catch (e) {
-        print('Failed to decode complaints: $e');
-      }
-    }
-
-    // Convert to List<int> structure
-    final Map<String, List<int>> symptomsData = {};
-    for (var label in symptomKeys.keys) {
-      symptomsData[label] = [
-        rightCounts[label] ?? 0,
-        leftCounts[label] ?? 0,
-      ];
-    }
-
-    return symptomsData;
-  }
-
-  Future<void> _fetchRefractiveErrorDistribution() async {
-    final checkups = await DatabaseHelper.instance.getEyeCheckups();
-
-    final ranges = {
-      "-6.0 or worse": 0,
-      "-5.9 to -4.0": 0,
-      "-3.9 to -2.0": 0,
-      "-1.9 to -0.5": 0,
-      "-0.4 to +0.4": 0,
-      "+0.5 to +2.0": 0,
-      "+2.1 to +4.0": 0,
-      "+4.1 or more": 0,
-    };
-
-    for (var entry in checkups) {
-      final rawJson = entry['withCorrection'];
-
-      if (rawJson == null || rawJson.trim().isEmpty) continue;
-
-      try {
-        final parsed = jsonDecode(rawJson);
-
-        for (final eye in ['left', 'right']) {
-          final eyeData = parsed[eye];
-          if (eyeData == null) continue;
-
-          final sign = eyeData['sphereSign'] ?? '';
-          final value = eyeData['sphere'] ?? '';
-          if (value == '') continue;
-
-          double? sphere = double.tryParse(value.toString());
-          if (sphere == null) continue;
-
-          if (sign == '-') sphere = -sphere;
-
-          // Categorize
-          if (sphere <= -6.0) {
-            ranges["-6.0 or worse"] = ranges["-6.0 or worse"]! + 1;
-          } else if (sphere <= -4.0) {
-            ranges["-5.9 to -4.0"] = ranges["-5.9 to -4.0"]! + 1;
-          } else if (sphere <= -2.0) {
-            ranges["-3.9 to -2.0"] = ranges["-3.9 to -2.0"]! + 1;
-          } else if (sphere <= -0.5) {
-            ranges["-1.9 to -0.5"] = ranges["-1.9 to -0.5"]! + 1;
-          } else if (sphere <= 0.4) {
-            ranges["-0.4 to +0.4"] = ranges["-0.4 to +0.4"]! + 1;
-          } else if (sphere <= 2.0) {
-            ranges["+0.5 to +2.0"] = ranges["+0.5 to +2.0"]! + 1;
-          } else if (sphere <= 4.0) {
-            ranges["+2.1 to +4.0"] = ranges["+2.1 to +4.0"]! + 1;
-          } else {
-            ranges["+4.1 or more"] = ranges["+4.1 or more"]! + 1;
-          }
-        }
-      } catch (e) {
-        print('⚠️ Failed to decode withCorrection: $e');
-      }
-    }
-
-    setState(() {
-      sphereRangeCounts = ranges;
-    });
-  }
-
-  Future<void> _fetchData() async {
-    final registrations = await DatabaseHelper.instance.getRegistrations();
-
-    // Count genders
-    maleCount = registrations.where((e) => e['gender']?.toLowerCase() == 'male').length;
-    femaleCount = registrations.where((e) => e['gender']?.toLowerCase() == 'female').length;
-    otherCount = registrations.where((e) => e['gender']?.toLowerCase() == 'other').length;
-
-    setState(() {});
-  }
-
-  Future<void> _fetchAgeGroups() async {
-    final registrations = await DatabaseHelper.instance.getRegistrations();
-
-    age0_18 = 0;
-    age19_40 = 0;
-    age41_60 = 0;
-    age60plus = 0;
-
-    for (var reg in registrations) {
-      int? age = reg['age'];
-      if (age == null) continue;
-
-      if (age <= 18) {
-        age0_18++;
-      } else if (age <= 40) {
-        age19_40++;
-      } else if (age <= 60) {
-        age41_60++;
-      } else {
-        age60plus++;
-      }
-    }
-
-    setState(() {}); // Update UI after fetch
-  }
 
   Widget genderCard({
     required String label,
@@ -311,19 +115,37 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _fetchData();
-    _fetchAgeGroups();
-    _fetchRefractiveErrorDistribution();
-    fetchSymptomsData().then((data) {
+
+    CampDataService.fetchGenderCounts().then((data) {
+      setState(() {
+        genderCounts = data;
+      });
+    });
+
+    CampDataService.fetchAgeGroups().then((data) {
+      setState(() {
+        ageGroupCounts = data;
+      });
+    });
+
+    CampDataService.fetchSphereRangeCounts().then((data) {
+      setState(() {
+        sphereRangeCounts = data;
+      });
+    });
+
+    CampDataService.fetchSymptomsData().then((data) {
       setState(() {
         symptomsData = data;
       });
     });
-    fetchComorbidityCounts().then((data) {
+
+    CampDataService.fetchComorbidityCounts().then((data) {
       setState(() {
         comorbidityData = data;
       });
     });
+
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -550,11 +372,11 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    genderCard(label: "Male", count: maleCount, totalCount: totalCount),
+                    genderCard(label: "Male", count: genderCounts["male"] ?? 0, totalCount: totalCount),
                     const SizedBox(width: 16),
-                    genderCard(label: "Female", count: femaleCount, totalCount: totalCount),
+                    genderCard(label: "Female", count: genderCounts["female"] ?? 0, totalCount: totalCount),
                     const SizedBox(width: 16),
-                    genderCard(label: "Other", count: otherCount, totalCount: totalCount),
+                    genderCard(label: "Other", count: genderCounts["other"] ?? 0, totalCount: totalCount),
                   ],
                 ),
               ],
@@ -575,10 +397,10 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                   SizedBox(height: 4),
                   Text('Breakdown of patients by age groups', style: const TextStyle(color: Colors.black45, fontSize: 14),),
                   SizedBox(height: 8),
-                  buildBar('0-18', age0_18, totalAgeCount, Colors.blue),
-                  buildBar('19-40', age19_40, totalAgeCount, Colors.green),
-                  buildBar('41-60', age41_60, totalAgeCount, Colors.purple),
-                  buildBar('60+', age60plus, totalAgeCount, Colors.amber),
+                  buildBar('0-18', ageGroupCounts['0-18'] ?? 0, totalAgeCount, Colors.blue),
+                  buildBar('19-40', ageGroupCounts['19-40'] ?? 0, totalAgeCount, Colors.green),
+                  buildBar('41-60', ageGroupCounts['41-60'] ?? 0, totalAgeCount, Colors.purple),
+                  buildBar('60+', ageGroupCounts['60+'] ?? 0, totalAgeCount, Colors.amber),
                 ],
               )
           ),
