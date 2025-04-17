@@ -35,12 +35,19 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
 
   int get totalAgeCount => ageGroupCounts.values.reduce((a, b) => a + b);
 
-
   Map<String, int> sphereRangeCounts = {};
 
   Map<String, List<int>> symptomsData = {};
 
   Map<String, int> comorbidityData = {};
+
+  Map<String, int> vaImprovementData = {};
+
+  Map<String, int> diagnosisData = {};
+
+  int get totalVAImprovements => vaImprovementData.values.fold(0, (sum, value) => sum + value);
+
+  Map<String, Map<String, int>> anatomicalFindings = {};
 
   Widget genderCard({
     required String label,
@@ -84,7 +91,7 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
   }) {
     return Expanded(
       child: Container(
-        height: 100,
+        height: 112,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
@@ -97,13 +104,14 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: Color(0xFF163351),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12),
+              style: TextStyle(fontSize: 12, color: Color(0xFF163351).withValues(alpha: 0.7),),
             ),
           ],
         ),
@@ -143,6 +151,24 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
     CampDataService.fetchComorbidityCounts().then((data) {
       setState(() {
         comorbidityData = data;
+      });
+    });
+
+    CampDataService.fetchVAImprovementData().then((data) {
+      setState(() {
+        vaImprovementData = data;
+      });
+    });
+
+    CampDataService.fetchAnatomicalFindings().then((data) {
+      setState(() {
+        anatomicalFindings = data;
+      });
+    });
+
+    CampDataService.fetchDiagnosisCounts().then((data) {
+      setState(() {
+        diagnosisData = data;
       });
     });
 
@@ -254,7 +280,30 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
     );
   }
 
-  Widget buildBar(String label, int count, int totalCount, Color color) {
+  Widget buildCategorySection(String title, Map<String, int> data) {
+    final total = data.values.fold(0, (a, b) => a + b);
+    final colorMap = [Colors.blue, Colors.green, Colors.purple, Colors.amber, Colors.pink, Colors.teal, Colors.indigo];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+        Divider(),
+        const SizedBox(height: 8),
+        for (var i = 0; i < data.length; i++)
+          buildBar(
+            data.keys.elementAt(i),
+            data.values.elementAt(i),
+            total == 0 ? 1 : total,
+            colorMap[i % colorMap.length],
+          ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+
+  Widget buildBar(String label, int count, int totalCount, Color color, {bool showIcon = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Column(
@@ -263,7 +312,15 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: const TextStyle(fontSize: 14)),
+              Row(
+                children: [
+                  if (showIcon) ...[
+                    Icon(Icons.circle, color: color, size: 14),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(label, style: const TextStyle(fontSize: 14)),
+                ],
+              ),
               Text(count.toString(),
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             ],
@@ -276,38 +333,6 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
             minHeight: 8,
             borderRadius: BorderRadius.circular(4),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildCaseRow(dynamic icon, String label, int count) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              icon is String
-                  ? SvgPicture.asset(
-                icon,
-                colorFilter: ColorFilter.mode(
-                  const Color(0xFF163351).withValues(alpha: .4),
-                  BlendMode.srcIn,
-                ),
-                height: 26.0,
-                width: 26.0,
-              )
-                  : Icon(
-                icon,
-                color: const Color(0xFF163351).withValues(alpha: .4),
-              ),
-              SizedBox(width: 8),
-              Text(label, style: TextStyle(fontSize: 14)),
-            ],
-          ),
-          Text(count.toString(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -417,7 +442,7 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                     Icon(Icons.visibility, color: Color(0xFF163351)),
                     SizedBox(width: 8),
                     Text(
-                      'Refractive Error Range (Sphere)',
+                      'Refractive Error Range',
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -504,6 +529,41 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
               ],
             ),
           ),
+          if (anatomicalFindings.values.any((section) => section.isNotEmpty))
+            SizedBox(height: 16),
+          if (anatomicalFindings.values.any((section) => section.isNotEmpty))
+            CardComponent(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.visibility, color: Color(0xFF163351)),
+                      SizedBox(width: 8),
+                      Text(
+                        'Anatomical Findings',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Detailed breakdown of anatomical findings by category',
+                    style: const TextStyle(color: Colors.black45, fontSize: 14),
+                  ),
+                  SizedBox(height: 16),
+                  ...anatomicalFindings.entries
+                      .where((entry) => entry.value.isNotEmpty)
+                      .map((entry) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: buildCategorySection(entry.key, entry.value),
+                  )),
+                ],
+              ),
+            )
+          else
+            SizedBox.shrink(),
           SizedBox(height: 16),
           CardComponent(
             child: Column(
@@ -571,22 +631,188 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                       count: comorbidityData["Prostatic Hyperplasia"] ?? 0,
                     ),
                   ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    comorbidityCard(
+                      label: "On Antiplatelets",
+                      count: comorbidityData["On Antiplatelets"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    Expanded(child: SizedBox()),
+                    SizedBox(width: 16,),
+                    Expanded(child: SizedBox())
+                  ],
                 )
               ],
             ),
           ),
         ]
       ),
-      CardComponent(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Special Cases', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 8),
-              buildCaseRow(Icons.visibility, 'Non-Vision Cases', 18),
-              buildCaseRow("assets/icons/eyeglasses.svg", 'Bifocal Prescriptions', 43),
-            ],
-          )
+      Column(
+        children: [
+          CardComponent(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.arrow_outward, color: Color(0xFF163351)),
+                      SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          'VA Improvement Pre/Post Correction',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4),
+                  Text('Visual acuity improvement after correction', style: const TextStyle(color: Colors.black45, fontSize: 14),),
+                  SizedBox(height: 8),
+                  buildBar('Significant (3+ lines)', vaImprovementData['Significant'] ?? 0, totalVAImprovements, Colors.green, showIcon: true),
+                  buildBar('Moderate (1–2 lines)', vaImprovementData['Moderate'] ?? 0, totalVAImprovements, Colors.blue, showIcon: true),
+                  buildBar('Minimal (<1 line)', vaImprovementData['Minimal'] ?? 0, totalVAImprovements, Colors.amber, showIcon: true),
+                  buildBar('No improvement', vaImprovementData['No improvement'] ?? 0, totalVAImprovements, Colors.red, showIcon: true),
+                ],
+              )
+          ),
+          SizedBox(height: 16),
+          CardComponent(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/icons/stethoscope.svg",
+                      colorFilter: ColorFilter.mode(
+                        const Color(0xFF163351),
+                        BlendMode.srcIn,
+                      ),
+                      height: 26.0,
+                      width: 26.0,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'All Diagnoses',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Diagnoses among patients',
+                  style: const TextStyle(color: Colors.black45, fontSize: 14),
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    comorbidityCard(
+                      label: "Immature Cataract",
+                      count: diagnosisData["Immature Cataract"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Near Mature Cataract",
+                      count: diagnosisData["Near Mature Cataract"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Mature Cataract",
+                      count: diagnosisData["Mature Cataract"] ?? 0,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    comorbidityCard(
+                      label: "Hypermature Cataract",
+                      count: diagnosisData["Hypermature Cataract"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "PCIOL",
+                      count: diagnosisData["Pciol"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Aphakia",
+                      count: diagnosisData["Aphakia"] ?? 0,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    comorbidityCard(
+                      label: "Pterygium",
+                      count: diagnosisData["Pterygium"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Dacryocystitis",
+                      count: diagnosisData["Dacryocystitis"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Amblyopia",
+                      count: diagnosisData["Amblyopia"] ?? 0,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    comorbidityCard(
+                      label: "Glaucoma",
+                      count: diagnosisData["Glaucoma"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Diabetic Retinopathy",
+                      count: diagnosisData["Diabetic Retinopathy"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Stye",
+                      count: diagnosisData["Stye"] ?? 0,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    comorbidityCard(
+                      label: "Conjunctivitis",
+                      count: diagnosisData["Conjunctivitis"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Dry Eye",
+                      count: diagnosisData["Dry Eye"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Allergic Conjunctivitis",
+                      count: diagnosisData["Allergic Conjunctivitis"] ?? 0,
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ],
       )
     ];
 
