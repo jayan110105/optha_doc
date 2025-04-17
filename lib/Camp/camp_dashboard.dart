@@ -18,6 +18,11 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
 
   int _selectedSegment = 0;
 
+  Map<String, int> stats = {
+    'Registrations': 0,
+    'Checkups': 0,
+  };
+
   Map<String, int> genderCounts = {
     'male': 0,
     'female': 0,
@@ -48,6 +53,20 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
   int get totalVAImprovements => vaImprovementData.values.fold(0, (sum, value) => sum + value);
 
   Map<String, Map<String, int>> anatomicalFindings = {};
+
+  String timeframe = "Today";
+
+  void _loadAllData() {
+    CampDataService.fetchStats(timeframe).then((d) => setState(() => stats = d));
+    CampDataService.fetchGenderCounts(timeframe).then((d) => setState(() => genderCounts = d));
+    CampDataService.fetchAgeGroups(timeframe).then((d) => setState(() => ageGroupCounts = d));
+    CampDataService.fetchSphereRangeCounts(timeframe).then((d) => setState(() => sphereRangeCounts = d));
+    CampDataService.fetchSymptomsData(timeframe).then((d) => setState(() => symptomsData = d));
+    CampDataService.fetchComorbidityCounts(timeframe).then((d) => setState(() => comorbidityData = d));
+    CampDataService.fetchVAImprovementData(timeframe).then((d) => setState(() => vaImprovementData = d));
+    CampDataService.fetchAnatomicalFindings(timeframe).then((d) => setState(() => anatomicalFindings = d));
+    CampDataService.fetchDiagnosisCounts(timeframe).then((d) => setState(() => diagnosisData = d));
+  }
 
   Widget genderCard({
     required String label,
@@ -123,55 +142,7 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-
-    CampDataService.fetchGenderCounts().then((data) {
-      setState(() {
-        genderCounts = data;
-      });
-    });
-
-    CampDataService.fetchAgeGroups().then((data) {
-      setState(() {
-        ageGroupCounts = data;
-      });
-    });
-
-    CampDataService.fetchSphereRangeCounts().then((data) {
-      setState(() {
-        sphereRangeCounts = data;
-      });
-    });
-
-    CampDataService.fetchSymptomsData().then((data) {
-      setState(() {
-        symptomsData = data;
-      });
-    });
-
-    CampDataService.fetchComorbidityCounts().then((data) {
-      setState(() {
-        comorbidityData = data;
-      });
-    });
-
-    CampDataService.fetchVAImprovementData().then((data) {
-      setState(() {
-        vaImprovementData = data;
-      });
-    });
-
-    CampDataService.fetchAnatomicalFindings().then((data) {
-      setState(() {
-        anatomicalFindings = data;
-      });
-    });
-
-    CampDataService.fetchDiagnosisCounts().then((data) {
-      setState(() {
-        diagnosisData = data;
-      });
-    });
-
+    _loadAllData();
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -235,7 +206,7 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Today's Stats",
+              "$timeframe's Stats",
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -246,8 +217,9 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildStat("Registrations", "12"),
-                _buildStat("Checkups", "8"),
+                _buildStat("Registrations", "${stats['Registrations']}"),
+                const SizedBox(width: 16.0),
+                _buildStat("Checkups", "${stats['Checkups']}"),
               ],
             ),
           ],
@@ -257,26 +229,28 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
   }
 
   Widget _buildStat(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white60, // text-white/60
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.white60, // text-white/60
+            ),
           ),
-        ),
-        const SizedBox(height: 4.0),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+          const SizedBox(height: 4.0),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -842,17 +816,19 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                   SizedBox(width: 16.0),
                   Expanded(
                     child: CustomDropdown(
-                      hintText: "Select VA",
+                      hintText: "Select Time Frame",
                       textStyle: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF163351),
                           fontWeight: FontWeight.w500
                       ),
-                      keyName: 'withoutGlasses-distanceVision',
+                      keyName: 'timeframe',
                       verticalPadding: 0,
                       items: ["Today", "This Week", "This Month", "All Time"],
-                      selectedValue: "Today",
+                      selectedValue: timeframe,
                       onChanged: (value) {
+                        setState(() => timeframe = value!);
+                        _loadAllData();
                       },
                     ),
                   ),

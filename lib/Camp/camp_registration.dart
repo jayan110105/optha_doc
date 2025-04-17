@@ -72,10 +72,13 @@ class _CampRegistrationState extends State<CampRegistration> {
   void saveRegistration() async {
 
     final dbHelper = DatabaseHelper.instance;
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
 
     // Prepare the data
     final registrationData = {
       'token': controllers['token']?.text ?? '',
+      'date': formattedDate,
       'name': controllers['name']?.text ?? '',
       'age': int.tryParse(controllers['age']?.text ?? '0') ?? 0,
       'gender': controllers['gender']?.text ?? '',

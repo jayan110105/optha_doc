@@ -30,6 +30,7 @@ class DatabaseHelper {
            CREATE TABLE registrations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             token TEXT UNIQUE,
+            date DATETIME,
             name TEXT,
             age INTEGER,
             gender TEXT,
@@ -44,7 +45,7 @@ class DatabaseHelper {
           CREATE TABLE eye_checkups (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             patientToken TEXT UNIQUE,
-            date TEXT,
+            date DATETIME,
 
             -- Vision tests stored as JSON
             withoutGlasses TEXT,
@@ -64,7 +65,7 @@ class DatabaseHelper {
           CREATE TABLE examinations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             patientToken TEXT UNIQUE,
-            date TEXT,
+            date DATETIME,
 
             -- Vision Test stored as JSON
             visionTest TEXT,
@@ -104,6 +105,11 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getRegistrations() async {
     final db = await database;
     return await db.query('registrations');
+  }
+
+  Future<void> clearRegistrations() async {
+    final db = await database;
+    await db.delete('registrations');
   }
 
   Future<int> insertEyeCheckup(Map<String, dynamic> checkupData) async {
