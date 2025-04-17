@@ -73,16 +73,16 @@ class _CampExamineState extends State<CampExamine> {
         "Pain/redness",
         "Watering/discharge",
       ])
-        "$label-$eye": null, // For radio or dropdown selections
+        "$label-$eye": "no", // For radio or dropdown selections
 
     for (var eye in ['right', 'left'])
       "Nature of Trauma-$eye": TextEditingController(),
 
     // **Only one instance of these fields (not per eye)**
-    "History of glasses": null,
-    "Are PG comfortable ?": null,
+    "History of glasses": "no",
+    "Are PG comfortable ?": "no",
     "Last Glass change": TextEditingController(), // Text input
-    "Previous surgery/laser rx": null,
+    "Previous surgery/laser rx": "no",
     "Details of surgery/procedure": TextEditingController(), // Text input
   };
 
@@ -98,45 +98,46 @@ class _CampExamineState extends State<CampExamine> {
   };
 
   final Map<String, String> _examData = {
-    "visualAxis-right": "",
-    "visualAxis-left": "",
-    "eom-right": "",
-    "eom-left": "",
-    "conjunctiva-right": "",
-    "conjunctiva-left": "",
-    "cornea-right": "",
-    "cornea-left": "",
-    "ac-right": "",
-    "ac-left": "",
-    "pupilReactions-right": "",
-    "pupilReactions-left": "",
-    "lens-right": "",
-    "lens-left": "",
+    "visualAxis-right": "Parallel",
+    "visualAxis-left":  "Parallel",
+    "eom-right":        "Normal",
+    "eom-left":         "Normal",
+    "conjunctiva-right":"Normal",
+    "conjunctiva-left": "Normal",
+    "cornea-right":     "Clear",
+    "cornea-left":      "Clear",
+    "ac-right":         "Normal",
+    "ac-left":          "Normal",
+    "pupilReactions-right":"Normal",
+    "pupilReactions-left": "Normal",
+    "lens-right":       "Clear",
+    "lens-left":        "Clear",
   };
 
   final Map<String, dynamic> _workupData = {
-    "re-ducts": "",
-    "le-ducts": "",
+    "re-ducts": "Free",
+    "le-ducts": "Free",
     "sbp": TextEditingController(),
     "dbp": TextEditingController(),
     "grbs": TextEditingController(),
   };
 
   final Map<String, dynamic> _dilatedData = {
-    "mydriasis-right": null,
-    "mydriasis-left": null,
-    "fundus-right": "",
-    "fundus-left": "",
-    "Cataract-right": null,
-    "Cataract-left": null,
-    "Glaucoma-right": null,
-    "Glaucoma-left": null,
-    "Diabetic retinopathy-right": null,
-    "Diabetic retinopathy-left": null,
-    "ARMD-right": null,
-    "ARMD-left": null,
-    "Optic disc pallor/ atrophy-right": null,
-    "Optic disc pallor/ atrophy-left": null,
+    "mydriasis-right": "1 mm",
+    "mydriasis-left":  "1 mm",
+    "fundus-right":     "Grossly normal",
+    "fundus-left":      "Grossly normal",
+
+    "Cataract-right":           "no",
+    "Cataract-left":            "no",
+    "Glaucoma-right":           "no",
+    "Glaucoma-left":            "no",
+    "Diabetic retinopathy-right":"no",
+    "Diabetic retinopathy-left": "no",
+    "ARMD-right":               "no",
+    "ARMD-left":                "no",
+    "Optic disc pallor/ atrophy-right":"no",
+    "Optic disc pallor/ atrophy-left": "no",
   };
 
   final Map<String, dynamic> _diagnosisData = {
@@ -607,19 +608,51 @@ class _CampExamineState extends State<CampExamine> {
         if (value is TextEditingController) {
           value.clear();
         } else {
-          _historyData[key] = null;
+          _historyData[key] = "no";
         }
       });
       _comorbidities.updateAll((key, value) => false);
-      _examData.updateAll((key, value) => "");
+
+      _examData
+        ..["visualAxis-right"]    = "Parallel"
+        ..["visualAxis-left"]     = "Parallel"
+        ..["eom-right"]           = "Normal"
+        ..["eom-left"]            = "Normal"
+        ..["conjunctiva-right"]   = "Normal"
+        ..["conjunctiva-left"]    = "Normal"
+        ..["cornea-right"]        = "Clear"
+        ..["cornea-left"]         = "Clear"
+        ..["ac-right"]            = "Normal"
+        ..["ac-left"]             = "Normal"
+        ..["pupilReactions-right"]= "Normal"
+        ..["pupilReactions-left"] = "Normal"
+        ..["lens-right"]          = "Clear"
+        ..["lens-left"]           = "Clear";
+
+      _workupData
+        ..["re-ducts"] = "Free"
+        ..["le-ducts"] = "Free";
+
       _workupData.forEach((key, value) {
-        if (value is TextEditingController) {
-          value.clear();
-        } else {
-          _workupData[key] = "";
-        }
+        if (value is TextEditingController) value.clear();
       });
-      _dilatedData.updateAll((key, value) => null);
+
+      _dilatedData["mydriasis-right"] = "1 mm";
+      _dilatedData["mydriasis-left"]  = "1 mm";
+      _dilatedData["fundus-right"]    = "Grossly normal";
+      _dilatedData["fundus-left"]     = "Grossly normal";
+
+      for (var key in [
+        "Cataract",
+        "Glaucoma",
+        "Diabetic retinopathy",
+        "ARMD",
+        "Optic disc pallor/ atrophy",
+      ]) {
+        _dilatedData["$key-right"] = "no";
+        _dilatedData["$key-left"]  = "no";
+      }
+
       _diagnosisData.updateAll((key, value) => false);
       _preSurgeryData.updateAll((key, value) => null);
 
