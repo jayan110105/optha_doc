@@ -158,6 +158,8 @@ class _CampExamineState extends State<CampExamine> {
         "Conjunctivitis",
         "Dry eye",
         "Allergic conjunctivitis",
+        "Refractive error",
+        "Normal"
       ])
         "$label-$eye": false,
 
@@ -554,6 +556,8 @@ class _CampExamineState extends State<CampExamine> {
           "Conjunctivitis": _diagnosisData["Conjunctivitis-right"] ?? false,
           "Dry eye": _diagnosisData["Dry eye-right"] ?? false,
           "Allergic conjunctivitis": _diagnosisData["Allergic conjunctivitis-right"] ?? false,
+          "Refractive error": _diagnosisData["Refractive error-right"] ?? false,
+          "Normal": _diagnosisData["Normal-right"] ?? false,
         },
         "leftEye": {
           "Immature cataract": _diagnosisData["Immature cataract-left"] ?? false,
@@ -571,6 +575,8 @@ class _CampExamineState extends State<CampExamine> {
           "Conjunctivitis": _diagnosisData["Conjunctivitis-left"] ?? false,
           "Dry eye": _diagnosisData["Dry eye-left"] ?? false,
           "Allergic conjunctivitis": _diagnosisData["Allergic conjunctivitis-left"] ?? false,
+          "Refractive error": _diagnosisData["Refractive error-left"] ?? false,
+          "Normal": _diagnosisData["Normal-left"] ?? false,
         },
         "notes": _diagnosisData["notes"]?.text ?? '',
       }),

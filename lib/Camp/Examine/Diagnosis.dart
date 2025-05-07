@@ -30,6 +30,8 @@ class Diagnosis extends StatelessWidget {
       "Conjunctivitis",
       "Dry eye",
       "Allergic conjunctivitis",
+      "Refractive error",
+      "Normal"
     ];
 
     return Column(

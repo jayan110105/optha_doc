@@ -58,7 +58,8 @@ Future<void> generateExamine(
     'Immature cataract', 'Near Mature cataract', 'Mature Cataract',
     'Hypermature Cataract', 'PCIOL', 'Aphakia', 'Pterygium',
     'Dacryocystitis', 'Amblyopia', 'Glaucoma', 'Diabetic retinopathy',
-    'Stye', 'Conjunctivitis', 'Dry eye', 'Allergic conjunctivitis'
+    'Stye', 'Conjunctivitis', 'Dry eye', 'Allergic conjunctivitis',
+    'Refractive error', 'Normal'
   ];
 
 // Create lists to store diagnoses per eye

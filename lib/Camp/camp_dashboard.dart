@@ -466,20 +466,20 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                   children: const [
                     Row(
                       children: [
-                        Icon(Icons.circle, color: Colors.blue, size: 10),
+                        Icon(Icons.circle, color: Colors.green, size: 10),
                         SizedBox(width: 4),
                         Text(
-                            "Left Eye",
+                            "Right Eye",
                             style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        Icon(Icons.circle, color: Colors.green, size: 10),
+                        Icon(Icons.circle, color: Colors.blue, size: 10),
                         SizedBox(width: 4),
                         Text(
-                            "Right Eye",
+                            "Left Eye",
                             style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ],
@@ -782,7 +782,24 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
                       count: diagnosisData["Allergic Conjunctivitis"] ?? 0,
                     ),
                   ],
-                )
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    comorbidityCard(
+                      label: "Refractive Error",
+                      count: diagnosisData["Refractive Error"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    comorbidityCard(
+                      label: "Normal",
+                      count: diagnosisData["Normal"] ?? 0,
+                    ),
+                    SizedBox(width: 16,),
+                    Expanded(child: SizedBox()),
+                  ],
+                ) 
               ],
             ),
           ),
