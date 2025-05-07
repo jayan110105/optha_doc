@@ -50,7 +50,11 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
 
   Map<String, int> diagnosisData = {};
 
+  Map<String, int> surgicalPathData = {};
+
   int get totalVAImprovements => vaImprovementData.values.fold(0, (sum, value) => sum + value);
+
+  int get totalSurgicalPath => surgicalPathData.values.fold(0, (sum, value) => sum + value);
 
   Map<String, Map<String, int>> anatomicalFindings = {};
 
@@ -66,6 +70,7 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
     CampDataService.fetchVAImprovementData(timeframe).then((d) => setState(() => vaImprovementData = d));
     CampDataService.fetchAnatomicalFindings(timeframe).then((d) => setState(() => anatomicalFindings = d));
     CampDataService.fetchDiagnosisCounts(timeframe).then((d) => setState(() => diagnosisData = d));
+    CampDataService.fetchSurgicalPathCounts(timeframe).then((d) => setState(() => surgicalPathData = d));
   }
 
   Widget genderCard({
@@ -334,6 +339,39 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSurgicalPathSection() {
+    return CardComponent(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          Row(
+            children: [
+              Icon(Icons.assignment_outlined, color: Color(0xFF163351)),
+              SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  'Surgical Path',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  softWrap: true,
+                  overflow: TextOverflow.visible,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 4),
+          Text('Patient progression through surgical pathway', style: const TextStyle(color: Colors.black45, fontSize: 14),),
+          SizedBox(height: 8),
+          buildBar('Selected for Surgery', surgicalPathData["Selected for Surgery"] ?? 0, totalSurgicalPath, Colors.blue),
+          buildBar('Referred', surgicalPathData["Referred"] ?? 0, totalSurgicalPath, Colors.green),
+          buildBar('Review Next Camp', surgicalPathData["Review Next Camp"] ?? 0, totalSurgicalPath, Colors.amber),
+          buildBar('Medical Fitness', surgicalPathData["Medical Fitness"] ?? 0, totalSurgicalPath, Colors.pink),
+          buildBar('Observation', surgicalPathData["Observation"] ?? 0, totalSurgicalPath, Colors.teal),
+          buildBar('Glass Prescription', surgicalPathData["Glass Prescription"] ?? 0, totalSurgicalPath, Colors.indigo),
+        ],
+      )
     );
   }
 
@@ -656,6 +694,8 @@ class _CampDashboardState extends State<CampDashboard> with SingleTickerProvider
               )
           ),
           SizedBox(height: 16),
+          _buildSurgicalPathSection(),
+          const SizedBox(height:16),
           CardComponent(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

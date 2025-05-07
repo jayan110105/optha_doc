@@ -260,4 +260,31 @@ class CampDataService {
     }
     return counts;
   }
+
+  /// Fetches surgical path counts from examinations.
+  static Future<Map<String, int>> fetchSurgicalPathCounts(String range) async {
+    final exams = await _filteredQuery('examinations', range);
+    final counts = {
+      'Selected for Surgery': 0,
+      'Referred': 0,
+      'Review Next Camp': 0,
+      'Medical Fitness': 0,
+      'Observation': 0,
+      'Glass Prescription': 0,
+    };
+    
+    for (var e in exams) {
+      final raw = e['preSurgeryPlan'] as String?;
+      if (raw == null || raw.isEmpty) continue;
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      
+      if (decoded['selectedForSurgery'] == true) counts['Selected for Surgery'] = counts['Selected for Surgery']! + 1;
+      if (decoded['referral'] == true) counts['Referred'] = counts['Referred']! + 1;
+      if (decoded['reviewNextCamp'] == true) counts['Review Next Camp'] = counts['Review Next Camp']! + 1;
+      if (decoded['medicalFitness'] == true) counts['Medical Fitness'] = counts['Medical Fitness']! + 1;
+      if (decoded['observation'] == true) counts['Observation'] = counts['Observation']! + 1;
+      if (decoded['glassPrescription'] == true) counts['Glass Prescription'] = counts['Glass Prescription']! + 1;
+    }
+    return counts;
+  }
 }
