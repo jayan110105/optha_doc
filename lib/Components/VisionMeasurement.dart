@@ -51,7 +51,7 @@ class _VisionMeasurementsState extends State<VisionMeasurements> {
           Padding(
             padding: EdgeInsets.only(bottom: 8.0),
             child: Text(
-              widget.prefix == 'With Glasses' ? "With Glasses" : "With BGC",
+              widget.prefix == 'withGlasses' ? "With Glasses" : "With BGC",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

@@ -634,6 +634,7 @@ class _CampEyeCheckupState extends State<CampEyeCheckup> {
                       ),
                       const SizedBox(height: 20),
                       CardComponent(
+                        backgroundColor: step == 3 ? Color(0xFFFBFAF0) : Colors.white ,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: stepWidgets[step],
